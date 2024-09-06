@@ -36,12 +36,12 @@ const userItem = [getItem('User', '6', <DesktopOutlined />)];
 // Table columns
 const columns = [
     {
-        title: 'App Name',
+        title: 'Name',
         dataIndex: 'app_name',
         key: 'app_name',
     },
     {
-        title: 'Username',
+        title: 'User_name',
         dataIndex: 'username',
         key: 'username',
     },
@@ -145,8 +145,8 @@ const App = () => {
             >
                 {selectedRow && (
                     <div>
-                        <p><strong>App Name:</strong> {selectedRow.app_name}</p>
-                        <p><strong>Username:</strong> {selectedRow.username}</p>
+                        <p><strong>Name:</strong> {selectedRow.app_name}</p>
+                        <p><strong>User_name:</strong> {selectedRow.username}</p>
                         <p><strong>Password:</strong> {selectedRow.password}</p>
                     </div>
                 )}
