@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Breadcrumb, Layout, Menu, theme, Table, Modal } from 'antd';
 import {
     DesktopOutlined,
     PieChartOutlined,
     UserOutlined,
 } from '@ant-design/icons';
-import { data } from './data';
+import axios from 'axios';
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -76,6 +76,30 @@ const App = () => {
         setSelectedRow(null);
     };
 
+    // State for fetched data
+    const [data, setData] = useState([]);
+
+    useEffect(() => {
+        dataFetching();
+    }, []);
+
+    // API call to fetch data
+    function dataFetching() {
+        axios.get('https://jsonplaceholder.typicode.com/posts')
+            .then(response => {
+                // Map the API response to fit table columns structure
+                const mappedData = response.data.map(item => ({
+                    app_name: item.title,        // Mapping title as app_name
+                    username: `User ${item.userId}`, // Mocked username
+                    password: '******',         // Mocked password
+                }));
+                setData(mappedData);
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    }
+
     return (
         <Layout style={{ minHeight: '100vh' }}>
             {/* Sidebar */}
@@ -120,7 +144,7 @@ const App = () => {
                         }}
                     >
                         <Table
-                            dataSource={data}
+                            dataSource={data}  // Use the fetched data here
                             columns={columns}
                             rowKey="app_name"
                             onRow={(record) => ({
