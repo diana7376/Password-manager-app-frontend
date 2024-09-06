@@ -27,15 +27,4 @@ const App = () => {
 export default App;
 
 
-const MyComponent = () => {
-  return(
-      <div>
-        {data.map((item) => (
-            <div key={item.app_name}>
-              <h3>Name: {item.username}</h3>
-              <p>Age: {item.password}</p>
-            </div>
-        ))}
-      </div>
-  );
-};
+
