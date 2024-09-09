@@ -38,45 +38,45 @@ const userItem = [getItem('User', '6', <DesktopOutlined />)];
 
 
 
-// function addData() {
-//     axios.post('https://jsonplaceholder.typicode.com/posts', newData)
-//         .then(response => {
-//             setData([...data, response.data]);
-//             setNewData({name:''});
-//         })
-//         .catch(error =>{
-//             console.log(error);
-//         })
-// }
-//
-// function updateData() {
-//     axios.put(`https://jsonplaceholder.typicode.com/posts${selectedData.id}`, selectedData)
-//         .then(response => {
-//             const newData = data.map(item => {
-//                 if (item.id === selectedData.id){
-//                     return response.data;
-//                 }
-//                 return item;
-//             });
-//             setData(newData);
-//             setSelectedData(null);
-//         })
-//         .catch(error =>{
-//             console.log(error);
-//         })
-//
-// }
-//
-// function deleteData(id) {
-//     axios.delete(`https://jsonplaceholder.typicode.com/posts${id}`)
-//         .then(() => {
-//             const newData = data.filter(item => item.id !== id);
-//             setData(newData);
-//         })
-//         .catch(error => {
-//             console.log(error);
-//         })
-// }
+function addData() {
+    axios.post('groups/password-items/', newData)
+        .then(response => {
+            setData([...data, response.data]);
+            setNewData({name:''});
+        })
+        .catch(error =>{
+            console.log(error);
+        })
+}
+
+function updateData() {
+    axios.put(`https://jsonplaceholder.typicode.com/posts${selectedData.id}`, selectedData)
+        .then(response => {
+            const newData = data.map(item => {
+                if (item.id === selectedData.id){
+                    return response.data;
+                }
+                return item;
+            });
+            setData(newData);
+            setSelectedData(null);
+        })
+        .catch(error =>{
+            console.log(error);
+        })
+
+}
+
+function deleteData(id) {
+    axios.delete(`https://jsonplaceholder.typicode.com/posts${id}`)
+        .then(() => {
+            const newData = data.filter(item => item.id !== id);
+            setData(newData);
+        })
+        .catch(error => {
+            console.log(error);
+        })
+}
 
 const App = () => {
     const [collapsed, setCollapsed] = useState(false);
