@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useEffect, useState } from 'react';
 import { Breadcrumb, Layout, Menu, theme, Table, Modal } from 'antd';
 import {
     DesktopOutlined,
@@ -83,6 +84,7 @@ const App = () => {
         token: { colorBgContainer, borderRadiusLG },
     } = theme.useToken();
 
+
     return (
         <Layout style={{ minHeight: '100vh' }}>
             <Sider
@@ -105,7 +107,7 @@ const App = () => {
                 <Header style={{ padding: 0, background: colorBgContainer }} />
 
                 <Content style={{ margin: '0 16px' }}>
-                    <Breadcrumb
+                      <Breadcrumb
                         style={{ margin: '16px 0' }}
                         items={[
                             { title: 'Group' },
@@ -114,6 +116,7 @@ const App = () => {
                     />
                     {/* MainPage component rendered here */}
                     <MainPage />
+
                 </Content>
 
                 <Footer style={{ textAlign: 'center' }}>LockR</Footer>
