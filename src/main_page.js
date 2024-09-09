@@ -6,13 +6,13 @@ const MainPage = () => {
     const columns = [
         {
             title: 'Name',
-            dataIndex: 'app_name',
-            key: 'app_name',
+            dataIndex: 'itemName',
+            key: 'itemName',
         },
         {
             title: 'User_name',
-            dataIndex: 'username',
-            key: 'username',
+            dataIndex: 'userName',
+            key: 'userName',
         },
         {
             title: 'Password',
@@ -30,12 +30,12 @@ const MainPage = () => {
     }, []);
 
     function dataFetching() {
-        axios.get('https://jsonplaceholder.typicode.com/posts')
+        axios.get('http://127.0.0.1:8000/api/password-items/')
             .then(response => {
                 const mappedData = response.data.map(item => ({
-                    app_name: item.title,
-                    username: `User ${item.userId}`,
-                    password: '******',
+                    itemName: item.itemName,
+                    userName: item.userName,
+                    password: item.password,
                 }));
                 setData(mappedData);
             })
