@@ -8,6 +8,7 @@ import {
 } from '@ant-design/icons';
 import axios from 'axios';
 import MainPage from './main_page';
+import SaveNewPassword from './save_new_password';
 const { Header, Content, Footer, Sider } = Layout;
 
 
@@ -29,7 +30,8 @@ const items = [
     getItem('Groups', 'sub1', <UserOutlined />, [
         getItem('Banking', '3'),
         getItem('Social media', '4'),
-        getItem('Home', '5'),
+        getItem('Gaming', '5'),
+        getItem('Unlisted', '5'),
     ]),
 ];
 
@@ -87,38 +89,29 @@ const App = () => {
 
     return (
         <Layout style={{ minHeight: '100vh' }}>
-            <Sider
-                collapsible
-                collapsed={collapsed}
-                onCollapse={(value) => setCollapsed(value)}
-                style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}
-            >
-                <div>
-                    <div className="demo-logo-vertical" />
-                    <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline" items={items} />
-                </div>
-
-                <div>
-                    <Menu theme="dark" mode="inline" items={userItem} />
-                </div>
+            <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
+                <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline" items={items} />
+                <Menu theme="dark" mode="inline" items={userItem} />
             </Sider>
 
             <Layout>
                 <Header style={{ padding: 0, background: colorBgContainer }} />
-
                 <Content style={{ margin: '0 16px' }}>
-                      <Breadcrumb
-                        style={{ margin: '16px 0' }}
-                        items={[
-                            { title: 'Group' },
-                            { title: 'Group-name' },
-                        ]}
-                    />
-                    {/* MainPage component rendered here */}
+                    <Breadcrumb style={{ margin: '16px 0' }} items={[{ title: 'Group' }, { title: 'Group-name' }]} />
+
+                    {/* MainPage component with table */}
                     <MainPage />
 
+                    {/* Plus Button at the bottom-right corner under the table */}
+                    <div style={{
+                        position: 'fixed',
+                        bottom: 24,
+                        right: 24,
+                        zIndex: 1000, // Ensure it's above other elements
+                    }}>
+                        <SaveNewPassword /> {/* Render your button component here */}
+                    </div>
                 </Content>
-
                 <Footer style={{ textAlign: 'center' }}>LockR</Footer>
             </Layout>
         </Layout>
