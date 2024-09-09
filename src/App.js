@@ -9,16 +9,6 @@ import axios from 'axios';
 
 const { Header, Content, Footer, Sider } = Layout;
 
-// Function to get menu items for the sidebar
-function getItem(label, key, icon, children) {
-    return {
-        key,
-        icon,
-        children,
-        label,
-    };
-}
-
 // Sidebar menu items
 const items = [
     getItem('About us', '1', <PieChartOutlined />),
@@ -52,6 +42,15 @@ const columns = [
     },
 ];
 
+// Function to get menu items for the sidebar
+function getItem(label, key, icon, children) {
+    return {
+        key,
+        icon,
+        children,
+        label,
+    };
+}
 const App = () => {
     // Sidebar state
     const [collapsed, setCollapsed] = useState(false);
@@ -78,6 +77,10 @@ const App = () => {
 
     // State for fetched data
     const [data, setData] = useState([]);
+
+    //TO DO:
+    // const [newData, setNewData] = useState({ name: '' });
+    // const [selectedData, setSelectedData] = useState(null);
 
     useEffect(() => {
         dataFetching();
