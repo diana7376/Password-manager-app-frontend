@@ -75,8 +75,8 @@ const MainPage = () => {
             >
                 {selectRow && (
                     <div>
-                        <p><strong>Name:</strong> {selectRow.app_name}</p>
-                        <p><strong>User_name:</strong> {selectRow.username}</p>
+                        <p><strong>Name:</strong> {selectRow.itemName}</p>
+                        <p><strong>User_name:</strong> {selectRow.userName}</p>
                         <p><strong>Password:</strong> {selectRow.password}</p>
                     </div>
                 )}
