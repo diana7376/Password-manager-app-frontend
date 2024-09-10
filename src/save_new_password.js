@@ -40,15 +40,12 @@ const SaveNewPassword = () => {
         {
             label: 'Gaming',
             key: '3',
-            icon: <UserOutlined />,
-            danger: true,
+            icon: <UserOutlined />
         },
         {
             label: 'Unlisted',
             key: '4',
-            icon: <UserOutlined />,
-            danger: true,
-            disabled: true,
+            icon: <UserOutlined />
         },
     ];
     const menuProps = {
