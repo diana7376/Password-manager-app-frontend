@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { Breadcrumb, Layout, Menu, theme, Table, Modal } from 'antd';
+import {Breadcrumb, Layout, Menu, theme} from 'antd';
 import {
     DesktopOutlined,
     PieChartOutlined,
@@ -10,6 +10,7 @@ import axios from 'axios';
 import MainPage from './main_page';
 import { useParams } from 'react-router-dom';
 import SaveNewPassword from './save_new_password';
+import {dataFetching} from "./crud_operation";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -42,11 +43,23 @@ const userItem = [getItem('User', '6', <DesktopOutlined />)];
 
 const App = () => {
     const [collapsed, setCollapsed] = useState(false);
+    const [passwordItems, setPasswordItems] = useState([]);
+    const groupId = 1;
     const {
         token: { colorBgContainer, borderRadiusLG },
     } = theme.useToken();
 
+    const fetchData = () => {
+        dataFetching(groupId, setPasswordItems);
+    };
 
+    useEffect(() => {
+        fetchData();
+    }, []);
+
+    const onPasswordAdd = () => {
+        fetchData();
+    };
     return (
         <Layout style={{ minHeight: '100vh' }}>
             <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
@@ -57,6 +70,7 @@ const App = () => {
             <Layout>
                 <Header style={{ padding: 0, background: colorBgContainer }} />
                 <Content style={{ margin: '0 16px' }}>
+                    {/* MainPage component rendered here */}
                   <Breadcrumb
                         style={{ margin: '16px 0' }}
                         items={[
@@ -65,7 +79,7 @@ const App = () => {
                         ]}
                     />
                     {/* MainPage component rendered here */}
-                    <MainPage groupId={1}/>
+                    <MainPage groupId={groupId} passwordItems={passwordItems}/>
 
 
                     {/* Plus Button at the bottom-right corner under the table */}
@@ -75,7 +89,7 @@ const App = () => {
                         right: 24,
                         zIndex: 1000, // Ensure it's above other elements
                     }}>
-                        <SaveNewPassword /> {/* Render your button component here */}
+                        <SaveNewPassword groupId={groupId} onPasswordAdd={onPasswordAdd} /> {/* Render your button component here */}
                     </div>
                 </Content>
                 <Footer style={{ textAlign: 'center' }}>LockR</Footer>

@@ -1,13 +1,14 @@
 import axios from 'axios';
 
 export function addPasswordItem(newItem, groupId) {
-    axios.post('http://127.0.0.1:8000/groups/${groupId}/password-items/', newItem)
+   return axios.post('http://127.0.0.1:8000/groups/${groupId}/password-items/', newItem)
         .then(response => {
-            setData([...data, response.data]);
+            return response.data;
         })
         .catch(error =>{
             console.log('Error in adding a new password',error);
-        })
+            throw error;
+        });
 }
 
 export function updatePasswordItem(updateItem, groupId) {
