@@ -8,7 +8,9 @@ import {
 } from '@ant-design/icons';
 import axios from 'axios';
 import MainPage from './main_page';
+import { useParams } from 'react-router-dom';
 import SaveNewPassword from './save_new_password';
+
 const { Header, Content, Footer, Sider } = Layout;
 
 
@@ -38,48 +40,6 @@ const items = [
 // User menu items for the bottom of the sidebar
 const userItem = [getItem('User', '6', <DesktopOutlined />)];
 
-
-
-function addData() {
-    axios.post('groups/password-items/', newData)
-        .then(response => {
-            setData([...data, response.data]);
-            setNewData({name:''});
-        })
-        .catch(error =>{
-            console.log(error);
-        })
-}
-
-function updateData() {
-    axios.put(`https://jsonplaceholder.typicode.com/posts${selectedData.id}`, selectedData)
-        .then(response => {
-            const newData = data.map(item => {
-                if (item.id === selectedData.id){
-                    return response.data;
-                }
-                return item;
-            });
-            setData(newData);
-            setSelectedData(null);
-        })
-        .catch(error =>{
-            console.log(error);
-        })
-
-}
-
-function deleteData(id) {
-    axios.delete(`https://jsonplaceholder.typicode.com/posts${id}`)
-        .then(() => {
-            const newData = data.filter(item => item.id !== id);
-            setData(newData);
-        })
-        .catch(error => {
-            console.log(error);
-        })
-}
-
 const App = () => {
     const [collapsed, setCollapsed] = useState(false);
     const {
@@ -97,10 +57,16 @@ const App = () => {
             <Layout>
                 <Header style={{ padding: 0, background: colorBgContainer }} />
                 <Content style={{ margin: '0 16px' }}>
-                    <Breadcrumb style={{ margin: '16px 0' }} items={[{ title: 'Group' }, { title: 'Group-name' }]} />
+                  <Breadcrumb
+                        style={{ margin: '16px 0' }}
+                        items={[
+                            { title: 'Group' },
+                            { title: 'Group-name' },
+                        ]}
+                    />
+                    {/* MainPage component rendered here */}
+                    <MainPage groupId={1}/>
 
-                    {/* MainPage component with table */}
-                    <MainPage />
 
                     {/* Plus Button at the bottom-right corner under the table */}
                     <div style={{

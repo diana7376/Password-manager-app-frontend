@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Modal } from 'antd';
 import axios from 'axios';
+import {dataFetching} from './crud_operation'
+import { useParams } from 'react-router-dom'
 
-const MainPage = () => {
+const MainPage = ({ groupId }) => {
     const columns = [
         {
             title: 'Name',
@@ -22,27 +24,15 @@ const MainPage = () => {
     ];
 
     const [data, setData] = useState([]);
-    const [selectRow, setSelectRow] = useState(null);  // Corrected to selectRow
+    const [selectRow, setSelectRow] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    useEffect(() => {
-        dataFetching();
-    }, []);
+        useEffect(() => {
+            if (groupId) {
+                dataFetching(groupId,setData);
+            }
 
-    function dataFetching() {
-        axios.get('http://127.0.0.1:8000/api/password-items/')
-            .then(response => {
-                const mappedData = response.data.map(item => ({
-                    itemName: item.itemName,
-                    userName: item.userName,
-                    password: item.password,
-                }));
-                setData(mappedData);
-            })
-            .catch(error => {
-                console.error(error);
-            });
-    }
+        }, [groupId]);
 
     const handleRowClick = (record) => {
         setSelectRow(record);
@@ -59,7 +49,7 @@ const MainPage = () => {
             <Table
                 dataSource={data}
                 columns={columns}
-                rowKey="app_name"
+                rowKey= {(record) => record.itemName}
                 onRow={(record) => ({
                     onClick: () => handleRowClick(record),
                 })}
