@@ -1,40 +1,76 @@
-import React, { useState } from 'react';
-import { SearchOutlined, PlusOutlined, UserOutlined, EyeInvisibleOutlined, EyeTwoTone, DownOutlined } from '@ant-design/icons'; // Import the Plus icon
-import { Button, Divider, Flex, Radio, Space, Tooltip, Modal, Input, Dropdown, message } from 'antd';
-import {addPasswordItem} from './crud_operation.js';
+import React, { useState, useEffect } from 'react';
+import { PlusOutlined, UserOutlined, EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
+import { Button, Tooltip, Modal, Input, Select, message } from 'antd';
+import { addPasswordItem, config } from './crud_operation';
+import axios from 'axios';
 
+const { Option } = Select;
 
-const SaveNewPassword = ({groupId,userId, comment, url ,onPasswordAdd}) => {
-    const [position, setPosition] = useState('end');
+const SaveNewPassword = ({ groupId, userId, comment, url, onPasswordAdd }) => {
     const [open, setOpen] = useState(false);
-
-
-    // States for the form fields
     const [fieldName, setFieldName] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [selectedGroup, setSelectedGroup] = useState(null);
+    const [groupOptions, setGroupOptions] = useState([]);
+    const [newGroupName, setNewGroupName] = useState('');
+
+    // Fetch existing groups
+    useEffect(() => {
+        axios.get('http://127.0.0.1:8000/api/groups/', config)
+            .then(response => {
+                setGroupOptions(response.data); // Update group options
+            })
+            .catch(error => {
+                console.error('Error fetching groups:', error);
+            });
+    }, []);
 
     const showModal = () => {
         setOpen(true);
     };
 
     const handleOk = () => {
+        let groupIdToUse = selectedGroup;
+
+        // If a new group name is provided, create the new group
+        if (newGroupName) {
+            axios.post('http://127.0.0.1:8000/api/groups/', { groupName: newGroupName }, config)
+                .then(response => {
+                    groupIdToUse = response.data.groupId; // Use newly created group
+                    savePassword(groupIdToUse);
+                })
+                .catch(error => {
+                    if (error.response) {
+                        console.error('Response error:', error.response.data);  // Log the error from the backend
+                    } else if (error.request) {
+                        console.error('No response received:', error.request);
+                    } else {
+                        console.error('Error setting up request:', error.message);
+                    }
+                    message.error('Failed to create new group');
+                });
+        } else {
+            // If no new group, use the selected group
+            savePassword(groupIdToUse);
+        }
+    };
+
+    // Moved savePassword outside of handleOk
+    const savePassword = (groupIdToUse) => {
         const newPasswordItem = {
             itemName: fieldName,
             userName: username,
             password: password,
-            groupId: groupId,
-            userId :userId,
+            groupId: groupIdToUse,  // Use selected or newly created group ID
+            userId: userId,
             comment: comment,
             url: url,
-
         };
 
-        console.log('Sending newPasswordItem:', newPasswordItem);  // Log the data
-        console.log('Group ID:', groupId);  // Log the groupId
+        console.log('Sending newPasswordItem:', newPasswordItem);
 
-        addPasswordItem(newPasswordItem, groupId)
+        addPasswordItem(newPasswordItem, groupIdToUse)
             .then(() => {
                 message.success('New password added successfully');
                 onPasswordAdd();
@@ -52,34 +88,10 @@ const SaveNewPassword = ({groupId,userId, comment, url ,onPasswordAdd}) => {
             });
     };
 
-
-
-
     const handleCancel = () => {
-      setOpen(false);
+        setOpen(false);
     };
-    const [passwordVisible, setPasswordVisible] = React.useState(false);
 
-    const handleButtonClick = (e) => {
-        message.info('Click on left button.');
-        console.log('click left button', e);
-    };
-    const handleMenuClick = (e) => {
-        setSelectedGroup(e.key);
-    };
-    const items = [
-        {
-            label: 'Unlisted',
-            key: '1',
-            icon: <UserOutlined />,
-        },
-
-
-    ];
-    const menuProps = {
-        items,
-        onClick: handleMenuClick,
-    };
     return (
         <>
             {/* Plus button to open modal */}
@@ -93,36 +105,61 @@ const SaveNewPassword = ({groupId,userId, comment, url ,onPasswordAdd}) => {
             </Tooltip>
 
             {/* Modal definition */}
-                <Modal
-                    title="Add New Password"
-                    centered
-                    open={open}
-                    onOk={handleOk}
-                    onCancel={handleCancel}
-                    width={1000} // You can adjust the width if needed
-                >
-                    <p>Enter the new password details here...</p>
-                    {/* Form for password details */}
+            <Modal
+                title="Add New Password"
+                centered
+                open={open}
+                onOk={handleOk}
+                onCancel={handleCancel}
+                width={600}  // You can adjust the width if needed
+            >
+                <p>Enter the new password details here...</p>
 
-                    <Input placeholder="Field name" value={fieldName} onChange={(e) => setFieldName(e.target.value)} style={{ marginBottom: '10px' }} />
-                    <Input placeholder="User-name" prefix={<UserOutlined />} value={username} onChange={(e) => setUsername(e.target.value)} style={{ marginBottom: '10px' }} />
-                    <Input.Password
-                        placeholder="Input password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
-                        style={{ marginBottom: '10px' }}
-                    />
-                    <Dropdown menu={menuProps}>
-                        <Button>
-                            <Space>
-                                Choose group
-                                <DownOutlined />
-                            </Space>
-                        </Button>
-                    </Dropdown>
-                </Modal>
+                {/* Form for password details */}
+                <Input
+                    placeholder="Field name"
+                    value={fieldName}
+                    onChange={(e) => setFieldName(e.target.value)}
+                    style={{ marginBottom: '10px' }}
+                />
+                <Input
+                    placeholder="User-name"
+                    prefix={<UserOutlined />}
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    style={{ marginBottom: '10px' }}
+                />
+                <Input.Password
+                    placeholder="Input password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
+                    style={{ marginBottom: '10px' }}
+                />
+
+                {/* Group Selection */}
+                <Select
+                    style={{ width: '100%', marginBottom: '10px' }}
+                    placeholder="Select an existing group"
+                    onChange={(value) => setSelectedGroup(value)}
+                >
+                    {groupOptions.map((group) => (
+                        <Option key={group.groupId} value={group.groupId}>
+                            {group.groupName}
+                        </Option>
+                    ))}
+                </Select>
+
+                {/* New Group Input */}
+                <Input
+                    placeholder="Or enter new group name"
+                    value={newGroupName}
+                    onChange={(e) => setNewGroupName(e.target.value)}
+                    style={{ marginBottom: '10px' }}
+                />
+            </Modal>
         </>
     );
 };
+
 export default SaveNewPassword;

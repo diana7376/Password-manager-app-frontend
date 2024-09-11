@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="32870176-a3ef-4b17-9697-625be79b400a" name="Changes" comment="fixed">
+    <list default="true" id="32870176-a3ef-4b17-9697-625be79b400a" name="Changes" comment="fixed saving new password using an authorisation token">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/crud_operation.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/crud_operation.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/save_new_password.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/save_new_password.js" afterDir="false" />
     </list>
@@ -45,7 +44,7 @@
   "keyToString": {
     "Node.js.main_page.js.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "PM-F9",
     "last_opened_file_path": "D:/Projects/frontend/Password-manager-app-frontend",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
@@ -108,6 +107,7 @@
     <MESSAGE value="start to connect sidebar w the back (not ready)" />
     <MESSAGE value="connect ui w crud + search bar + backend connected with search bar" />
     <MESSAGE value="fixed" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixed" />
+    <MESSAGE value="fixed saving new password using an authorisation token" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed saving new password using an authorisation token" />
   </component>
 </project>
