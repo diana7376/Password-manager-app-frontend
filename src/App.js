@@ -1,18 +1,32 @@
 
 import React, { useEffect, useState } from 'react';
-import { Breadcrumb, Layout, Menu, theme } from 'antd';
+import {Breadcrumb, Layout, Menu, theme, Input, Space} from 'antd';
 import {
     DesktopOutlined,
     PieChartOutlined,
     UserOutlined,
+    AudioOutlined,
 } from '@ant-design/icons';
+
 import axios from 'axios';
 import MainPage from './main_page';
 import SaveNewPassword from './save_new_password';
+import {dataFetching} from "./crud_operation";
+import { config } from './crud_operation';
 
 const { Header, Content, Footer, Sider } = Layout;
 
+const { Search } = Input;
+const suffix = (
+    <AudioOutlined
+        style={{
+            fontSize: 16,
+            color: '#1677ff',
+        }}
+    />
+);
 
+const onSearch = (value, _e, info) => console.log(info?.source, value);
 
 // Function to get menu items for the sidebar
 function getItem(label, key, icon, children) {
@@ -24,42 +38,48 @@ function getItem(label, key, icon, children) {
     };
 }
 
-
-
 const App = () => {
     const [collapsed, setCollapsed] = useState(false);
+    const [passwordItems, setPasswordItems] = useState([]);
     const [groupItems, setGroupItems] = useState([]);
     const [selectedGroupId, setSelectedGroupId] = useState(1);
+    const [userId, setUserId] = useState(1);
+    const [comment, setCommentId] = useState(null);
+    const [url, setUrlId] = useState(null);
+
     const {
         token: { colorBgContainer },
     } = theme.useToken();
 
-    // Fetch all groups from the backend
-    useEffect(() => {
-        axios.get('http://127.0.0.1:8000/groups/')
-            .then((response) => {
-                console.log(response.data);
-                const fetchedGroups = response.data.map((group) => getItem(group.groupName, group.groupId));
-                setGroupItems(fetchedGroups);
-            })
-            .catch((error) => {
-                console.error('Error fetching groups:', error);
-            });
-    }, []);
-
-    // Fetch data for the selected group when selectedGroupId changes
-    useEffect(() => {
-        console.log(`Requesting: http://127.0.0.1:8000/groups/${selectedGroupId}/`);
+    const fetchData = () => {
         if (selectedGroupId) {
-            axios.get(`http://127.0.0.1:8000/groups/${selectedGroupId}/`)
-                .then((response) => {
-                    console.log('Selected group data:', response.data);
-                })
-                .catch((error) => {
-                    console.error('Error fetching selected group:', error);
-                });
+            dataFetching(selectedGroupId, setPasswordItems);
+        } else {
+            console.error("No group selected");
         }
-    }, [selectedGroupId]);
+    };
+
+// Fetch all groups
+    axios.get('http://127.0.0.1:8000/api/groups/', config)
+        .then(response => {
+            const fetchedGroups = response.data.map(group => getItem(group.groupName, group.groupId));
+            setGroupItems(fetchedGroups);
+        })
+        .catch(error => {
+            console.error('Error fetching groups:', error);
+        });
+
+// Fetch specific group
+    if (selectedGroupId) {
+        axios.get(`http://127.0.0.1:8000/api/groups/${selectedGroupId}/`, config)
+            .then(response => {
+                //console.log('Selected group data:', response.data);
+            })
+            .catch(error => {
+                console.error(`Error fetching group ${selectedGroupId}:`, error);
+            });
+    }
+
 
 
 
@@ -72,15 +92,21 @@ const App = () => {
         getItem('Passwords', '2', <DesktopOutlined />),
         getItem('Groups', 'sub1', <UserOutlined />, groupItems.map((group) => (
             <Menu.Item key={group.key} onClick={() => handleGroupClick(group.key)}>
-            {group.label}
-        </Menu.Item>
+                {group.label}
+            </Menu.Item>
         ))),
-
     ];
 
 // User menu items for the bottom of the sidebar
     const userItem = [getItem('User', '3', <DesktopOutlined />)];
 
+    useEffect(() => {
+        fetchData();
+    }, []);
+
+    const onPasswordAdd = () => {
+        fetchData();
+    };
     return (
         <Layout style={{ minHeight: '100vh' }}>
             <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
@@ -89,8 +115,19 @@ const App = () => {
             </Sider>
 
             <Layout>
-                <Header style={{ padding: 0, background: colorBgContainer }} />
+                <Search
+                    placeholder="input search text"
+                    onSearch={onSearch}
+                    style={{
+                        padding: 30,
+                        width: 1050,
+                    }}
+                />
+                <Header style={{ padding: 0, background: colorBgContainer }} /> {/**/}
+
                 <Content style={{ margin: '0 16px' }}>
+
+                    {/* MainPage component rendered here */}
                   <Breadcrumb
                         style={{ margin: '16px 0' }}
                         items={[
@@ -99,17 +136,18 @@ const App = () => {
                         ]}
                     />
                     {/* MainPage component rendered here */}
-                    <MainPage groupId={selectedGroupId}/>
+                    <MainPage groupId={selectedGroupId} passwordItems={passwordItems}/>
 
 
                     {/* Plus Button at the bottom-right corner under the table */}
                     <div style={{
                         position: 'fixed',
+                        //top: 10
                         bottom: 24,
                         right: 24,
                         zIndex: 1000, // Ensure it's above other elements
                     }}>
-                        <SaveNewPassword /> {/* Render your button component here */}
+                        <SaveNewPassword groupId={selectedGroupId} userId={userId} comment={comment} url={url} onPasswordAdd={onPasswordAdd} /> {/* Render your button component here */}
                     </div>
                 </Content>
                 <Footer style={{ textAlign: 'center' }}>LockR</Footer>
