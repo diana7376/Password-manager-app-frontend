@@ -7,9 +7,9 @@ import {
     UserOutlined,
     AudioOutlined,
 } from '@ant-design/icons';
+
 import axios from 'axios';
 import MainPage from './main_page';
-import { useParams } from 'react-router-dom';
 import SaveNewPassword from './save_new_password';
 import {dataFetching} from "./crud_operation";
 
@@ -37,32 +37,64 @@ function getItem(label, key, icon, children) {
     };
 }
 
-// Sidebar menu items
-const items = [
-    getItem('About us', '1', <PieChartOutlined />),
-    getItem('Passwords', '2', <DesktopOutlined />),
-    getItem('Groups', 'sub1', <UserOutlined />, [
-        getItem('Banking', '3'),
-        getItem('Social media', '4'),
-        getItem('Gaming', '5'),
-        getItem('Unlisted', '6'),
-    ]),
-];
-
-// User menu items for the bottom of the sidebar
-const userItem = [getItem('User', '7', <DesktopOutlined />)];
-
 const App = () => {
     const [collapsed, setCollapsed] = useState(false);
     const [passwordItems, setPasswordItems] = useState([]);
-    const groupId = 1;
+    const [groupItems, setGroupItems] = useState([]);
+    const [selectedGroupId, setSelectedGroupId] = useState(1);
+
     const {
-        token: { colorBgContainer, borderRadiusLG },
+        token: { colorBgContainer },
     } = theme.useToken();
 
     const fetchData = () => {
         dataFetching(groupId, setPasswordItems);
     };
+    //fetch groups from backend
+    useEffect(() => {
+        axios.get('http://127.0.0.1:8000/groups/')
+            .then((response) => {
+                console.log(response.data);
+                const fetchedGroups = response.data.map((group) => getItem(group.groupName, group.groupId));
+                setGroupItems(fetchedGroups);
+            })
+            .catch((error)=> {
+                console.error('error fetching groups:', error)
+            });
+    }, []);
+
+// Fetch data for the selected group when selectedGroupId changes
+    useEffect(() => {
+        console.log(`Requesting: http://127.0.0.1:8000/groups/${selectedGroupId}/`);
+        if (selectedGroupId) {
+            axios.get(`http://127.0.0.1:8000/groups/${selectedGroupId}/`)
+                .then((response) => {
+                    console.log('Selected group data:', response.data);
+                })
+                .catch((error) => {
+                    console.error('Error fetching selected group:', error);
+                });
+        }
+    }, [selectedGroupId]);
+
+
+
+    const handleGroupClick = (groupId) => {
+        setSelectedGroupId(groupId);
+    };
+    // Sidebar menu items
+    const items = [
+        getItem('About us', '1', <PieChartOutlined />),
+        getItem('Passwords', '2', <DesktopOutlined />),
+        getItem('Groups', 'sub1', <UserOutlined />, groupItems.map((group) => (
+            <Menu.Item key={group.key} onClick={() => handleGroupClick(group.key)}>
+                {group.label}
+            </Menu.Item>
+        ))),
+    ];
+
+// User menu items for the bottom of the sidebar
+    const userItem = [getItem('User', '3', <DesktopOutlined />)];
 
     useEffect(() => {
         fetchData();
@@ -100,7 +132,7 @@ const App = () => {
                         ]}
                     />
                     {/* MainPage component rendered here */}
-                    <MainPage groupId={groupId} passwordItems={passwordItems}/>
+                    <MainPage groupId={selectedGroupId} passwordItems={passwordItems}/>
 
 
                     {/* Plus Button at the bottom-right corner under the table */}
