@@ -4,10 +4,10 @@ import { Button, Divider, Flex, Radio, Space, Tooltip, Modal, Input, Dropdown, m
 import {addPasswordItem} from './crud_operation.js';
 
 
-const SaveNewPassword = ({groupId, onPasswordAdd}) => {
+const SaveNewPassword = ({groupId,userId, comment, url ,onPasswordAdd}) => {
     const [position, setPosition] = useState('end');
     const [open, setOpen] = useState(false);
-    //const [passwordVisible, setPasswordVisible] = useState(false);
+
 
     // States for the form fields
     const [fieldName, setFieldName] = useState('');
@@ -25,6 +25,9 @@ const SaveNewPassword = ({groupId, onPasswordAdd}) => {
             userName: username,
             password: password,
             groupId: groupId,
+            userId :userId,
+            comment: comment,
+            url: url,
 
         };
 
@@ -66,25 +69,12 @@ const SaveNewPassword = ({groupId, onPasswordAdd}) => {
     };
     const items = [
         {
-            label: 'Banking',
+            label: 'Unlisted',
             key: '1',
             icon: <UserOutlined />,
         },
-        {
-            label: 'Social media',
-            key: '2',
-            icon: <UserOutlined />,
-        },
-        {
-            label: 'Gaming',
-            key: '3',
-            icon: <UserOutlined />
-        },
-        {
-            label: 'Unlisted',
-            key: '4',
-            icon: <UserOutlined />
-        },
+
+
     ];
     const menuProps = {
         items,
