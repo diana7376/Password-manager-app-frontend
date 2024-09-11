@@ -1,29 +1,17 @@
-
 import React, { useEffect, useState } from 'react';
-import {Breadcrumb, Layout, Menu, theme, Input, Space} from 'antd';
-import {
-    DesktopOutlined,
-    PieChartOutlined,
-    UserOutlined,
-    AudioOutlined,
-} from '@ant-design/icons';
-
+import { Breadcrumb, Layout, Menu, theme, Input, Space } from 'antd';
+import { DesktopOutlined, PieChartOutlined, UserOutlined, AudioOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import MainPage from './main_page';
 import SaveNewPassword from './save_new_password';
-import {dataFetching} from "./crud_operation";
+import { dataFetching } from './crud_operation';
 import { config } from './crud_operation';
 
 const { Header, Content, Footer, Sider } = Layout;
-
 const { Search } = Input;
+
 const suffix = (
-    <AudioOutlined
-        style={{
-            fontSize: 16,
-            color: '#1677ff',
-        }}
-    />
+    <AudioOutlined style={{ fontSize: 16, color: '#1677ff' }} />
 );
 
 const onSearch = (value, _e, info) => console.log(info?.source, value);
@@ -41,11 +29,13 @@ function getItem(label, key, icon, children) {
 const App = () => {
     const [collapsed, setCollapsed] = useState(false);
     const [passwordItems, setPasswordItems] = useState([]);
-    const [groupItems, setGroupItems] = useState([]);
+    const [groupItems, setGroupItems] = useState([]); // Initialize as an array
     const [selectedGroupId, setSelectedGroupId] = useState(1);
     const [userId, setUserId] = useState(1);
     const [comment, setCommentId] = useState(null);
     const [url, setUrlId] = useState(null);
+    const [selectedKey, setSelectedKey] = useState('1'); // State to track selected menu item
+    const [openKeys, setOpenKeys] = useState([]); // Track open submenu keys
 
     const {
         token: { colorBgContainer },
@@ -55,63 +45,85 @@ const App = () => {
         if (selectedGroupId) {
             dataFetching(selectedGroupId, setPasswordItems);
         } else {
-            console.error("No group selected");
+            console.error('No group selected');
         }
     };
 
-// Fetch all groups
-    axios.get('http://127.0.0.1:8000/api/groups/', config)
-        .then(response => {
-            const fetchedGroups = response.data.map(group => getItem(group.groupName, group.groupId));
-            setGroupItems(fetchedGroups);
-        })
-        .catch(error => {
-            console.error('Error fetching groups:', error);
-        });
-
-// Fetch specific group
-    if (selectedGroupId) {
-        axios.get(`http://127.0.0.1:8000/api/groups/${selectedGroupId}/`, config)
-            .then(response => {
-                //console.log('Selected group data:', response.data);
+    // Fetch all groups
+    useEffect(() => {
+        axios
+            .get('http://127.0.0.1:8000/api/groups/', config)
+            .then((response) => {
+                if (Array.isArray(response.data)) {
+                    const fetchedGroups = response.data.map((group) =>
+                        getItem(group.groupName, `group-${group.groupId}`) // Ensure unique key for each group
+                    );
+                    setGroupItems(fetchedGroups); // Set fetched groups
+                } else {
+                    console.error('API response is not an array', response.data);
+                    setGroupItems([]); // Fallback to an empty array
+                }
             })
-            .catch(error => {
-                console.error(`Error fetching group ${selectedGroupId}:`, error);
+            .catch((error) => {
+                console.error('Error fetching groups:', error);
+                setGroupItems([]); // Fallback to an empty array
             });
-    }
+    }, []); // Empty dependency array ensures it only runs once
 
-
-
-
-    const handleGroupClick = (groupId) => {
-        setSelectedGroupId(groupId);
+    const handleMenuClick = (key) => {
+        setSelectedKey(key); // Set the selected key when a menu item is clicked
     };
+
+    const onOpenChange = (keys) => {
+        setOpenKeys(keys); // Control open submenus
+    };
+
     // Sidebar menu items
-    const items = [
-        getItem('About us', '1', <PieChartOutlined />),
-        getItem('Passwords', '2', <DesktopOutlined />),
-        getItem('Groups', 'sub1', <UserOutlined />, groupItems.map((group) => (
-            <Menu.Item key={group.key} onClick={() => handleGroupClick(group.key)}>
-                {group.label}
-            </Menu.Item>
-        ))),
+    const groupMenuItems = [
+        {
+            label: 'About us',
+            key: '1',
+            icon: <PieChartOutlined />
+        },
+        {
+            label: 'Passwords',
+            key: '2',
+            icon: <DesktopOutlined />
+        },
+        {
+            label: 'Groups',
+            key: 'sub1',
+            icon: <UserOutlined />,
+            children: groupItems.length > 0 ? groupItems : [{ label: 'Loading...', key: 'loading' }],
+        },
     ];
 
-// User menu items for the bottom of the sidebar
+    // User menu items for the bottom of the sidebar
     const userItem = [getItem('User', '3', <DesktopOutlined />)];
-
-    useEffect(() => {
-        fetchData();
-    }, []);
 
     const onPasswordAdd = () => {
         fetchData();
     };
+
     return (
         <Layout style={{ minHeight: '100vh' }}>
             <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
-                <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline" items={items} />
-                <Menu theme="dark" mode="inline" items={userItem} />
+                <Menu
+                    theme="dark"
+                    mode="inline"
+                    selectedKeys={[selectedKey]} // Highlight the selected menu item
+                    openKeys={openKeys} // Control which menus are open
+                    onClick={({ key }) => handleMenuClick(key)} // Handle menu click
+                    onOpenChange={onOpenChange} // Handle submenu open/close
+                    items={groupMenuItems} // Use structured items
+                />
+                <Menu
+                    theme="dark"
+                    mode="inline"
+                    selectedKeys={[selectedKey]} // Ensure only one selected item at a time
+                    onClick={({ key }) => handleMenuClick(key)} // Handle user menu click
+                    items={userItem}
+                />
             </Sider>
 
             <Layout>
@@ -126,28 +138,31 @@ const App = () => {
                 <Header style={{ padding: 0, background: colorBgContainer }} /> {/**/}
 
                 <Content style={{ margin: '0 16px' }}>
-
-                    {/* MainPage component rendered here */}
-                  <Breadcrumb
+                    <Breadcrumb
                         style={{ margin: '16px 0' }}
                         items={[
                             { title: 'Group' },
                             { title: 'Group-name' },
                         ]}
                     />
-                    {/* MainPage component rendered here */}
-                    <MainPage groupId={selectedGroupId} passwordItems={passwordItems}/>
-
+                    <MainPage groupId={selectedGroupId} passwordItems={passwordItems} />
 
                     {/* Plus Button at the bottom-right corner under the table */}
-                    <div style={{
-                        position: 'fixed',
-                        //top: 10
-                        bottom: 24,
-                        right: 24,
-                        zIndex: 1000, // Ensure it's above other elements
-                    }}>
-                        <SaveNewPassword groupId={selectedGroupId} userId={userId} comment={comment} url={url} onPasswordAdd={onPasswordAdd} /> {/* Render your button component here */}
+                    <div
+                        style={{
+                            position: 'fixed',
+                            bottom: 24,
+                            right: 24,
+                            zIndex: 1000, // Ensure it's above other elements
+                        }}
+                    >
+                        <SaveNewPassword
+                            groupId={selectedGroupId}
+                            userId={userId}
+                            comment={comment}
+                            url={url}
+                            onPasswordAdd={onPasswordAdd}
+                        />
                     </div>
                 </Content>
                 <Footer style={{ textAlign: 'center' }}>LockR</Footer>
