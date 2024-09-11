@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { Breadcrumb, Layout, Menu, theme, Table, Modal } from 'antd';
+import { Breadcrumb, Layout, Menu, theme } from 'antd';
 import {
     DesktopOutlined,
     PieChartOutlined,
@@ -8,7 +8,6 @@ import {
 } from '@ant-design/icons';
 import axios from 'axios';
 import MainPage from './main_page';
-import { useParams } from 'react-router-dom';
 import SaveNewPassword from './save_new_password';
 
 const { Header, Content, Footer, Sider } = Layout;
@@ -25,27 +24,36 @@ function getItem(label, key, icon, children) {
     };
 }
 
-// Sidebar menu items
-const items = [
-    getItem('About us', '1', <PieChartOutlined />),
-    getItem('Passwords', '2', <DesktopOutlined />),
-    getItem('Groups', 'sub1', <UserOutlined />, [
-        getItem('Banking', '3'),
-        getItem('Social media', '4'),
-        getItem('Gaming', '5'),
-        getItem('Unlisted', '5'),
-    ]),
-];
 
-// User menu items for the bottom of the sidebar
-const userItem = [getItem('User', '6', <DesktopOutlined />)];
 
 const App = () => {
     const [collapsed, setCollapsed] = useState(false);
+    const [groupItems, setGroupItems] = useState([]);
     const {
-        token: { colorBgContainer, borderRadiusLG },
+        token: { colorBgContainer },
     } = theme.useToken();
 
+    //fetch groups from backend
+    useEffect(() => {
+        axios.get('http://127.0.0.1:8000/api/groups/')
+            .then((response) => {
+                const fetchedGroups = response.data.map((group) => getItem(group.name, group.id));
+                setGroupItems(fetchedGroups);
+            })
+            .catch((error)=> {
+                console.error('error fetching groups:', error)
+            });
+    }, []);
+
+    // Sidebar menu items
+    const items = [
+        getItem('About us', '1', <PieChartOutlined />),
+        getItem('Passwords', '2', <DesktopOutlined />),
+        getItem('Groups', 'sub1', <UserOutlined />, groupItems),
+    ];
+
+// User menu items for the bottom of the sidebar
+    const userItem = [getItem('User', '3', <DesktopOutlined />)];
 
     return (
         <Layout style={{ minHeight: '100vh' }}>
