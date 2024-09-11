@@ -4,8 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="30415877-8e74-4120-9d86-1294def20539" name="Changes" comment="">
+
+    <list default="true" id="32870176-a3ef-4b17-9697-625be79b400a" name="Changes" comment="fixed saving new password using an authorisation token">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/crud_operation.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/crud_operation.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/save_new_password.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/save_new_password.js" afterDir="false" />
+
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -67,12 +71,17 @@
   "keyToString": {
     "Node.js.App.js.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+
+    "git-widget-placeholder": "PM-F9",
+    "last_opened_file_path": "D:/Projects/frontend/Password-manager-app-frontend",
+
     "git-widget-placeholder": "#19 on PM-F10",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "/Users/daria/Desktop/Uni/Password-manager-app-frontend",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
+
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
     "npm.start.executor": "Run",
@@ -179,8 +188,13 @@
     <MESSAGE value="fixed table lable names" />
     <MESSAGE value="connected crud operations with UI, also added the search bar" />
     <MESSAGE value="fixed" />
+
+    <MESSAGE value="fixed saving new password using an authorisation token" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed saving new password using an authorisation token" />
+
     <MESSAGE value="nothing was changed, simply my github &quot;isi bate joc de noi&quot;" />
     <MESSAGE value="fixed the buttons in side bar" />
     <option name="LAST_COMMIT_MESSAGE" value="fixed the buttons in side bar" />
+
   </component>
 </project>
