@@ -4,6 +4,7 @@ const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNz
 export const config = {
     headers: { Authorization: `Bearer ${token}` }
 };
+console.log("used token:", token);
 
 export function addPasswordItem(newItem, groupId) {
     return axios.post(`http://127.0.0.1:8000/api/groups/${groupId}/password-items/`,
@@ -19,38 +20,35 @@ export function addPasswordItem(newItem, groupId) {
 }
 
 
-export function updatePasswordItem(updateItem, groupId) {
-    axios.put(`http://127.0.0.1:8000/groups/${groupId}/password-items/${updatedItem.id}/`, updatedItem)
+export function updatePasswordItem(id, groupId, updatedData) {
+    return axios.put(`http://127.0.0.1:8000/api/groups/${groupId}/password-items/${id}/`, updatedData, config)
         .then(response => {
-            const newData = data.map(item => {
-                if (item.id === updateItem.id){
-                    return response.data;
-                }
-                return item;
-            });
-            setData(newData);
-        })
-        .catch(error =>{
-            console.log('Error in updating the password.',error);
-        })
-
-}
-
-export function deleteData(id, groupId) {
-    axios.delete(`http://127.0.0.1:8000/groups/${groupId}/password-items/${id}/`)
-        .then(() => {
-            const newData = data.filter(item => item.id !== id);
-            setData(newData);
+            return response.data;
         })
         .catch(error => {
-            console.log('Error in deleting the password.',error);
-        })
+            console.error('Error updating the password item:', error);
+            throw error;
+        });
 }
+
+
+export function deleteData(id, groupId) {
+    return axios.delete(`http://127.0.0.1:8000/api/groups/${groupId}/password-items/${id}/`, config)
+        .then(response => {
+            return response.data;
+        })
+        .catch(error => {
+            console.error('Error deleting the password item:', error);
+            throw error;
+        });
+}
+
 
 export function dataFetching(groupId, setData) {
     axios.get('http://127.0.0.1:8000/api/password-items/', config)
         .then(response => {
             const mappedData = response.data.map(item => ({
+                id: item.id,
                 itemName: item.itemName,
                 userName: item.userName,
                 password: item.password,
