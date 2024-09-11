@@ -29,27 +29,53 @@ function getItem(label, key, icon, children) {
 const App = () => {
     const [collapsed, setCollapsed] = useState(false);
     const [groupItems, setGroupItems] = useState([]);
+    const [selectedGroupId, setSelectedGroupId] = useState(1);
     const {
         token: { colorBgContainer },
     } = theme.useToken();
 
-    //fetch groups from backend
+    // Fetch all groups from the backend
     useEffect(() => {
-        axios.get('http://127.0.0.1:8000/api/groups/')
+        axios.get('http://127.0.0.1:8000/groups/')
             .then((response) => {
-                const fetchedGroups = response.data.map((group) => getItem(group.name, group.id));
+                console.log(response.data);
+                const fetchedGroups = response.data.map((group) => getItem(group.groupName, group.groupId));
                 setGroupItems(fetchedGroups);
             })
-            .catch((error)=> {
-                console.error('error fetching groups:', error)
+            .catch((error) => {
+                console.error('Error fetching groups:', error);
             });
     }, []);
 
+    // Fetch data for the selected group when selectedGroupId changes
+    useEffect(() => {
+        console.log(`Requesting: http://127.0.0.1:8000/groups/${selectedGroupId}/`);
+        if (selectedGroupId) {
+            axios.get(`http://127.0.0.1:8000/groups/${selectedGroupId}/`)
+                .then((response) => {
+                    console.log('Selected group data:', response.data);
+                })
+                .catch((error) => {
+                    console.error('Error fetching selected group:', error);
+                });
+        }
+    }, [selectedGroupId]);
+
+
+
+    const handleGroupClick = (groupId) => {
+        setSelectedGroupId(groupId);
+    };
     // Sidebar menu items
     const items = [
         getItem('About us', '1', <PieChartOutlined />),
         getItem('Passwords', '2', <DesktopOutlined />),
-        getItem('Groups', 'sub1', <UserOutlined />, groupItems),
+        getItem('Groups', 'sub1', <UserOutlined />, groupItems.map((group) => (
+            <Menu.Item key={group.key} onClick={() => handleGroupClick(group.key)}>
+            {group.label}
+        </Menu.Item>
+        ))),
+
     ];
 
 // User menu items for the bottom of the sidebar
@@ -73,7 +99,7 @@ const App = () => {
                         ]}
                     />
                     {/* MainPage component rendered here */}
-                    <MainPage groupId={1}/>
+                    <MainPage groupId={selectedGroupId}/>
 
 
                     {/* Plus Button at the bottom-right corner under the table */}
