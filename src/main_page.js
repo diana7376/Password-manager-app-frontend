@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Modal } from 'antd';
-import axios from 'axios';
 import {dataFetching} from './crud_operation'
-import { useParams } from 'react-router-dom'
 
 const MainPage = ({ groupId }) => {
     const columns = [
