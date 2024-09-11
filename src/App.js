@@ -1,10 +1,11 @@
 
 import React, { useEffect, useState } from 'react';
-import {Breadcrumb, Layout, Menu, theme} from 'antd';
+import {Breadcrumb, Layout, Menu, theme, Input, Space} from 'antd';
 import {
     DesktopOutlined,
     PieChartOutlined,
     UserOutlined,
+    AudioOutlined,
 } from '@ant-design/icons';
 import axios from 'axios';
 import MainPage from './main_page';
@@ -14,7 +15,17 @@ import {dataFetching} from "./crud_operation";
 
 const { Header, Content, Footer, Sider } = Layout;
 
+const { Search } = Input;
+const suffix = (
+    <AudioOutlined
+        style={{
+            fontSize: 16,
+            color: '#1677ff',
+        }}
+    />
+);
 
+const onSearch = (value, _e, info) => console.log(info?.source, value);
 
 // Function to get menu items for the sidebar
 function getItem(label, key, icon, children) {
@@ -34,12 +45,12 @@ const items = [
         getItem('Banking', '3'),
         getItem('Social media', '4'),
         getItem('Gaming', '5'),
-        getItem('Unlisted', '5'),
+        getItem('Unlisted', '6'),
     ]),
 ];
 
 // User menu items for the bottom of the sidebar
-const userItem = [getItem('User', '6', <DesktopOutlined />)];
+const userItem = [getItem('User', '7', <DesktopOutlined />)];
 
 const App = () => {
     const [collapsed, setCollapsed] = useState(false);
@@ -68,8 +79,18 @@ const App = () => {
             </Sider>
 
             <Layout>
-                <Header style={{ padding: 0, background: colorBgContainer }} />
+                <Search
+                    placeholder="input search text"
+                    onSearch={onSearch}
+                    style={{
+                        padding: 30,
+                        width: 1050,
+                    }}
+                />
+                <Header style={{ padding: 0, background: colorBgContainer }} /> {/**/}
+
                 <Content style={{ margin: '0 16px' }}>
+
                     {/* MainPage component rendered here */}
                   <Breadcrumb
                         style={{ margin: '16px 0' }}
@@ -85,6 +106,7 @@ const App = () => {
                     {/* Plus Button at the bottom-right corner under the table */}
                     <div style={{
                         position: 'fixed',
+                        //top: 10
                         bottom: 24,
                         right: 24,
                         zIndex: 1000, // Ensure it's above other elements

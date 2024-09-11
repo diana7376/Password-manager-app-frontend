@@ -1,15 +1,16 @@
 import axios from 'axios';
 
 export function addPasswordItem(newItem, groupId) {
-   return axios.post('http://127.0.0.1:8000/groups/${groupId}/password-items/', newItem)
+    return axios.post(`http://127.0.0.1:8000/api/groups/${groupId}/password-items/`, newItem)  // Use backticks for template literals
         .then(response => {
             return response.data;
         })
-        .catch(error =>{
-            console.log('Error in adding a new password',error);
+        .catch(error => {
+            console.log('Error in adding a new password', error);
             throw error;
         });
 }
+
 
 export function updatePasswordItem(updateItem, groupId) {
     axios.put(`http://127.0.0.1:8000/groups/${groupId}/password-items/${updatedItem.id}/`, updatedItem)
@@ -46,6 +47,7 @@ export function dataFetching(groupId, setData) {
                 itemName: item.itemName,
                 userName: item.userName,
                 password: item.password,
+                groupId: item.groupId,
             }));
             setData(mappedData);
         })

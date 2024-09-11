@@ -24,9 +24,12 @@ const SaveNewPassword = ({groupId, onPasswordAdd}) => {
             itemName: fieldName,
             userName: username,
             password: password,
+            groupId: groupId,
+
         };
 
-        console.log('Sending newPasswordItem:', newPasswordItem); // Add this line
+        console.log('Sending newPasswordItem:', newPasswordItem);  // Log the data
+        console.log('Group ID:', groupId);  // Log the groupId
 
         addPasswordItem(newPasswordItem, groupId)
             .then(() => {
@@ -36,18 +39,16 @@ const SaveNewPassword = ({groupId, onPasswordAdd}) => {
             })
             .catch((error) => {
                 if (error.response) {
-                    // The request was made and the server responded with a status code
                     console.log('Response error:', error.response.data);
                 } else if (error.request) {
-                    // The request was made but no response was received
                     console.log('No response received:', error.request);
                 } else {
-                    // Something happened in setting up the request
                     console.log('Error setting up request:', error.message);
                 }
                 message.error('Failed to add password');
             });
     };
+
 
 
 
