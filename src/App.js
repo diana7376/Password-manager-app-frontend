@@ -12,6 +12,7 @@ import axios from 'axios';
 import MainPage from './main_page';
 import SaveNewPassword from './save_new_password';
 import {dataFetching} from "./crud_operation";
+import { config } from './crud_operation';
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -42,40 +43,43 @@ const App = () => {
     const [passwordItems, setPasswordItems] = useState([]);
     const [groupItems, setGroupItems] = useState([]);
     const [selectedGroupId, setSelectedGroupId] = useState(1);
+    const [userId, setUserId] = useState(1);
+    const [comment, setCommentId] = useState(null);
+    const [url, setUrlId] = useState(null);
 
     const {
         token: { colorBgContainer },
     } = theme.useToken();
 
     const fetchData = () => {
-        dataFetching(groupId, setPasswordItems);
-    };
-    //fetch groups from backend
-    useEffect(() => {
-        axios.get('http://127.0.0.1:8000/groups/')
-            .then((response) => {
-                console.log(response.data);
-                const fetchedGroups = response.data.map((group) => getItem(group.groupName, group.groupId));
-                setGroupItems(fetchedGroups);
-            })
-            .catch((error)=> {
-                console.error('error fetching groups:', error)
-            });
-    }, []);
-
-// Fetch data for the selected group when selectedGroupId changes
-    useEffect(() => {
-        console.log(`Requesting: http://127.0.0.1:8000/groups/${selectedGroupId}/`);
         if (selectedGroupId) {
-            axios.get(`http://127.0.0.1:8000/groups/${selectedGroupId}/`)
-                .then((response) => {
-                    console.log('Selected group data:', response.data);
-                })
-                .catch((error) => {
-                    console.error('Error fetching selected group:', error);
-                });
+            dataFetching(selectedGroupId, setPasswordItems);
+        } else {
+            console.error("No group selected");
         }
-    }, [selectedGroupId]);
+    };
+
+// Fetch all groups
+    axios.get('http://127.0.0.1:8000/api/groups/', config)
+        .then(response => {
+            const fetchedGroups = response.data.map(group => getItem(group.groupName, group.groupId));
+            setGroupItems(fetchedGroups);
+        })
+        .catch(error => {
+            console.error('Error fetching groups:', error);
+        });
+
+// Fetch specific group
+    if (selectedGroupId) {
+        axios.get(`http://127.0.0.1:8000/api/groups/${selectedGroupId}/`, config)
+            .then(response => {
+                //console.log('Selected group data:', response.data);
+            })
+            .catch(error => {
+                console.error(`Error fetching group ${selectedGroupId}:`, error);
+            });
+    }
+
 
 
 
@@ -143,7 +147,7 @@ const App = () => {
                         right: 24,
                         zIndex: 1000, // Ensure it's above other elements
                     }}>
-                        <SaveNewPassword groupId={groupId} onPasswordAdd={onPasswordAdd} /> {/* Render your button component here */}
+                        <SaveNewPassword groupId={selectedGroupId} userId={userId} comment={comment} url={url} onPasswordAdd={onPasswordAdd} /> {/* Render your button component here */}
                     </div>
                 </Content>
                 <Footer style={{ textAlign: 'center' }}>LockR</Footer>
