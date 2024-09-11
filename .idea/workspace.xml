@@ -20,14 +20,9 @@
     </option>
   </component>
   <component name="Git.Settings">
-    <option name="PREVIOUS_COMMIT_AUTHORS">
-      <list>
-        <option value="Diana7376 &lt;dianelup3105@gmail.com&gt;" />
-      </list>
-    </option>
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="PM-F10" />
+        <entry key="$PROJECT_DIR$" value="PM-F7" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -42,16 +37,6 @@
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/diana7376/Password-manager-app-frontend.git&quot;,
     &quot;accountId&quot;: &quot;57859c28-2743-448d-af66-d5b5da3f691b&quot;
-  },
-  &quot;recentNewPullRequestHead&quot;: {
-    &quot;server&quot;: {
-      &quot;useHttp&quot;: false,
-      &quot;host&quot;: &quot;github.com&quot;,
-      &quot;port&quot;: null,
-      &quot;suffix&quot;: null
-    },
-    &quot;owner&quot;: &quot;diana7376&quot;,
-    &quot;repository&quot;: &quot;Password-manager-app-frontend&quot;
   }
 }</component>
   <component name="ProjectColorInfo">{
@@ -63,29 +48,29 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Node.js.App.js.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "main",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/Users/daria/Desktop/Uni/Password-manager-app-frontend",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "npm.start.executor": "Run",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Node.js.App.js.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/daria/Desktop/Uni/Password-manager-app-frontend&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;npm.start.executor&quot;: &quot;Run&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "GitStage.ChangesTree.GroupingKeys": [
-      "directory",
-      "module",
-      "repository"
+  &quot;keyToStringList&quot;: {
+    &quot;GitStage.ChangesTree.GroupingKeys&quot;: [
+      &quot;directory&quot;,
+      &quot;module&quot;,
+      &quot;repository&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration name="start" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
@@ -99,8 +84,6 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="npm.start" />
-        <item itemvalue="npm.start" />
         <item itemvalue="npm.start" />
       </list>
     </recent_temporary>
@@ -134,39 +117,7 @@
       <option name="project" value="LOCAL" />
       <updated>1725617819554</updated>
     </task>
-    <task id="LOCAL-00002" summary="nothing was changed, simply my github &quot;isi bate joc de noi&quot;">
-      <option name="closed" value="true" />
-      <created>1726061196380</created>
-      <option name="number" value="00002" />
-      <option name="presentableId" value="LOCAL-00002" />
-      <option name="project" value="LOCAL" />
-      <updated>1726061196380</updated>
-    </task>
-    <task id="LOCAL-00003" summary="nothing was changed, simply my github &quot;isi bate joc de noi&quot;">
-      <option name="closed" value="true" />
-      <created>1726061284730</created>
-      <option name="number" value="00003" />
-      <option name="presentableId" value="LOCAL-00003" />
-      <option name="project" value="LOCAL" />
-      <updated>1726061284730</updated>
-    </task>
-    <task id="LOCAL-00004" summary="fixed the buttons in side bar">
-      <option name="closed" value="true" />
-      <created>1726076591368</created>
-      <option name="number" value="00004" />
-      <option name="presentableId" value="LOCAL-00004" />
-      <option name="project" value="LOCAL" />
-      <updated>1726076591368</updated>
-    </task>
-    <task id="LOCAL-00005" summary="fixed the buttons in side bar">
-      <option name="closed" value="true" />
-      <created>1726076961277</created>
-      <option name="number" value="00005" />
-      <option name="presentableId" value="LOCAL-00005" />
-      <option name="project" value="LOCAL" />
-      <updated>1726076961277</updated>
-    </task>
-    <option name="localTasksCounter" value="6" />
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -185,10 +136,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="fixed table lable names" />
-    <MESSAGE value="connected crud operations with UI, also added the search bar" />
-    <MESSAGE value="fixed" />
-    <MESSAGE value="nothing was changed, simply my github &quot;isi bate joc de noi&quot;" />
-    <MESSAGE value="fixed the buttons in side bar" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixed the buttons in side bar" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed table lable names" />
   </component>
 </project>

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const token = " eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMwMzgwNDg0LCJpYXQiOjE3MjYwNjA0ODQsImp0aSI6IjgzMTA2Njk1OTVjNjRlZThhYmYzMTFjM2UyMmZmNzQwIiwidXNlcl9pZCI6MX0.FV5m3mUDf5_CtVmtOd226WJo6EfE8IbZF7WHnctRSw4 "
+const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMwMzgwNDg0LCJpYXQiOjE3MjYwNjA0ODQsImp0aSI6IjgzMTA2Njk1OTVjNjRlZThhYmYzMTFjM2UyMmZmNzQwIiwidXNlcl9pZCI6MX0.FV5m3mUDf5_CtVmtOd226WJo6EfE8IbZF7WHnctRSw4 "
 export const config = {
     headers: { Authorization: `Bearer ${token}` }
 };
