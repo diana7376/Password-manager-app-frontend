@@ -33,12 +33,22 @@
     &quot;assignee&quot;: &quot;DashaRateeva&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/diana7376/Password-manager-app-frontend.git&quot;,
-    &quot;accountId&quot;: &quot;57859c28-2743-448d-af66-d5b5da3f691b&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/diana7376/Password-manager-app-frontend.git",
+    "accountId": "57859c28-2743-448d-af66-d5b5da3f691b"
+  },
+  "recentNewPullRequestHead": {
+    "server": {
+      "useHttp": false,
+      "host": "github.com",
+      "port": null,
+      "suffix": null
+    },
+    "owner": "diana7376",
+    "repository": "Password-manager-app-frontend"
   }
-}</component>
+}]]></component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 7
 }</component>
@@ -52,7 +62,7 @@
   "keyToString": {
     "Node.js.App.js.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "PM-F12",
+    "git-widget-placeholder": "main",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "/Users/daria/Desktop/Uni/Password-manager-app-frontend",
     "node.js.detected.package.eslint": "true",
@@ -117,7 +127,15 @@
       <option name="project" value="LOCAL" />
       <updated>1725617819554</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="sorted the table by the groups">
+      <option name="closed" value="true" />
+      <created>1726130296847</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1726130296847</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -136,6 +154,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="fixed table lable names" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixed table lable names" />
+    <MESSAGE value="sorted the table by the groups" />
+    <option name="LAST_COMMIT_MESSAGE" value="sorted the table by the groups" />
   </component>
 </project>
