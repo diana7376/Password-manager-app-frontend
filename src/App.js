@@ -79,10 +79,24 @@ const App = () => {
             const groupId = key.split('-')[1]; // Extract the groupId
             setSelectedGroupId(groupId); // Update the selected group ID
 
-            // Fetch the selected group's name and update breadcrumbs
+            // Find the group in the groupItems array by matching the key
+            const clickedGroup = groupItems.find(item => item.key === key);
+
+            if (clickedGroup) {
+                const groupName = clickedGroup.label; // Use the group name directly from the menu item
+
+                // Update the breadcrumb immediately with the clicked group's name
+                setBreadcrumbItems([
+                    { title: 'Group' },
+                    { title: groupName },
+                ]);
+            }
+
+            // You can still keep the API call for background data fetching if needed
             axios.get(`http://127.0.0.1:8000/api/groups/${groupId}/`, config)
                 .then(response => {
                     const groupName = response.data.groupName;
+                    // Optionally update the breadcrumb again if the API call returns different data
                     setBreadcrumbItems([
                         { title: 'Group' },
                         { title: groupName },
