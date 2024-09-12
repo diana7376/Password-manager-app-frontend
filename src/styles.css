@@ -4,7 +4,7 @@
 
 body {
   font-family: sans-serif;
-  margin: 20px;
+  margin: 0;
   padding: 0;
 }
 
@@ -44,4 +44,16 @@ code {
 
 ul {
   padding-inline-start: 20px;
+}
+/* Hide action icons by default */
+.ant-table-row .action-icon {
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+/* Show action icons when row is hovered */
+.ant-table-row:hover .action-icon {
+  visibility: visible;
+  opacity: 1;
 }

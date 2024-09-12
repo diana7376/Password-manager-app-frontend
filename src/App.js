@@ -6,6 +6,7 @@ import MainPage from './main_page';
 import SaveNewPassword from './save_new_password';
 import { dataFetching } from './crud_operation';
 import { config } from './crud_operation';
+import './styles.css';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { Search } = Input;
@@ -57,7 +58,7 @@ const App = () => {
             .then((response) => {
                 if (Array.isArray(response.data)) {
                     const fetchedGroups = response.data.map((group) =>
-                        getItem(group.groupName, `group-${group.groupId}`) // Ensure unique key for each group
+                        getItem(group.groupName, `group-${group.groupId}`)
                     );
                     setGroupItems(fetchedGroups); // Set fetched groups
                 } else {
@@ -156,11 +157,13 @@ const App = () => {
                     placeholder="input search text"
                     onSearch={onSearch}
                     style={{
-                        padding: 30,
+                        margin: '0 auto',
+                        padding: '50px 0',
                         width: 1050,
+                        color: '#0a0a0a',
                     }}
                 />
-                <Header style={{ padding: 0, background: colorBgContainer }} /> {/**/}
+                {/* <Header style={{ padding: 0, background: colorBgContainer }} />*/}
 
                 <Content style={{ margin: '0 16px' }}>
                     <Breadcrumb
@@ -187,7 +190,7 @@ const App = () => {
                         />
                     </div>
                 </Content>
-                <Footer style={{ textAlign: 'center' }}>LockR</Footer>
+                <Footer style={{ textAlign: 'center' }}>© 2024 LockR</Footer>
             </Layout>
         </Layout>
     );

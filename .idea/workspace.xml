@@ -4,8 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="30415877-8e74-4120-9d86-1294def20539" name="Changes" comment="">
+    <list default="true" id="30415877-8e74-4120-9d86-1294def20539" name="Changes" comment="able to save new password in an existing group (cant create new group)">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/crud_operation.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/crud_operation.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main_page.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main_page.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/save_new_password.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/save_new_password.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/styles.css" afterDir="false" />
+
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -22,7 +31,9 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="PM-F7" />
+
+        <entry key="$PROJECT_DIR$" value="PM-F9" />
+
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -52,7 +63,9 @@
   "keyToString": {
     "Node.js.App.js.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "PM-F12",
+
+    "git-widget-placeholder": "PM-F11",
+
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "/Users/daria/Desktop/Uni/Password-manager-app-frontend",
     "node.js.detected.package.eslint": "true",
@@ -85,6 +98,9 @@
     <recent_temporary>
       <list>
         <item itemvalue="npm.start" />
+
+     
+
       </list>
     </recent_temporary>
   </component>
@@ -117,7 +133,17 @@
       <option name="project" value="LOCAL" />
       <updated>1725617819554</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+
+    <task id="LOCAL-00002" summary="connect backend to groups in sidebar (still not working)">
+      <option name="closed" value="true" />
+      <created>1726049133681</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1726049133681</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
+
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -135,7 +161,13 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
+    <MESSAGE value="add CRUD operations + dataFetching caught error" />
+    <MESSAGE value="start to connect sidebar w the back (not ready)" />
+    <MESSAGE value="connect backend to groups in sidebar (still not working)" />
     <MESSAGE value="fixed table lable names" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixed table lable names" />
+
+    <MESSAGE value="able to save new password in an existing group (cant create new group)" />
+    <option name="LAST_COMMIT_MESSAGE" value="able to save new password in an existing group (cant create new group)" />
+
   </component>
 </project>
