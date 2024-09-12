@@ -35,7 +35,7 @@ const SaveNewPassword = ({ groupId, userId, comment, url, onPasswordAdd }) => {
 
         // If a new group name is provided, create the new group
         if (newGroupName) {
-            axios.post('http://127.0.0.1:8000/api/groups/', { groupName: newGroupName }, config)
+            axios.post('http://127.0.0.1:8000/api/groups/', { groupName: newGroupName, userId: userId }, config)
                 .then(response => {
                     groupIdToUse = response.data.groupId; // Use newly created group
                     savePassword(groupIdToUse);
