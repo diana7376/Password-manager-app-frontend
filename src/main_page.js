@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Modal } from 'antd';
-import {dataFetching} from './crud_operation'
+import { dataFetching } from './crud_operation';
 
 const MainPage = ({ groupId }) => {
     const columns = [
@@ -25,12 +25,14 @@ const MainPage = ({ groupId }) => {
     const [selectRow, setSelectRow] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-        useEffect(() => {
-            if (groupId) {
-                dataFetching(groupId,setData);
-            }
+    useEffect(() => {
+        if (groupId) {
+            dataFetching(groupId, setData);
+        }
+    }, [groupId]);
 
-        }, [groupId]);
+    // Filter data based on the selected groupId
+    const filteredData = data.filter(item => item.groupId === Number(groupId));
 
     const handleRowClick = (record) => {
         setSelectRow(record);
@@ -45,16 +47,16 @@ const MainPage = ({ groupId }) => {
     return (
         <div>
             <Table
-                dataSource={data}
+                dataSource={filteredData} // Use the filtered data
                 columns={columns}
-                rowKey= {(record) => record.itemName}
+                rowKey={(record) => record.itemName}
                 onRow={(record) => ({
                     onClick: () => handleRowClick(record),
                 })}
             />
 
             <Modal
-                title={selectRow ? selectRow.app_name : "Details"}
+                title={selectRow ? selectRow.itemName : "Details"}
                 open={isModalOpen}
                 onOk={handleModalClose}
                 onCancel={handleModalClose}

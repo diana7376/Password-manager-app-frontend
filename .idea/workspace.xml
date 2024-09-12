@@ -4,12 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-
-    <list default="true" id="32870176-a3ef-4b17-9697-625be79b400a" name="Changes" comment="fixed saving new password using an authorisation token">
+    <list default="true" id="30415877-8e74-4120-9d86-1294def20539" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/crud_operation.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/crud_operation.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/save_new_password.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/save_new_password.js" afterDir="false" />
-
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -24,14 +20,9 @@
     </option>
   </component>
   <component name="Git.Settings">
-    <option name="PREVIOUS_COMMIT_AUTHORS">
-      <list>
-        <option value="Diana7376 &lt;dianelup3105@gmail.com&gt;" />
-      </list>
-    </option>
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="main" />
+        <entry key="$PROJECT_DIR$" value="PM-F7" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -42,22 +33,12 @@
     &quot;assignee&quot;: &quot;DashaRateeva&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/diana7376/Password-manager-app-frontend.git",
-    "accountId": "57859c28-2743-448d-af66-d5b5da3f691b"
-  },
-  "recentNewPullRequestHead": {
-    "server": {
-      "useHttp": false,
-      "host": "github.com",
-      "port": null,
-      "suffix": null
-    },
-    "owner": "diana7376",
-    "repository": "Password-manager-app-frontend"
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/diana7376/Password-manager-app-frontend.git&quot;,
+    &quot;accountId&quot;: &quot;57859c28-2743-448d-af66-d5b5da3f691b&quot;
   }
-}]]></component>
+}</component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 7
 }</component>
@@ -71,17 +52,12 @@
   "keyToString": {
     "Node.js.App.js.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-
-    "git-widget-placeholder": "PM-F9",
-    "last_opened_file_path": "D:/Projects/frontend/Password-manager-app-frontend",
-
-    "git-widget-placeholder": "#19 on PM-F10",
+    "git-widget-placeholder": "PM-F12",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "/Users/daria/Desktop/Uni/Password-manager-app-frontend",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
-
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
     "npm.start.executor": "Run",
@@ -108,8 +84,6 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="npm.start" />
-        <item itemvalue="npm.start" />
         <item itemvalue="npm.start" />
       </list>
     </recent_temporary>
@@ -143,31 +117,7 @@
       <option name="project" value="LOCAL" />
       <updated>1725617819554</updated>
     </task>
-    <task id="LOCAL-00002" summary="nothing was changed, simply my github &quot;isi bate joc de noi&quot;">
-      <option name="closed" value="true" />
-      <created>1726061196380</created>
-      <option name="number" value="00002" />
-      <option name="presentableId" value="LOCAL-00002" />
-      <option name="project" value="LOCAL" />
-      <updated>1726061196380</updated>
-    </task>
-    <task id="LOCAL-00003" summary="nothing was changed, simply my github &quot;isi bate joc de noi&quot;">
-      <option name="closed" value="true" />
-      <created>1726061284730</created>
-      <option name="number" value="00003" />
-      <option name="presentableId" value="LOCAL-00003" />
-      <option name="project" value="LOCAL" />
-      <updated>1726061284730</updated>
-    </task>
-    <task id="LOCAL-00004" summary="fixed the buttons in side bar">
-      <option name="closed" value="true" />
-      <created>1726076591368</created>
-      <option name="number" value="00004" />
-      <option name="presentableId" value="LOCAL-00004" />
-      <option name="project" value="LOCAL" />
-      <updated>1726076591368</updated>
-    </task>
-    <option name="localTasksCounter" value="5" />
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -186,15 +136,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="fixed table lable names" />
-    <MESSAGE value="connected crud operations with UI, also added the search bar" />
-    <MESSAGE value="fixed" />
-
-    <MESSAGE value="fixed saving new password using an authorisation token" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixed saving new password using an authorisation token" />
-
-    <MESSAGE value="nothing was changed, simply my github &quot;isi bate joc de noi&quot;" />
-    <MESSAGE value="fixed the buttons in side bar" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixed the buttons in side bar" />
-
+    <option name="LAST_COMMIT_MESSAGE" value="fixed table lable names" />
   </component>
 </project>

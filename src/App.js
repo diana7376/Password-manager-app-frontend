@@ -37,6 +37,7 @@ const App = () => {
     const [selectedKey, setSelectedKey] = useState('1'); // State to track selected menu item
     const [openKeys, setOpenKeys] = useState([]); // Track open submenu keys
 
+
     const {
         token: { colorBgContainer },
     } = theme.useToken();
@@ -72,6 +73,26 @@ const App = () => {
 
     const handleMenuClick = (key) => {
         setSelectedKey(key); // Set the selected key when a menu item is clicked
+
+        if (key.startsWith('group-')) {
+            const groupId = key.split('-')[1]; // Extract the groupId
+            setSelectedGroupId(groupId); // Update the selected group ID
+
+            // Fetch the selected group's name and update breadcrumbs
+            axios.get(`http://127.0.0.1:8000/api/groups/${groupId}/`, config)
+                .then(response => {
+                    const groupName = response.data.groupName;
+                    setBreadcrumbItems([
+                        { title: 'Group' },
+                        { title: groupName },
+                    ]);
+                })
+                .catch(error => {
+                    console.error('Error fetching group details:', error);
+                });
+
+            console.log('Selected Group ID:', groupId); // Debugging log
+        }
     };
 
     const onOpenChange = (keys) => {
@@ -105,6 +126,10 @@ const App = () => {
         fetchData();
     };
 
+    const [breadcrumbItems, setBreadcrumbItems] = useState([
+        { title: 'Group' },
+        { title: 'Group-name' },
+    ]);
     return (
         <Layout style={{ minHeight: '100vh' }}>
             <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
@@ -140,12 +165,9 @@ const App = () => {
                 <Content style={{ margin: '0 16px' }}>
                     <Breadcrumb
                         style={{ margin: '16px 0' }}
-                        items={[
-                            { title: 'Group' },
-                            { title: 'Group-name' },
-                        ]}
+                        items={breadcrumbItems}
                     />
-                    <MainPage groupId={selectedGroupId} passwordItems={passwordItems} />
+                    <MainPage groupId={selectedGroupId} />
 
                     {/* Plus Button at the bottom-right corner under the table */}
                     <div
