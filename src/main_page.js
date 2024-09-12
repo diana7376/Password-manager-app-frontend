@@ -113,9 +113,6 @@ const MainPage = ({ groupId }) => {
         },
     ];
 
-    const [data, setData] = useState([]);
-    const [selectRow, setSelectRow] = useState(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => {
         if (groupId) {
@@ -143,9 +140,8 @@ const MainPage = ({ groupId }) => {
             <Table
                 dataSource={filteredData} // Use the filtered data
                 columns={columns}
-/
-                {/*rowKey={(record) => record.id}*/}
 
+                 rowKey={(record) => record.id}
                 rowKey={(record) => record.itemName}
 
                 onRow={(record) => ({
