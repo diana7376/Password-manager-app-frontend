@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMwMzgwNDg0LCJpYXQiOjE3MjYwNjA0ODQsImp0aSI6IjgzMTA2Njk1OTVjNjRlZThhYmYzMTFjM2UyMmZmNzQwIiwidXNlcl9pZCI6MX0.FV5m3mUDf5_CtVmtOd226WJo6EfE8IbZF7WHnctRSw4 "
+const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMxMzIyMzI0LCJpYXQiOjE3MjYxMzgzMjQsImp0aSI6ImRlMmEzYzAxNzE3ZjQ0YmE4MTliMzMzYjc1YjM1NWVlIiwidXNlcl9pZCI6MX0.-HnajkUUmPF64Z-xSch4WZ2eV8nreC_yQsPCPPm2y-s"
 export const config = {
     headers: { Authorization: `Bearer ${token}` }
 };
@@ -45,7 +45,7 @@ export function deleteData(id, groupId) {
 
 
 export function dataFetching(groupId, setData) {
-    axios.get('http://127.0.0.1:8000/api/password-items/', config)
+    axios.get(`http://127.0.0.1:8000/api/groups/${groupId}/password-items/`, config)
         .then(response => {
             const mappedData = response.data.map(item => ({
                 id: item.id,
@@ -53,14 +53,14 @@ export function dataFetching(groupId, setData) {
                 userName: item.userName,
                 password: item.password,
                 groupId: item.groupId,
-                userId :item.userId,
+                userId: item.userId,
                 comment: item.comment,
                 url: item.url,
             }));
             setData(mappedData);
         })
         .catch(error => {
-            console.error('' +
-                'There is an error fetching the data.',error);
+            console.error('Error fetching password items for group:', error);
         });
 }
+

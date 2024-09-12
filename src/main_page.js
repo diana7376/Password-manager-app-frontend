@@ -18,11 +18,7 @@ const MainPage = ({ groupId }) => {
     const [editedPassword, setEditedPassword] = useState('');    // Fetch data whenever groupId changes
     const [editedGroup, setEditedGroup] = useState('');
 
-    useEffect(() => {
-        if (groupId) {
-            dataFetching(groupId, setData);
-        }
-    }, [groupId]);
+
 
     // Handle menu click (edit/delete actions)
     const handleMenuClick = ({ key }) => {
@@ -116,6 +112,7 @@ const MainPage = ({ groupId }) => {
 
     useEffect(() => {
         if (groupId) {
+            // Fetch the password items for the selected group directly from the backend
             dataFetching(groupId, setData);
         }
     }, [groupId]);
@@ -138,12 +135,9 @@ const MainPage = ({ groupId }) => {
         <div>
             {/* Table to display password items */}
             <Table
-                dataSource={filteredData} // Use the filtered data
+                dataSource={data} // Use the data fetched for the group
                 columns={columns}
-
-                 rowKey={(record) => record.id}
-                rowKey={(record) => record.itemName}
-
+                rowKey={(record) => record.id}
                 onRow={(record) => ({
                     onClick: () => setSelectRow(record),
                 })}
