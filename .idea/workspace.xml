@@ -81,7 +81,6 @@
   },
   "keyToStringList": {
     "GitStage.ChangesTree.GroupingKeys": [
-      "directory",
       "module",
       "repository"
     ]
