@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+
 import { Table, Modal, Dropdown, Menu, message, Input } from 'antd';
 import { MoreOutlined } from '@ant-design/icons';  // Import ellipsis icon
 import { dataFetching, deleteData } from './crud_operation';
 import './styles.css';
+
 
 const MainPage = ({ groupId }) => {
     const [data, setData] = useState([]);
@@ -111,6 +113,25 @@ const MainPage = ({ groupId }) => {
         },
     ];
 
+    const [data, setData] = useState([]);
+    const [selectRow, setSelectRow] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    useEffect(() => {
+        if (groupId) {
+            dataFetching(groupId, setData);
+        }
+    }, [groupId]);
+
+    // Filter data based on the selected groupId
+    const filteredData = data.filter(item => item.groupId === Number(groupId));
+
+    const handleRowClick = (record) => {
+        setSelectRow(record);
+        setIsModalOpen(true);
+    };
+
+
     const handleModalClose = () => {
         setIsModalOpen(false);
         setSelectRow(null);
@@ -120,9 +141,13 @@ const MainPage = ({ groupId }) => {
         <div>
             {/* Table to display password items */}
             <Table
-                dataSource={data}
+                dataSource={filteredData} // Use the filtered data
                 columns={columns}
-                rowKey={(record) => record.id}
+/
+                {/*rowKey={(record) => record.id}*/}
+
+                rowKey={(record) => record.itemName}
+
                 onRow={(record) => ({
                     onClick: () => setSelectRow(record),
                 })}

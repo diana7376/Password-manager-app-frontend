@@ -12,6 +12,9 @@
       <change beforePath="$PROJECT_DIR$/src/main_page.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main_page.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/save_new_password.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/save_new_password.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/styles.css" afterDir="false" />
+
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -28,7 +31,9 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
+
         <entry key="$PROJECT_DIR$" value="PM-F9" />
+
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -58,7 +63,9 @@
   "keyToString": {
     "Node.js.App.js.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+
     "git-widget-placeholder": "PM-F11",
+
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "/Users/daria/Desktop/Uni/Password-manager-app-frontend",
     "node.js.detected.package.eslint": "true",
@@ -91,7 +98,9 @@
     <recent_temporary>
       <list>
         <item itemvalue="npm.start" />
-        <item itemvalue="npm.start" />
+
+     
+
       </list>
     </recent_temporary>
   </component>
@@ -124,6 +133,7 @@
       <option name="project" value="LOCAL" />
       <updated>1725617819554</updated>
     </task>
+
     <task id="LOCAL-00002" summary="connect backend to groups in sidebar (still not working)">
       <option name="closed" value="true" />
       <created>1726049133681</created>
@@ -133,6 +143,7 @@
       <updated>1726049133681</updated>
     </task>
     <option name="localTasksCounter" value="3" />
+
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -154,7 +165,9 @@
     <MESSAGE value="start to connect sidebar w the back (not ready)" />
     <MESSAGE value="connect backend to groups in sidebar (still not working)" />
     <MESSAGE value="fixed table lable names" />
+
     <MESSAGE value="able to save new password in an existing group (cant create new group)" />
     <option name="LAST_COMMIT_MESSAGE" value="able to save new password in an existing group (cant create new group)" />
+
   </component>
 </project>
