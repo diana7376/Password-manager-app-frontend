@@ -270,5 +270,5 @@ const MainPage = ({ groupId }) => {
         </div>
     );
 };
-
+console.log("working")
 export default MainPage;

@@ -130,3 +130,5 @@ export const fetchHistory = async (passwordId) => {
         throw error;
     }
 };
+
+console.log("working")
