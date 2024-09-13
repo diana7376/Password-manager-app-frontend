@@ -2,7 +2,13 @@ import React, { useState, useEffect } from 'react';
 
 import { Table, Modal, Dropdown, Menu, message, Input, Typography, Space } from 'antd';
 import { MoreOutlined, DownOutlined, SmileOutlined } from '@ant-design/icons';  // Import ellipsis icon
-import { dataFetching, deleteData, fetchAllPasswordItems, fetchUnlistedPasswordItems } from './crud_operation';
+import {
+    dataFetching,
+    deleteData,
+    fetchAllPasswordItems,
+    fetchHistory,
+    fetchUnlistedPasswordItems
+} from './crud_operation';
 import './styles.css';
 
 const { Text } = Typography;
@@ -118,6 +124,7 @@ const MainPage = ({ groupId }) => {
     // Define the dropdown menu (for edit/delete)
     const menu = (
         <Menu onClick={handleMenuClick}>
+            <Menu.Item key="read">Read</Menu.Item>
             <Menu.Item key="edit">Edit</Menu.Item>
             <Menu.Item key="delete">Delete</Menu.Item>
         </Menu>
