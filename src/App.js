@@ -5,7 +5,7 @@ import axios from 'axios';
 import MainPage from './main_page';
 import SaveNewPassword from './save_new_password';
 import { dataFetching } from './crud_operation';
-import { config } from './crud_operation';
+import { config, fetchAllPasswordItems } from './crud_operation';
 import './styles.css';
 
 const { Header, Content, Footer, Sider } = Layout;
@@ -45,11 +45,15 @@ const App = () => {
 
     const fetchData = () => {
         if (selectedGroupId) {
+            // Fetch data for a specific group
             dataFetching(selectedGroupId, setPasswordItems);
         } else {
-            console.error('No group selected');
+            // Fetch all data when "All" is selected
+            fetchAllPasswordItems(setPasswordItems);
         }
     };
+
+
 
     // Fetch all groups
     useEffect(() => {
@@ -57,10 +61,16 @@ const App = () => {
             .get('http://127.0.0.1:8000/api/groups/', config)
             .then((response) => {
                 if (Array.isArray(response.data)) {
-                    const fetchedGroups = response.data.map((group) =>
-                        getItem(group.groupName, `group-${group.groupId}`)
-                    );
-                    setGroupItems(fetchedGroups); // Set fetched groups
+                    // Create the default "All" group
+                    const allGroup = getItem('All', 'group-0');
+
+                    // Map fetched groups and prepend "All" group
+                    const fetchedGroups = [
+                        allGroup, // Insert "All" group first
+                        ...response.data.map((group) => getItem(group.groupName, `group-${group.groupId}`))
+                    ];
+
+                    setGroupItems(fetchedGroups); // Set the complete group list
                 } else {
                     console.error('API response is not an array', response.data);
                     setGroupItems([]); // Fallback to an empty array
@@ -72,43 +82,64 @@ const App = () => {
             });
     }, []); // Empty dependency array ensures it only runs once
 
+
+
     const handleMenuClick = (key) => {
         setSelectedKey(key); // Set the selected key when a menu item is clicked
 
         if (key.startsWith('group-')) {
             const groupId = key.split('-')[1]; // Extract the groupId
-            setSelectedGroupId(groupId); // Update the selected group ID
 
-            // Find the group in the groupItems array by matching the key
-            const clickedGroup = groupItems.find(item => item.key === key);
-
-            if (clickedGroup) {
-                const groupName = clickedGroup.label; // Use the group name directly from the menu item
-
-                // Update the breadcrumb immediately with the clicked group's name
+            if (groupId === '0') {
+                // "All" group selected, fetch all data
+                setSelectedGroupId(null); // Set null or some flag to indicate all groups
                 setBreadcrumbItems([
                     { title: 'Group' },
-                    { title: groupName },
+                    { title: 'All' },
                 ]);
-            }
+                console.log('All groups selected');
+                // Fetch data for all groups
+                fetchDataForAllGroups();
+            } else {
+                setSelectedGroupId(groupId); // Update the selected group ID
+                const clickedGroup = groupItems.find(item => item.key === key);
 
-            // You can still keep the API call for background data fetching if needed
-            axios.get(`http://127.0.0.1:8000/api/groups/${groupId}/`, config)
-                .then(response => {
-                    const groupName = response.data.groupName;
-                    // Optionally update the breadcrumb again if the API call returns different data
+                if (clickedGroup) {
+                    const groupName = clickedGroup.label;
                     setBreadcrumbItems([
                         { title: 'Group' },
                         { title: groupName },
                     ]);
-                })
-                .catch(error => {
-                    console.error('Error fetching group details:', error);
-                });
+                }
 
-            console.log('Selected Group ID:', groupId); // Debugging log
+                // Fetch group-specific data
+                axios.get(`http://127.0.0.1:8000/api/groups/${groupId}/`, config)
+                    .then(response => {
+                        const groupName = response.data.groupName;
+                        setBreadcrumbItems([
+                            { title: 'Group' },
+                            { title: groupName },
+                        ]);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching group details:', error);
+                    });
+            }
         }
     };
+
+
+    const fetchDataForAllGroups = () => {
+        axios
+            .get('http://127.0.0.1:8000/api/password-items/', config) // Adjust API endpoint if necessary
+            .then((response) => {
+                setPasswordItems(response.data); // Assuming response contains all password items
+            })
+            .catch((error) => {
+                console.error('Error fetching all password items:', error);
+            });
+    };
+
 
     const onOpenChange = (keys) => {
         setOpenKeys(keys); // Control open submenus
