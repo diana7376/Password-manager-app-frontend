@@ -1,27 +1,52 @@
 import React, { useState, useEffect } from 'react';
 
-import { Table, Modal, Dropdown, Menu, message, Input } from 'antd';
-import { MoreOutlined } from '@ant-design/icons';  // Import ellipsis icon
+import { Table, Modal, Dropdown, Menu, message, Input, Typography, Space } from 'antd';
+import { MoreOutlined, DownOutlined, SmileOutlined } from '@ant-design/icons';  // Import ellipsis icon
 import { dataFetching, deleteData, fetchAllPasswordItems, fetchUnlistedPasswordItems } from './crud_operation';
 import './styles.css';
 
+const { Text } = Typography;
 
 const MainPage = ({ groupId }) => {
     const [data, setData] = useState([]);
     const [selectRow, setSelectRow] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [clickedRow, setClickedRow] = useState(null);
+    const [historyData, setHistoryData] = useState([]);
 
     // Form fields to store edited values
     const [editedItemName, setEditedItemName] = useState('');
     const [editedUserName, setEditedUserName] = useState('');
     const [editedPassword, setEditedPassword] = useState('');    // Fetch data whenever groupId changes
     const [editedGroup, setEditedGroup] = useState('');
+    const [readModalOpen, setReadModalOpen] = useState(false);
+    const [readModalContent, setReadModalContent] = useState(null);
 
+
+    //history drop down
+    const items = [
+        {
+            key: '1',
+            label: (
+                <a target="_blank" rel="noopener noreferrer">
+                    1st menu item
+                </a>
+            ),
+        },
+        {
+            key: '2',
+            label: (
+                <a target="_blank" rel="noopener noreferrer">
+                    2nd menu item
+                </a>
+            ),
+
+        },
+    ];
 
 
     // Handle menu click (edit/delete actions)
-    const handleMenuClick = ({ key }) => {
+    const handleMenuClick = async ({key}) => {
         if (!clickedRow || !clickedRow.id) {
             console.error('No row selected or row has no id');
             message.error('Failed to delete the password: no ID');
@@ -50,6 +75,15 @@ const MainPage = ({ groupId }) => {
                     message.error('Failed to delete password item');
                     console.error(error);
                 });
+        } else if (key === 'read') {
+            try {
+                const history = await fetchHistory(clickedRow.id);
+                setHistoryData(history);
+                setReadModalOpen(true);
+                setReadModalContent(clickedRow);
+            } catch (error) {
+                message.error('Failed to fetch history');
+            }
         }
     };
     const handleSaveChanges = () => {
@@ -72,6 +106,14 @@ const MainPage = ({ groupId }) => {
                 console.error(error);
             });
     };
+    const historyMenuItems = historyData.map((entry, index) => ({
+        key: `${index}`,
+        label: (
+            <a target="_blank" rel="noopener noreferrer">
+                {entry.timestamp}: {entry.oldPassword} {/* Adjust based on your history data structure */}
+            </a>
+        ),
+    }));
 
     // Define the dropdown menu (for edit/delete)
     const menu = (
@@ -188,6 +230,35 @@ const MainPage = ({ groupId }) => {
                     onChange={(e) => setEditedGroup(e.target.value)}
                     style={{ marginBottom: '10px' }}
                 />
+            </Modal>
+            <Modal
+                title="Read Password Details"
+                open={readModalOpen}
+                onOk={() => setReadModalOpen(false)}
+                onCancel={() => setReadModalOpen(false)}
+                okText="Close"
+                cancelText="Close"
+            >
+                {readModalContent && (
+                    <div>
+                        <p><strong>Name:</strong> {readModalContent.itemName}</p>
+                        <p><strong>User Name:</strong> {readModalContent.userName}</p>
+                        <p><strong>Password:</strong> {readModalContent.password}</p>
+                        <p><strong>Group:</strong> {readModalContent.group}</p>
+                        <Dropdown
+                            menu={{
+                                items: historyMenuItems, // Use historyMenuItems here
+                            }}
+                        >
+                            <a onClick={(e) => e.preventDefault()}>
+                                <Space>
+                                    History
+                                    <DownOutlined />
+                                </Space>
+                            </a>
+                        </Dropdown>
+                    </div>
+                )}
             </Modal>
         </div>
     );
