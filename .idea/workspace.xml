@@ -69,8 +69,10 @@
   "keyToString": {
     "Node.js.App.js.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+
     "git-widget-placeholder": "PM-F34",
     "ignore.virus.scanning.warn.message": "true",
+
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "D:/Projects/PM-F/Password-manager-app-frontend",
     "node.js.detected.package.eslint": "true",
@@ -112,7 +114,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-7c0b70fcd90d-JavaScript-WS-242.21829.149" />
+        <option value="bundled-jdk-9823dce3aa75-b114ca120d71-intellij.indexing.shared.core-IU-242.21829.142" />
+        <option value="bundled-js-predefined-d6986cc7102b-7c0b70fcd90d-JavaScript-IU-242.21829.142" />
       </set>
     </attachedChunks>
   </component>
@@ -128,7 +131,9 @@
       <workItem from="1725611377106" duration="11767000" />
       <workItem from="1725703899221" duration="608000" />
       <workItem from="1725869226364" duration="9206000" />
-      <workItem from="1726219433592" duration="3481000" />
+
+      <workItem from="1726221941234" duration="3055000" />
+
     </task>
     <task id="LOCAL-00001" summary="fixed table lable names">
       <option name="closed" value="true" />
