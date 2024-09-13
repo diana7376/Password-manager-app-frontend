@@ -1,47 +1,43 @@
 import React, { useEffect, useState } from 'react';
-import { Breadcrumb, Layout, Menu, theme, Input, Space } from 'antd';
-import { DesktopOutlined, PieChartOutlined, UserOutlined, AudioOutlined } from '@ant-design/icons';
-import axios from 'axios';
+import { Breadcrumb, Layout, Menu, theme, Input, Button, Modal } from 'antd';
+import { DesktopOutlined, PieChartOutlined, UserOutlined } from '@ant-design/icons';
+import axios from './axiosConfg'; // Ensure this is the correct path
 import MainPage from './main_page';
 import SaveNewPassword from './save_new_password';
 import { dataFetching } from './crud_operation';
 import { config } from './crud_operation';
 import './styles.css';
+import { Route, Routes, useNavigate } from 'react-router-dom';
+import Login from './auth'; // Import Login component
+import Register from './register'; // Import Register component
+import PrivateRoute from './PrivateRoute'; // Ensure this is the correct path
 
-const { Header, Content, Footer, Sider } = Layout;
+const { Content, Footer, Sider } = Layout;
 const { Search } = Input;
-
-const suffix = (
-    <AudioOutlined style={{ fontSize: 16, color: '#1677ff' }} />
-);
-
-const onSearch = (value, _e, info) => console.log(info?.source, value);
-
-// Function to get menu items for the sidebar
-function getItem(label, key, icon, children) {
-    return {
-        key,
-        icon,
-        children,
-        label,
-    };
-}
 
 const App = () => {
     const [collapsed, setCollapsed] = useState(false);
     const [passwordItems, setPasswordItems] = useState([]);
-    const [groupItems, setGroupItems] = useState([]); // Initialize as an array
+    const [groupItems, setGroupItems] = useState([]);
     const [selectedGroupId, setSelectedGroupId] = useState(1);
     const [userId, setUserId] = useState(1);
     const [comment, setCommentId] = useState(null);
     const [url, setUrlId] = useState(null);
-    const [selectedKey, setSelectedKey] = useState('1'); // State to track selected menu item
-    const [openKeys, setOpenKeys] = useState([]); // Track open submenu keys
-
-
+    const [selectedKey, setSelectedKey] = useState('1');
+    const [openKeys, setOpenKeys] = useState([]);
+    const [loggedIn, setLoggedIn] = useState(false); // State to track if user is logged in
+    const [showAuthModal, setShowAuthModal] = useState(false); // State to control the authentication modal
     const {
         token: { colorBgContainer },
     } = theme.useToken();
+
+    const navigate = useNavigate();
+
+    // Check if the user is logged in
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        setLoggedIn(!!token);
+    }, []);
 
     const fetchData = () => {
         if (selectedGroupId) {
@@ -51,35 +47,34 @@ const App = () => {
         }
     };
 
-    // Fetch all groups
-    useEffect(() => {
+   useEffect(() => {
         axios
-            .get('http://127.0.0.1:8000/api/groups/', config)
+            .get('http://127.0.0.1:8000/api/groups/', { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } })
             .then((response) => {
                 if (Array.isArray(response.data)) {
-                    const fetchedGroups = response.data.map((group) =>
-                        getItem(group.groupName, `group-${group.groupId}`)
-                    );
-                    setGroupItems(fetchedGroups); // Set fetched groups
+                    const fetchedGroups = response.data.map((group) => ({
+                        label: group.groupName, // Use the correct property for the name
+                        key: `group-${group.groupId}`, // Ensure the key is unique
+                    }));
+                    setGroupItems(fetchedGroups);
                 } else {
                     console.error('API response is not an array', response.data);
-                    setGroupItems([]); // Fallback to an empty array
+                    setGroupItems([]);
                 }
             })
             .catch((error) => {
                 console.error('Error fetching groups:', error);
-                setGroupItems([]); // Fallback to an empty array
+                setGroupItems([]);
             });
-    }, []); // Empty dependency array ensures it only runs once
+    }, []);
 
     const handleMenuClick = (key) => {
-        setSelectedKey(key); // Set the selected key when a menu item is clicked
+        setSelectedKey(key);
 
         if (key.startsWith('group-')) {
-            const groupId = key.split('-')[1]; // Extract the groupId
-            setSelectedGroupId(groupId); // Update the selected group ID
+            const groupId = key.split('-')[1];
+            setSelectedGroupId(groupId);
 
-            // Fetch the selected group's name and update breadcrumbs
             axios.get(`http://127.0.0.1:8000/api/groups/${groupId}/`, config)
                 .then(response => {
                     const groupName = response.data.groupName;
@@ -91,71 +86,87 @@ const App = () => {
                 .catch(error => {
                     console.error('Error fetching group details:', error);
                 });
-
-            console.log('Selected Group ID:', groupId); // Debugging log
+        } else if (key === 'logout') {
+            handleLogout(); // Call logout function when logout menu item is clicked
         }
     };
 
     const onOpenChange = (keys) => {
-        setOpenKeys(keys); // Control open submenus
+        setOpenKeys(keys);
     };
 
-    // Sidebar menu items
-    const groupMenuItems = [
+ const groupMenuItems = [
         {
             label: 'About us',
             key: '1',
-            icon: <PieChartOutlined />
+            icon: <DesktopOutlined />,
         },
         {
             label: 'Passwords',
             key: '2',
-            icon: <DesktopOutlined />
+            icon: <PieChartOutlined />,
         },
         {
             label: 'Groups',
             key: 'sub1',
             icon: <UserOutlined />,
-            children: groupItems.length > 0 ? groupItems : [{ label: 'Loading...', key: 'loading' }],
+            children: groupItems.length > 0
+                ? groupItems
+                : [{ label: 'Loading...', key: 'loading' }],
+        },
+        {
+            label: 'Logout',
+            key: 'logout',
+            icon: <UserOutlined />,
         },
     ];
-
-    // User menu items for the bottom of the sidebar
-    const userItem = [getItem('User', '3', <DesktopOutlined />)];
-
-    const onPasswordAdd = () => {
-        fetchData();
-    };
 
     const [breadcrumbItems, setBreadcrumbItems] = useState([
         { title: 'Group' },
         { title: 'Group-name' },
     ]);
+
+    const onMenuSelect = ({ key }) => {
+        handleMenuClick(key);
+    };
+
+    const handleLogin = () => {
+        navigate('/login');
+        setShowAuthModal(false);
+    };
+
+    const handleRegister = () => {
+        navigate('/register');
+        setShowAuthModal(false);
+    };
+
+    const onPasswordAdd = () => {
+        fetchData();
+    };
+
+    const handleLogout = () => {
+        localStorage.removeItem('token'); // Remove the token from local storage
+        setLoggedIn(false); // Update the loggedIn state
+        navigate('/login'); // Redirect to the login page
+    };
+
     return (
         <Layout style={{ minHeight: '100vh' }}>
             <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
                 <Menu
                     theme="dark"
                     mode="inline"
-                    selectedKeys={[selectedKey]} // Highlight the selected menu item
-                    openKeys={openKeys} // Control which menus are open
-                    onClick={({ key }) => handleMenuClick(key)} // Handle menu click
-                    onOpenChange={onOpenChange} // Handle submenu open/close
-                    items={groupMenuItems} // Use structured items
-                />
-                <Menu
-                    theme="dark"
-                    mode="inline"
-                    selectedKeys={[selectedKey]} // Ensure only one selected item at a time
-                    onClick={({ key }) => handleMenuClick(key)} // Handle user menu click
-                    items={userItem}
+                    selectedKeys={[selectedKey]}
+                    openKeys={openKeys}
+                    onClick={onMenuSelect}
+                    onOpenChange={onOpenChange}
+                    items={groupMenuItems}
                 />
             </Sider>
 
             <Layout>
                 <Search
                     placeholder="input search text"
-                    onSearch={onSearch}
                     style={{
                         margin: '0 auto',
                         padding: '50px 0',
@@ -163,22 +174,24 @@ const App = () => {
                         color: '#0a0a0a',
                     }}
                 />
-                {/* <Header style={{ padding: 0, background: colorBgContainer }} />*/}
-
                 <Content style={{ margin: '0 16px' }}>
                     <Breadcrumb
                         style={{ margin: '16px 0' }}
                         items={breadcrumbItems}
                     />
-                    <MainPage groupId={selectedGroupId} />
 
-                    {/* Plus Button at the bottom-right corner under the table */}
+                    <Routes>
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/register" element={<Register />} />
+                        <Route path="/" element={<PrivateRoute><MainPage groupId={selectedGroupId} /></PrivateRoute>} exact />
+                    </Routes>
+
                     <div
                         style={{
                             position: 'fixed',
                             bottom: 24,
                             right: 24,
-                            zIndex: 1000, // Ensure it's above other elements
+                            zIndex: 1000,
                         }}
                     >
                         <SaveNewPassword
@@ -192,6 +205,27 @@ const App = () => {
                 </Content>
                 <Footer style={{ textAlign: 'center' }}>© 2024 LockR</Footer>
             </Layout>
+
+            <Modal
+                title="Authentication"
+                visible={showAuthModal}
+                onCancel={() => setShowAuthModal(false)}
+                footer={null}
+            >
+                {loggedIn ? (
+                    <p>You are logged in.</p>
+                ) : (
+                    <div>
+                        <p>Please log in to continue.</p>
+                        <Button type="primary" onClick={handleLogin} style={{ marginRight: 8 }}>
+                            Login
+                        </Button>
+                        <Button type="default" onClick={handleRegister}>
+                            Create Account
+                        </Button>
+                    </div>
+                )}
+            </Modal>
         </Layout>
     );
 };
