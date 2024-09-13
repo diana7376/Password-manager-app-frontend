@@ -18,6 +18,11 @@ const MainPage = ({ groupId, userId }) => {
     const [editedPassword, setEditedPassword] = useState('');
     const [editedGroup, setEditedGroup] = useState('');
 
+    const [originalItemName, setOriginalItemName] = useState('');
+    const [originalUserName, setOriginalUserName] = useState('');
+    const [originalPassword, setOriginalPassword] = useState('');
+    const [originalGroup, setOriginalGroup] = useState('');
+
     const showConfirmSave = () => {
         confirm({
             title: 'Are you sure you want to save these changes?',
@@ -39,11 +44,18 @@ const MainPage = ({ groupId, userId }) => {
         }
 
         if (key === 'edit') {
-            // password details
+            // existing password details in the modal
             setEditedItemName(clickedRow.itemName);
             setEditedUserName(clickedRow.userName);
             setEditedPassword(clickedRow.password);
-            setEditedGroup(clickedRow.group);
+            setEditedGroup(clickedRow.groupId);
+
+            // set original values to compare
+            setOriginalItemName(clickedRow.itemName);
+            setOriginalUserName(clickedRow.userName);
+            setOriginalPassword(clickedRow.password);
+            setOriginalGroup(clickedRow.groupId);
+
             setIsModalOpen(true);
         } else if (key === 'delete') {
             deleteData(clickedRow.id, groupId)
@@ -82,6 +94,17 @@ const MainPage = ({ groupId, userId }) => {
                 console.error(error);
             });
     };
+
+    //compare original and edited values
+    const isSaveDisabled = () => {
+        return (
+            editedItemName === originalItemName &&
+            editedUserName === originalUserName &&
+            editedPassword === originalPassword &&
+            editedGroup === originalGroup
+        );
+    };
+
     const handleModalClose = () => {
         setIsModalOpen(false);
         setSelectRow(null);
@@ -155,6 +178,8 @@ const MainPage = ({ groupId, userId }) => {
                 onCancel={handleModalClose}
                 okText="Save"
                 cancelText="Close"
+                okButtonProps={{ disabled: isSaveDisabled() }}  // Disable the save button if no changes
+
             >
                 <Input
                     placeholder="Item Name"
