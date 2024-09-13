@@ -1,27 +1,55 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Modal, Dropdown, Menu, message, Input } from 'antd';
-import { MoreOutlined } from '@ant-design/icons';
-import { dataFetching, deleteData, updatePasswordItem} from './crud_operation';
+import { Table, Modal, Dropdown, Menu, message, Input, Typography, Space } from 'antd';
+import { MoreOutlined, DownOutlined, SmileOutlined } from '@ant-design/icons';
+import {
+    dataFetching,
+    deleteData,
+    fetchAllPasswordItems,
+    fetchHistory,
+    fetchUnlistedPasswordItems,
+    updatePasswordItem
+} from './crud_operation';
 import './styles.css';
 
+const { Text } = Typography;
 const { confirm } = Modal;
+
 
 const MainPage = ({ groupId, userId }) => {
     const [data, setData] = useState([]);
     const [selectRow, setSelectRow] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [clickedRow, setClickedRow] = useState(null);
+    const [historyData, setHistoryData] = useState([]);
 
     // Form fields to store edited values
     const [editedItemName, setEditedItemName] = useState('');
     const [editedUserName, setEditedUserName] = useState('');
     const [editedPassword, setEditedPassword] = useState('');
     const [editedGroup, setEditedGroup] = useState('');
+    const [readModalOpen, setReadModalOpen] = useState(false);
+    const [readModalContent, setReadModalContent] = useState(null);
 
-    const [originalItemName, setOriginalItemName] = useState('');
-    const [originalUserName, setOriginalUserName] = useState('');
-    const [originalPassword, setOriginalPassword] = useState('');
-    const [originalGroup, setOriginalGroup] = useState('');
+    //history drop down
+    const items = [
+        {
+            key: '1',
+            label: (
+                <a target="_blank" rel="noopener noreferrer">
+                    1st menu item
+                </a>
+            ),
+        },
+        {
+            key: '2',
+            label: (
+                <a target="_blank" rel="noopener noreferrer">
+                    2nd menu item
+                </a>
+            ),
+
+        },
+    ];
 
     const showConfirmSave = () => {
         confirm({
@@ -36,7 +64,7 @@ const MainPage = ({ groupId, userId }) => {
     };
 
     // Handle menu click (edit/delete actions)
-    const handleMenuClick = ({ key }) => {
+    const handleMenuClick = async ({key}) => {
         if (!clickedRow || !clickedRow.id) {
             console.error('No row selected or row has no id');
             message.error('Failed to delete the password: no ID');
@@ -44,21 +72,17 @@ const MainPage = ({ groupId, userId }) => {
         }
 
         if (key === 'edit') {
-            // existing password details in the modal
+            // password details
             setEditedItemName(clickedRow.itemName);
             setEditedUserName(clickedRow.userName);
             setEditedPassword(clickedRow.password);
-            setEditedGroup(clickedRow.groupId);
-
-            // set original values to compare
-            setOriginalItemName(clickedRow.itemName);
-            setOriginalUserName(clickedRow.userName);
-            setOriginalPassword(clickedRow.password);
-            setOriginalGroup(clickedRow.groupId);
-
+            setEditedGroup(clickedRow.group);
             setIsModalOpen(true);
         } else if (key === 'delete') {
-            deleteData(clickedRow.id, groupId)
+            // Use the item's groupId if we are in the "All" group view
+            const effectiveGroupId = groupId === -1 ? clickedRow.groupId : groupId;
+
+            deleteData(clickedRow.id, effectiveGroupId)
                 .then(() => {
                     message.success('Password item deleted successfully');
                     setData(prevData => prevData.filter(item => item.id !== clickedRow.id));
@@ -67,6 +91,15 @@ const MainPage = ({ groupId, userId }) => {
                     message.error('Failed to delete password item');
                     console.error(error);
                 });
+        } else if (key === 'read') {
+            try {
+                const history = await fetchHistory(clickedRow.id);
+                setHistoryData(history);
+                setReadModalOpen(true);
+                setReadModalContent(clickedRow);
+            } catch (error) {
+                message.error('Failed to fetch history');
+            }
         }
     };
 
@@ -95,24 +128,19 @@ const MainPage = ({ groupId, userId }) => {
             });
     };
 
-    //compare original and edited values
-    const isSaveDisabled = () => {
-        return (
-            editedItemName === originalItemName &&
-            editedUserName === originalUserName &&
-            editedPassword === originalPassword &&
-            editedGroup === originalGroup
-        );
-    };
-
-    const handleModalClose = () => {
-        setIsModalOpen(false);
-        setSelectRow(null);
-    };
+    const historyMenuItems = historyData.map((entry, index) => ({
+        key: `${index}`,
+        label: (
+            <a target="_blank" rel="noopener noreferrer">
+                {entry.timestamp}: {entry.oldPassword} {/* Adjust based on your history data structure */}
+            </a>
+        ),
+    }));
 
     // Define the dropdown menu (for edit/delete)
     const menu = (
         <Menu onClick={handleMenuClick}>
+            <Menu.Item key="read">Read</Menu.Item>
             <Menu.Item key="edit">Edit</Menu.Item>
             <Menu.Item key="delete">Delete</Menu.Item>
         </Menu>
@@ -151,13 +179,35 @@ const MainPage = ({ groupId, userId }) => {
 
 
     useEffect(() => {
-        if (groupId) {
+        if (groupId === -1) {
+            // Fetch the password items for the selected group directly from the backend
+            fetchAllPasswordItems(setData);
+        }
+        else if (groupId) {
             // Fetch the password items for the selected group directly from the backend
             dataFetching(groupId, setData);
+        } else {
+            // Fetch all password items when "All" group is selected
+            fetchUnlistedPasswordItems(setData);
         }
     }, [groupId]);
 
 
+
+    // Filter data based on the selected groupId
+
+    //const filteredData = groupId ? data.filter(item => item.groupId === Number(groupId)) : data;
+
+    const handleRowClick = (record) => {
+        setSelectRow(record);
+        setIsModalOpen(true);
+    };
+
+
+    const handleModalClose = () => {
+        setIsModalOpen(false);
+        setSelectRow(null);
+    };
     return (
         <div>
             {/* Table to display password items */}
@@ -178,8 +228,6 @@ const MainPage = ({ groupId, userId }) => {
                 onCancel={handleModalClose}
                 okText="Save"
                 cancelText="Close"
-                okButtonProps={{ disabled: isSaveDisabled() }}  // Disable the save button if no changes
-
             >
                 <Input
                     placeholder="Item Name"
@@ -206,8 +254,37 @@ const MainPage = ({ groupId, userId }) => {
                     style={{ marginBottom: '10px' }}
                 />
             </Modal>
+            <Modal
+                title="Read Password Details"
+                open={readModalOpen}
+                onOk={() => setReadModalOpen(false)}
+                onCancel={() => setReadModalOpen(false)}
+                okText="Close"
+                cancelText="Close"
+            >
+                {readModalContent && (
+                    <div>
+                        <p><strong>Name:</strong> {readModalContent.itemName}</p>
+                        <p><strong>User Name:</strong> {readModalContent.userName}</p>
+                        <p><strong>Password:</strong> {readModalContent.password}</p>
+                        <p><strong>Group:</strong> {readModalContent.group}</p>
+                        <Dropdown
+                            menu={{
+                                items: historyMenuItems, // Use historyMenuItems here
+                            }}
+                        >
+                            <a onClick={(e) => e.preventDefault()}>
+                                <Space>
+                                    History
+                                    <DownOutlined />
+                                </Space>
+                            </a>
+                        </Dropdown>
+                    </div>
+                )}
+            </Modal>
         </div>
     );
 };
-
+console.log("working")
 export default MainPage;
