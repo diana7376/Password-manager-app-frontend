@@ -68,7 +68,6 @@
   "keyToString": {
     "Node.js.App.js.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "PM-F14",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "/Users/daria/Desktop/Uni/Password-manager-app-frontend",
     "node.js.detected.package.eslint": "true",
@@ -109,14 +108,15 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-7c0b70fcd90d-JavaScript-WS-242.21829.149" />
+        <option value="bundled-jdk-9823dce3aa75-b114ca120d71-intellij.indexing.shared.core-IU-242.21829.142" />
+        <option value="bundled-js-predefined-d6986cc7102b-7c0b70fcd90d-JavaScript-IU-242.21829.142" />
       </set>
     </attachedChunks>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="30415877-8e74-4120-9d86-1294def20539" name="Changes" comment="" />
+      <changelist id="32870176-a3ef-4b17-9697-625be79b400a" name="Changes" comment="git stuff" />
       <created>1725452596617</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
@@ -125,6 +125,7 @@
       <workItem from="1725611377106" duration="11767000" />
       <workItem from="1725703899221" duration="608000" />
       <workItem from="1725869226364" duration="9206000" />
+      <workItem from="1726221941234" duration="2777000" />
     </task>
     <task id="LOCAL-00001" summary="fixed table lable names">
       <option name="closed" value="true" />
