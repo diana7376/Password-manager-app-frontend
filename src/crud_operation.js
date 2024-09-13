@@ -33,12 +33,24 @@ export function updatePasswordItem(id, groupId, updatedData) {
 
 
 export function deleteData(id, groupId) {
+    //delete password
     return axios.delete(`http://127.0.0.1:8000/api/groups/${groupId}/password-items/${id}/`, config)
-        .then(response => {
-            return response.data;
+        .then(() => {
+            //check if the group has any remaining items
+            return axios.get(`http://127.0.0.1:8000/api/groups/${groupId}/password-items/`, config);
         })
+        .then(response =>{
+                const remainingPasswords = response.data;
+                if (remainingPasswords.length === 0) {
+                    //if no pass i the group delete group
+                    return axios.delete(`http://127.0.0.1:8000/api/groups/${groupId}/`, config)
+                        .then(() => {
+                            console.log(`Group ${groupId} deleted because it became empty.`);
+                        });
+                }
+            })
         .catch(error => {
-            console.error('Error deleting the password item:', error);
+            console.error('Error in deleteData', error);
             throw error;
         });
 }

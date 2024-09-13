@@ -6,6 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="32870176-a3ef-4b17-9697-625be79b400a" name="Changes" comment="git stuff">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/crud_operation.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/crud_operation.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main_page.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main_page.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -39,22 +40,22 @@
     &quot;assignee&quot;: &quot;DashaRateeva&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/diana7376/Password-manager-app-frontend.git&quot;,
-    &quot;accountId&quot;: &quot;57859c28-2743-448d-af66-d5b5da3f691b&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/diana7376/Password-manager-app-frontend.git",
+    "accountId": "ceb78dfe-12be-453e-b546-61a3bd6ec750"
   },
-  &quot;recentNewPullRequestHead&quot;: {
-    &quot;server&quot;: {
-      &quot;useHttp&quot;: false,
-      &quot;host&quot;: &quot;github.com&quot;,
-      &quot;port&quot;: null,
-      &quot;suffix&quot;: null
+  "recentNewPullRequestHead": {
+    "server": {
+      "useHttp": false,
+      "host": "github.com",
+      "port": null,
+      "suffix": null
     },
-    &quot;owner&quot;: &quot;diana7376&quot;,
-    &quot;repository&quot;: &quot;Password-manager-app-frontend&quot;
+    "owner": "diana7376",
+    "repository": "Password-manager-app-frontend"
   }
-}</component>
+}]]></component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 7
 }</component>
@@ -68,15 +69,17 @@
   "keyToString": {
     "Node.js.App.js.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "PM-F14",
+    "git-widget-placeholder": "PM-F34",
+    "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/Users/daria/Desktop/Uni/Password-manager-app-frontend",
+    "last_opened_file_path": "D:/Projects/PM-F/Password-manager-app-frontend",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
     "npm.start.executor": "Run",
+    "ts.external.directory.path": "C:\\Program Files\\JetBrains\\WebStorm 2024.2.1\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external",
     "vue.rearranger.settings.migration": "true"
   },
   "keyToStringList": {
@@ -116,7 +119,7 @@
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="30415877-8e74-4120-9d86-1294def20539" name="Changes" comment="" />
+      <changelist id="32870176-a3ef-4b17-9697-625be79b400a" name="Changes" comment="git stuff" />
       <created>1725452596617</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
@@ -125,6 +128,7 @@
       <workItem from="1725611377106" duration="11767000" />
       <workItem from="1725703899221" duration="608000" />
       <workItem from="1725869226364" duration="9206000" />
+      <workItem from="1726219433592" duration="3481000" />
     </task>
     <task id="LOCAL-00001" summary="fixed table lable names">
       <option name="closed" value="true" />
