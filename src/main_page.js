@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 import { Table, Modal, Dropdown, Menu, message, Input } from 'antd';
 import { MoreOutlined } from '@ant-design/icons';  // Import ellipsis icon
-import { dataFetching, deleteData } from './crud_operation';
+import { dataFetching, deleteData, fetchAllPasswordItems } from './crud_operation';
 import './styles.css';
 
 
@@ -38,7 +38,10 @@ const MainPage = ({ groupId }) => {
             setEditedGroup(clickedRow.group);
             setIsModalOpen(true);
         } else if (key === 'delete') {
-            deleteData(clickedRow.id, groupId)
+            // Use the item's groupId if we are in the "All" group view
+            const effectiveGroupId = groupId === null ? clickedRow.groupId : groupId;
+
+            deleteData(clickedRow.id, effectiveGroupId)
                 .then(() => {
                     message.success('Password item deleted successfully');
                     setData(prevData => prevData.filter(item => item.id !== clickedRow.id));
@@ -114,11 +117,16 @@ const MainPage = ({ groupId }) => {
         if (groupId) {
             // Fetch the password items for the selected group directly from the backend
             dataFetching(groupId, setData);
+        } else {
+            // Fetch all password items when "All" group is selected
+            fetchAllPasswordItems(setData);
         }
     }, [groupId]);
 
+
     // Filter data based on the selected groupId
-    const filteredData = data.filter(item => item.groupId === Number(groupId));
+// Filter data based on the selected groupId
+    const filteredData = groupId ? data.filter(item => item.groupId === Number(groupId)) : data;
 
     const handleRowClick = (record) => {
         setSelectRow(record);
@@ -135,7 +143,7 @@ const MainPage = ({ groupId }) => {
         <div>
             {/* Table to display password items */}
             <Table
-                dataSource={data} // Use the data fetched for the group
+                dataSource={filteredData} // Use the data fetched for the group
                 columns={columns}
                 rowKey={(record) => record.id}
                 onRow={(record) => ({
