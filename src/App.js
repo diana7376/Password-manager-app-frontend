@@ -244,7 +244,7 @@ const App = () => {
                         style={{ margin: '16px 0' }}
                         items={breadcrumbItems}
                     />
-                    <MainPage groupId={selectedGroupId} />
+                    <MainPage groupId={selectedGroupId} userId={userId} />
 
                     {/* Plus Button at the bottom-right corner under the table */}
                     <div
