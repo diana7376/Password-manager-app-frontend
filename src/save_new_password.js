@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { PlusOutlined, UserOutlined, EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
-import { Button, Tooltip, Modal, Input, Select, message } from 'antd';
+import { Button, Tooltip, Modal, Input, Select, message, Flex } from 'antd';
 import { addPasswordItem, config } from './crud_operation';
 import axios from 'axios';
 
@@ -134,8 +134,9 @@ const SaveNewPassword = ({ groupId, userId, comment, url, onPasswordAdd }) => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
-                    style={{ marginBottom: '10px' }}
+                    style={{ width: '45%', marginBottom: '10px',  }}
                 />
+                <Button type="primary" style={{ width: '45%', marginBottom: '10px', marginLeft: '9.5%'}}>Generate password</Button>
 
                 {/* Group Selection */}
                 <Select
