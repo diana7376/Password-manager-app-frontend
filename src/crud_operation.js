@@ -63,6 +63,27 @@ export function fetchAllPasswordItems(setData) {
         });
 }
 
+export function fetchUnlistedPasswordItems(setData) {
+    axios.get('http://127.0.0.1:8000/api/password-items/unlisted/', config) // Adjust the endpoint if needed
+        .then(response => {
+            const mappedData = response.data.map(item => ({
+                id: item.id,
+                itemName: item.itemName,
+                userName: item.userName,
+                password: item.password,
+                groupId: item.groupId,  // Assuming the groupId is part of the response
+                userId: item.userId,
+                comment: item.comment,
+                url: item.url,
+            }));
+            setData(mappedData);
+        })
+        .catch(error => {
+            console.error('Error fetching unlisted password items:', error);
+        });
+}
+
+
 
 export function dataFetching(groupId, setData) {
     axios.get(`http://127.0.0.1:8000/api/groups/${groupId}/password-items/`, config)
