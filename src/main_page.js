@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-
 import { Table, Modal, Dropdown, Menu, message, Input } from 'antd';
-import { MoreOutlined } from '@ant-design/icons';  // Import ellipsis icon
+import { MoreOutlined } from '@ant-design/icons';
 import { dataFetching, deleteData } from './crud_operation';
 import './styles.css';
 
