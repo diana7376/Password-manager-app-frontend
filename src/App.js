@@ -5,7 +5,7 @@ import axios from 'axios';
 import MainPage from './main_page';
 import SaveNewPassword from './save_new_password';
 import { dataFetching } from './crud_operation';
-import { config, fetchAllPasswordItems } from './crud_operation';
+import { config, fetchAllPasswordItems, fetchUnlistedPasswordItems } from './crud_operation';
 import './styles.css';
 
 const { Header, Content, Footer, Sider } = Layout;
@@ -31,7 +31,7 @@ const App = () => {
     const [collapsed, setCollapsed] = useState(false);
     const [passwordItems, setPasswordItems] = useState([]);
     const [groupItems, setGroupItems] = useState([]); // Initialize as an array
-    const [selectedGroupId, setSelectedGroupId] = useState(1);
+    const [selectedGroupId, setSelectedGroupId] = useState(-1);
     const [userId, setUserId] = useState(1);
     const [comment, setCommentId] = useState(null);
     const [url, setUrlId] = useState(null);
@@ -44,12 +44,17 @@ const App = () => {
     } = theme.useToken();
 
     const fetchData = () => {
-        if (selectedGroupId) {
+        if (selectedGroupId === -1) {
+            // Fetch data for a specific group
+            fetchAllPasswordItems(setPasswordItems);
+        }
+        else if (selectedGroupId) {
             // Fetch data for a specific group
             dataFetching(selectedGroupId, setPasswordItems);
-        } else {
+        }
+        else {
             // Fetch all data when "All" is selected
-            fetchAllPasswordItems(setPasswordItems);
+            fetchUnlistedPasswordItems(setPasswordItems);
         }
     };
 
@@ -63,10 +68,12 @@ const App = () => {
                 if (Array.isArray(response.data)) {
                     // Create the default "All" group
                     const allGroup = getItem('All', 'group-0');
+                    const unlistedGroup = getItem('Unlisted', 'group-X');
 
                     // Map fetched groups and prepend "All" group
                     const fetchedGroups = [
                         allGroup, // Insert "All" group first
+                        unlistedGroup,
                         ...response.data.map((group) => getItem(group.groupName, `group-${group.groupId}`))
                     ];
 
@@ -92,15 +99,27 @@ const App = () => {
 
             if (groupId === '0') {
                 // "All" group selected, fetch all data
-                setSelectedGroupId(null); // Set null or some flag to indicate all groups
+                setSelectedGroupId(-1); // Set null or some flag to indicate all groups
                 setBreadcrumbItems([
                     { title: 'Group' },
                     { title: 'All' },
                 ]);
-                console.log('All groups selected');
+                console.log('All group selected');
                 // Fetch data for all groups
                 fetchDataForAllGroups();
-            } else {
+            }
+            else if (groupId === 'X') {
+                // "Unlisted" group selected, fetch all data
+                setSelectedGroupId(null); // Set -1 or some flag to indicate unlisted groups
+                setBreadcrumbItems([
+                    { title: 'Group' },
+                    { title: 'Unlisted' },
+                ]);
+                console.log('Unlisted group selected');
+                // Fetch data for unlisted groups
+                fetchDataForUnlistedGroups();
+            }
+            else {
                 setSelectedGroupId(groupId); // Update the selected group ID
                 const clickedGroup = groupItems.find(item => item.key === key);
 
@@ -140,6 +159,16 @@ const App = () => {
             });
     };
 
+    const fetchDataForUnlistedGroups = () => {
+        axios
+            .get('http://127.0.0.1:8000/api/password-items/unlisted/', config) // Adjust API endpoint if necessary
+            .then((response) => {
+                setPasswordItems(response.data); // Assuming response contains unlisted password items
+            })
+            .catch((error) => {
+                console.error('Error fetching unlisted password items:', error);
+            });
+    };
 
     const onOpenChange = (keys) => {
         setOpenKeys(keys); // Control open submenus
