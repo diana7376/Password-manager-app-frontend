@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Modal, Dropdown, Menu, message, Input } from 'antd';
 import { MoreOutlined } from '@ant-design/icons';
-import { dataFetching, deleteData } from './crud_operation';
+import { dataFetching, deleteData, updatePasswordItem} from './crud_operation';
 import './styles.css';
 
+const { confirm } = Modal;
 
-const MainPage = ({ groupId }) => {
+const MainPage = ({ groupId, userId }) => {
     const [data, setData] = useState([]);
     const [selectRow, setSelectRow] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -14,10 +15,20 @@ const MainPage = ({ groupId }) => {
     // Form fields to store edited values
     const [editedItemName, setEditedItemName] = useState('');
     const [editedUserName, setEditedUserName] = useState('');
-    const [editedPassword, setEditedPassword] = useState('');    // Fetch data whenever groupId changes
+    const [editedPassword, setEditedPassword] = useState('');
     const [editedGroup, setEditedGroup] = useState('');
 
-
+    const showConfirmSave = () => {
+        confirm({
+            title: 'Are you sure you want to save these changes?',
+            content: 'This will overwrite the existing password information.',
+            okText: 'Yes',
+            cancelText: 'No',
+            onOk() {
+                handleSaveChanges();
+            },
+        });
+    };
 
     // Handle menu click (edit/delete actions)
     const handleMenuClick = ({ key }) => {
@@ -27,10 +38,8 @@ const MainPage = ({ groupId }) => {
             return;
         }
 
-        console.log('clickedRow:', clickedRow);  // Debugging log for clickedRow
-        console.log('groupId:', groupId);  // Debugging log for groupId
-
         if (key === 'edit') {
+            // password details
             setEditedItemName(clickedRow.itemName);
             setEditedUserName(clickedRow.userName);
             setEditedPassword(clickedRow.password);
@@ -48,25 +57,34 @@ const MainPage = ({ groupId }) => {
                 });
         }
     };
+
+    //handle saved changes and update the DB
     const handleSaveChanges = () => {
         const updatedData = {
-            id: clickedRow.id,
             itemName: editedItemName,
             userName: editedUserName,
             password: editedPassword,
-            group: editedGroup,
+            groupId: editedGroup,
+            userId: userId
         };
 
         updatePasswordItem(clickedRow.id, groupId, updatedData)
             .then(() => {
                 message.success('Password item updated successfully');
-                setIsModalOpen(false);  // Close the modal
+                setIsModalOpen(false);
                 setData(prevData => prevData.map(item => (item.id === clickedRow.id ? updatedData : item)));
             })
             .catch((error) => {
+                if (error.response) {
+                    console.error('Response error:', error.response.data); // Log detailed response error
+                }
                 message.error('Failed to update password item');
                 console.error(error);
             });
+    };
+    const handleModalClose = () => {
+        setIsModalOpen(false);
+        setSelectRow(null);
     };
 
     // Define the dropdown menu (for edit/delete)
@@ -116,19 +134,6 @@ const MainPage = ({ groupId }) => {
         }
     }, [groupId]);
 
-    // Filter data based on the selected groupId
-    const filteredData = data.filter(item => item.groupId === Number(groupId));
-
-    const handleRowClick = (record) => {
-        setSelectRow(record);
-        setIsModalOpen(true);
-    };
-
-
-    const handleModalClose = () => {
-        setIsModalOpen(false);
-        setSelectRow(null);
-    };
 
     return (
         <div>
@@ -146,7 +151,7 @@ const MainPage = ({ groupId }) => {
             <Modal
                 title={selectRow ? selectRow.itemName : "Details"}
                 open={isModalOpen}
-                onOk={handleModalClose}
+                onOk={showConfirmSave}
                 onCancel={handleModalClose}
                 okText="Save"
                 cancelText="Close"

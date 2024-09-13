@@ -4,9 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="32870176-a3ef-4b17-9697-625be79b400a" name="Changes" comment="git stuff">
+    <list default="true" id="32870176-a3ef-4b17-9697-625be79b400a" name="Changes" comment="when deleting last pass in a group the group will delete">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/crud_operation.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/crud_operation.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main_page.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main_page.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -40,6 +42,17 @@
     &quot;assignee&quot;: &quot;DashaRateeva&quot;
   }
 }</component>
+  <component name="GitHubPullRequestState"><![CDATA[{
+  "prStates": [
+    {
+      "id": {
+        "id": "PR_kwDOMsHR9857a6G7",
+        "number": 46
+      },
+      "lastSeen": 1726225771304
+    }
+  ]
+}]]></component>
   <component name="GithubPullRequestsUISettings"><![CDATA[{
   "selectedUrlAndAccountId": {
     "url": "https://github.com/diana7376/Password-manager-app-frontend.git",
@@ -69,7 +82,7 @@
   "keyToString": {
     "Node.js.App.js.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "PM-F34",
+    "git-widget-placeholder": "PM-F27",
     "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "D:/Projects/PM-F/Password-manager-app-frontend",
@@ -128,7 +141,7 @@
       <workItem from="1725611377106" duration="11767000" />
       <workItem from="1725703899221" duration="608000" />
       <workItem from="1725869226364" duration="9206000" />
-      <workItem from="1726219433592" duration="3481000" />
+      <workItem from="1726219433592" duration="7699000" />
     </task>
     <task id="LOCAL-00001" summary="fixed table lable names">
       <option name="closed" value="true" />
@@ -170,7 +183,15 @@
       <option name="project" value="LOCAL" />
       <updated>1726137350895</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="when deleting last pass in a group the group will delete">
+      <option name="closed" value="true" />
+      <created>1726225751353</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1726225751353</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -195,6 +216,7 @@
     <MESSAGE value="nothing was changed, simply my github &quot;isi bate joc de noi&quot;" />
     <MESSAGE value="fixed the buttons in side bar" />
     <MESSAGE value="git stuff" />
-    <option name="LAST_COMMIT_MESSAGE" value="git stuff" />
+    <MESSAGE value="when deleting last pass in a group the group will delete" />
+    <option name="LAST_COMMIT_MESSAGE" value="when deleting last pass in a group the group will delete" />
   </component>
 </project>
