@@ -35,8 +35,10 @@ const App = () => {
     const [userId, setUserId] = useState(1);
     const [comment, setCommentId] = useState(null);
     const [url, setUrlId] = useState(null);
-    const [selectedKey, setSelectedKey] = useState('1'); // State to track selected menu item
+    const [selectedKey, setSelectedKey] = useState('group-0'); // State to track selected menu item
     const [openKeys, setOpenKeys] = useState([]); // Track open submenu keys
+
+
 
 
     const {
@@ -203,7 +205,7 @@ const App = () => {
 
     const [breadcrumbItems, setBreadcrumbItems] = useState([
         { title: 'Group' },
-        { title: 'Group-name' },
+        { title: 'All' },
     ]);
     return (
         <Layout style={{ minHeight: '100vh' }}>
@@ -244,7 +246,7 @@ const App = () => {
                         style={{ margin: '16px 0' }}
                         items={breadcrumbItems}
                     />
-                    <MainPage groupId={selectedGroupId} userId={userId} />
+                    <MainPage groupId={selectedGroupId} userId = {userId}/>
 
                     {/* Plus Button at the bottom-right corner under the table */}
                     <div
@@ -269,5 +271,5 @@ const App = () => {
         </Layout>
     );
 };
-console.log("working")
+
 export default App;

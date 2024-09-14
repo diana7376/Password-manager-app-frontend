@@ -40,15 +40,15 @@ export function deleteData(id, groupId) {
             return axios.get(`http://127.0.0.1:8000/api/groups/${groupId}/password-items/`, config);
         })
         .then(response =>{
-                const remainingPasswords = response.data;
-                if (remainingPasswords.length === 0) {
-                    //if no pass i the group delete group
-                    return axios.delete(`http://127.0.0.1:8000/api/groups/${groupId}/`, config)
-                        .then(() => {
-                            console.log(`Group ${groupId} deleted because it became empty.`);
-                        });
-                }
-            })
+            const remainingPasswords = response.data;
+            if (remainingPasswords.length === 0) {
+                //if no pass i the group delete group
+                return axios.delete(`http://127.0.0.1:8000/api/groups/${groupId}/`, config)
+                    .then(() => {
+                        console.log(`Group ${groupId} deleted because it became empty.`);
+                    });
+            }
+        })
         .catch(error => {
             console.error('Error in deleteData', error);
             throw error;
@@ -130,5 +130,3 @@ export const fetchHistory = async (passwordId) => {
         throw error;
     }
 };
-
-console.log("working")

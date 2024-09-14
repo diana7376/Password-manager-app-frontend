@@ -7,13 +7,15 @@ import {
     deleteData,
     fetchAllPasswordItems,
     fetchHistory,
-    fetchUnlistedPasswordItems
+    fetchUnlistedPasswordItems,
+    updatePasswordItem
 } from './crud_operation';
 import './styles.css';
 
 const { Text } = Typography;
+const { confirm } = Modal;
 
-const MainPage = ({ groupId }) => {
+const MainPage = ({ groupId, userId }) => {
     const [data, setData] = useState([]);
     const [selectRow, setSelectRow] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -27,6 +29,26 @@ const MainPage = ({ groupId }) => {
     const [editedGroup, setEditedGroup] = useState('');
     const [readModalOpen, setReadModalOpen] = useState(false);
     const [readModalContent, setReadModalContent] = useState(null);
+
+    // Original values for comparison
+    const [originalItemName, setOriginalItemName] = useState('');
+    const [originalUserName, setOriginalUserName] = useState('');
+    const [originalPassword, setOriginalPassword] = useState('');
+    const [originalGroup, setOriginalGroup] = useState('');
+
+    // State for disabling/enabling the save button
+    const [isSaveButtonDisabled, setIsSaveButtonDisabled] = useState(true);
+
+    const isSaveDisabled = () => {
+        return (
+            editedItemName === originalItemName &&
+            editedUserName === originalUserName &&
+            editedPassword === originalPassword &&
+            String(editedGroup) === String(originalGroup)  // Convert both to strings for comparison
+        );
+    };
+
+
 
 
     //history drop down
@@ -66,7 +88,18 @@ const MainPage = ({ groupId }) => {
             setEditedItemName(clickedRow.itemName);
             setEditedUserName(clickedRow.userName);
             setEditedPassword(clickedRow.password);
-            setEditedGroup(clickedRow.group);
+            setEditedGroup(String(clickedRow.groupId));  // Ensure it's set correctly as a string
+
+
+            // Set original values for comparison
+            setOriginalItemName(clickedRow.itemName);
+            setOriginalUserName(clickedRow.userName);
+            setOriginalPassword(clickedRow.password);
+            setOriginalGroup(String(clickedRow.groupId));  // Ensure original value is a string
+
+            // Reset the Save button state
+            setIsSaveButtonDisabled(isSaveDisabled());
+
             setIsModalOpen(true);
         } else if (key === 'delete') {
             // Use the item's groupId if we are in the "All" group view
@@ -92,26 +125,66 @@ const MainPage = ({ groupId }) => {
             }
         }
     };
+
+    // Update the Save button's disabled state whenever edited values change
+    useEffect(() => {
+        setIsSaveButtonDisabled(isSaveDisabled());
+    }, [editedItemName, editedUserName, editedPassword, editedGroup]);
+
+
     const handleSaveChanges = () => {
+        if (!userId) {
+            console.error("userId is not defined");
+            return;
+        }
+
+        // Use clickedRow.groupId if groupId is -1 (i.e., "All" group)
+        const effectiveGroupId = groupId === -1 ? clickedRow.groupId : groupId;
+
+
         const updatedData = {
             id: clickedRow.id,
             itemName: editedItemName,
             userName: editedUserName,
             password: editedPassword,
-            group: editedGroup,
+            groupId: effectiveGroupId,
+            userId: userId,
         };
 
-        updatePasswordItem(clickedRow.id, groupId, updatedData)
+        // Send PUT request to update the data
+        updatePasswordItem(clickedRow.id, effectiveGroupId, updatedData)
             .then(() => {
                 message.success('Password item updated successfully');
                 setIsModalOpen(false);  // Close the modal
+                // Update table with new data
                 setData(prevData => prevData.map(item => (item.id === clickedRow.id ? updatedData : item)));
+
+                // Update original values to match the saved data
+                setOriginalItemName(editedItemName);
+                setOriginalUserName(editedUserName);
+                setOriginalPassword(editedPassword);
+                setOriginalGroup(editedGroup);  // Update originalGroup to the saved group
             })
             .catch((error) => {
                 message.error('Failed to update password item');
                 console.error(error);
             });
     };
+
+
+    const showConfirmSave = () => {
+        confirm({
+            title: 'Are you sure you want to save these changes?',
+            content: 'This will overwrite the existing password information.',
+            okText: 'Yes',
+            cancelText: 'No',
+            onOk() {
+                handleSaveChanges(); // Call function to save changes
+            },
+        });
+    };
+
+
     const historyMenuItems = historyData.map((entry, index) => ({
         key: `${index}`,
         label: (
@@ -120,6 +193,12 @@ const MainPage = ({ groupId }) => {
             </a>
         ),
     }));
+
+    const handleModalClose = () => {
+        setIsModalOpen(false);
+        setSelectRow(null);
+    };
+
 
     // Define the dropdown menu (for edit/delete)
     const menu = (
@@ -153,7 +232,7 @@ const MainPage = ({ groupId }) => {
                 <Dropdown
                     overlay={menu}
                     trigger={['click']}
-                    onVisibleChange={(visible) => visible && setClickedRow(record)} // Set clicked row
+                    onOpenChange={(visible) => visible && setClickedRow(record)} // Set clicked row
                 >
                     <MoreOutlined className="action-icon" style={{ cursor: 'pointer', fontSize: '24px' }} />
                 </Dropdown>
@@ -187,10 +266,7 @@ const MainPage = ({ groupId }) => {
     };
 
 
-    const handleModalClose = () => {
-        setIsModalOpen(false);
-        setSelectRow(null);
-    };
+
 
     return (
         <div>
@@ -206,12 +282,14 @@ const MainPage = ({ groupId }) => {
 
             {/* Modal for showing/editing details */}
             <Modal
-                title={selectRow ? selectRow.itemName : "Details"}
+                title={clickedRow ? clickedRow.itemName : "Details"}
                 open={isModalOpen}
-                onOk={handleModalClose}
+                onOk={showConfirmSave}
                 onCancel={handleModalClose}
                 okText="Save"
                 cancelText="Close"
+                okButtonProps={{ disabled: isSaveButtonDisabled}}  // Disable Save button if no changes
+
             >
                 <Input
                     placeholder="Item Name"
@@ -270,5 +348,5 @@ const MainPage = ({ groupId }) => {
         </div>
     );
 };
-console.log("working")
+
 export default MainPage;
