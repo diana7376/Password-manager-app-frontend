@@ -15,7 +15,7 @@ import './styles.css';
 const { Text } = Typography;
 const { confirm } = Modal;
 
-const MainPage = ({ groupId, userId }) => {
+const MainPage = ({ groupId, userId ,passwordItems }) => {
     const [data, setData] = useState([]);
     const [selectRow, setSelectRow] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -272,7 +272,7 @@ const MainPage = ({ groupId, userId }) => {
         <div>
             {/* Table to display password items */}
             <Table
-                dataSource={data} // Use the data fetched for the group
+                dataSource={passwordItems} // Use the data fetched for the group
                 columns={columns}
                 rowKey={(record) => record.id}
                 onRow={(record) => ({

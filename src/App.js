@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState,useRef } from 'react';
 import { Breadcrumb, Layout, Menu, theme, Input, Space } from 'antd';
 import { DesktopOutlined, PieChartOutlined, UserOutlined, AudioOutlined } from '@ant-design/icons';
 import axios from 'axios';
+import fuzzysort from 'fuzzysort';
 import MainPage from './main_page';
 import SaveNewPassword from './save_new_password';
 import { dataFetching } from './crud_operation';
@@ -9,7 +10,7 @@ import { config, fetchAllPasswordItems, fetchUnlistedPasswordItems } from './cru
 import './styles.css';
 
 const { Header, Content, Footer, Sider } = Layout;
-const { Search } = Input;
+
 
 const suffix = (
     <AudioOutlined style={{ fontSize: 16, color: '#1677ff' }} />
@@ -17,6 +18,7 @@ const suffix = (
 
 const onSearch = (value, _e, info) => console.log(info?.source, value);
 
+const { Search } = Input;
 // Function to get menu items for the sidebar
 function getItem(label, key, icon, children) {
     return {
@@ -37,7 +39,18 @@ const App = () => {
     const [url, setUrlId] = useState(null);
     const [selectedKey, setSelectedKey] = useState('group-0'); // State to track selected menu item
     const [openKeys, setOpenKeys] = useState([]); // Track open submenu keys
+    const [filteredItems, setFilteredItems] = useState([]); // For storing search results
+    const [isSearching, setIsSearching] = useState(false); // Flag to track whether search is active
+    const searchRef = useRef(null);
 
+    const searchInputRef = useRef(null); // Create ref for the actual input element
+
+    // Focus on the input when the component mounts
+    useEffect(() => {
+        if (searchInputRef.current) {
+            searchInputRef.current.focus(); // Focus on the input element
+        }
+    }, []);
 
 
 
@@ -60,7 +73,9 @@ const App = () => {
         }
     };
 
-
+    useEffect(() => {
+        fetchData();
+    }, [selectedGroupId]);
 
     // Fetch all groups
     useEffect(() => {
@@ -92,9 +107,64 @@ const App = () => {
     }, []); // Empty dependency array ensures it only runs once
 
 
+    // Set up click event listener to detect clicks outside search bar
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (searchRef.current && !searchRef.current.contains(event.target)) {
+                setIsSearching(false); // Clear search state
+                setFilteredItems([]); // Clear search results
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    const onSearch = (value) => {
+        setIsSearching(true);
+
+        if (value.trim() === '') {
+            setIsSearching(false);
+            setFilteredItems([]); // Clear search results if the query is empty
+            return;
+        }
+
+        // Perform separate searches for each field
+        const resultsItemName = fuzzysort.go(value, passwordItems, { key: 'itemName', threshold: -10000 });
+        const resultsUserName = fuzzysort.go(value, passwordItems, { key: 'userName', threshold: -10000 });
+        const resultsComment = fuzzysort.go(value, passwordItems, { key: 'comment', threshold: -10000 });
+        const resultsUrl = fuzzysort.go(value, passwordItems, { key: 'url', threshold: -10000 });
+
+        // Combine the results, ensuring itemName results are prioritized
+        const combinedResults = [
+            ...resultsItemName,            // Prioritize itemName results
+            ...resultsUserName,            // Followed by userName results
+            ...resultsComment,             // Then comment results
+            ...resultsUrl                  // Finally URL results
+        ];
+
+        // Create a Map to deduplicate entries (since items might appear in multiple fields)
+        const uniqueResults = new Map();
+        combinedResults.forEach(result => {
+            if (!uniqueResults.has(result.obj.id)) {
+                uniqueResults.set(result.obj.id, result);
+            }
+        });
+
+        // Convert the Map back to an array of unique items
+        const filtered = Array.from(uniqueResults.values()).map(result => ({
+            ...result.obj,
+            similarityScore: result.score // Optionally include similarity score
+        }));
+
+        setFilteredItems(filtered); // Update the filteredItems with the search results
+    };
+
+
 
     const handleMenuClick = (key) => {
         setSelectedKey(key); // Set the selected key when a menu item is clicked
+        setIsSearching(false); // Reset search state
 
         if (key.startsWith('group-')) {
             const groupId = key.split('-')[1]; // Extract the groupId
@@ -106,8 +176,6 @@ const App = () => {
                     { title: 'Group' },
                     { title: 'All' },
                 ]);
-                console.log('All group selected');
-                // Fetch data for all groups
                 fetchDataForAllGroups();
             }
             else if (groupId === 'X') {
@@ -117,8 +185,6 @@ const App = () => {
                     { title: 'Group' },
                     { title: 'Unlisted' },
                 ]);
-                console.log('Unlisted group selected');
-                // Fetch data for unlisted groups
                 fetchDataForUnlistedGroups();
             }
             else {
@@ -150,6 +216,7 @@ const App = () => {
     };
 
 
+
     const fetchDataForAllGroups = () => {
         axios
             .get('http://127.0.0.1:8000/api/password-items/', config) // Adjust API endpoint if necessary
@@ -171,6 +238,8 @@ const App = () => {
                 console.error('Error fetching unlisted password items:', error);
             });
     };
+
+
 
     const onOpenChange = (keys) => {
         setOpenKeys(keys); // Control open submenus
@@ -229,25 +298,38 @@ const App = () => {
             </Sider>
 
             <Layout>
-                <Search
-                    placeholder="input search text"
-                    onSearch={onSearch}
-                    style={{
-                        margin: '0 auto',
-                        padding: '50px 0',
-                        width: 1050,
-                        color: '#0a0a0a',
-                    }}
-                />
+                <div ref={searchRef}>
+                    <Search
+
+                        placeholder="input search text"
+                        onSearch={onSearch}
+                        style={{
+                            margin: '0 auto',
+                            padding: '50px 0',
+                            width: 1050,
+                            color: '#0a0a0a',
+                        }}
+
+                        ref={(input) => {
+                            // Attach the ref to the input DOM element inside the Search component
+                            if (input) {
+                                searchInputRef.current = input.input;
+                            }
+                        }}
+                    />
+                </div>
                 {/* <Header style={{ padding: 0, background: colorBgContainer }} />*/}
 
-                <Content style={{ margin: '0 16px' }}>
+                <Content style={{margin: '0 16px'}}>
                     <Breadcrumb
-                        style={{ margin: '16px 0' }}
+                        style={{margin: '16px 0'}}
                         items={breadcrumbItems}
                     />
-                    <MainPage groupId={selectedGroupId} userId = {userId}/>
-
+                    <MainPage
+                        passwordItems={isSearching ? filteredItems : passwordItems} // Show search results or group data
+                        groupId={selectedGroupId}
+                        userId={userId}
+                    />
                     {/* Plus Button at the bottom-right corner under the table */}
                     <div
                         style={{
@@ -269,7 +351,12 @@ const App = () => {
                 <Footer style={{ textAlign: 'center' }}>© 2024 LockR</Footer>
             </Layout>
         </Layout>
+
     );
+
+
 };
+
+
 
 export default App;
