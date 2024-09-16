@@ -1,16 +1,21 @@
 import React, { useEffect, useState,useRef } from 'react';
-import { Breadcrumb, Layout, Menu, theme, Input, Space } from 'antd';
+import { Breadcrumb, Layout, Menu, theme, Input, Space, Button, Modal  } from 'antd';
 import { DesktopOutlined, PieChartOutlined, UserOutlined, AudioOutlined } from '@ant-design/icons';
 import axios from 'axios';
+import axios from './axiosConfg'; 
 import fuzzysort from 'fuzzysort';
 import MainPage from './main_page';
 import SaveNewPassword from './save_new_password';
 import { dataFetching } from './crud_operation';
 import { config, fetchAllPasswordItems, fetchUnlistedPasswordItems } from './crud_operation';
 import './styles.css';
+import { Route, Routes, useNavigate } from 'react-router-dom';
+import Login from './auth'; // Import Login component
+import Register from './register'; // Import Register component
+import PrivateRoute from './PrivateRoute'; // Ensure this is the correct path
+
 
 const { Header, Content, Footer, Sider } = Layout;
-
 
 const suffix = (
     <AudioOutlined style={{ fontSize: 16, color: '#1677ff' }} />
@@ -42,9 +47,11 @@ const App = () => {
     const [filteredItems, setFilteredItems] = useState([]); // For storing search results
     const [isSearching, setIsSearching] = useState(false); // Flag to track whether search is active
     const searchRef = useRef(null);
-
     const searchInputRef = useRef(null); // Create ref for the actual input element
-
+  
+    const [loggedIn, setLoggedIn] = useState(false); // State to track if user is logged in
+    const [showAuthModal, setShowAuthModal] = useState(false); // State to control the authentication modal
+  
     // Focus on the input when the component mounts
     useEffect(() => {
         if (searchInputRef.current) {
@@ -52,11 +59,17 @@ const App = () => {
         }
     }, []);
 
-
-
     const {
         token: { colorBgContainer },
     } = theme.useToken();
+
+    const navigate = useNavigate();
+
+    // Check if the user is logged in
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        setLoggedIn(!!token);
+    }, []);
 
     const fetchData = () => {
         if (selectedGroupId === -1) {
@@ -73,16 +86,19 @@ const App = () => {
         }
     };
 
+
     useEffect(() => {
         fetchData();
     }, [selectedGroupId]);
 
     // Fetch all groups
     useEffect(() => {
+
         axios
-            .get('http://127.0.0.1:8000/api/groups/', config)
+            .get('http://127.0.0.1:8000/api/groups/', { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } })
             .then((response) => {
                 if (Array.isArray(response.data)) {
+                  
                     // Create the default "All" group
                     const allGroup = getItem('All', 'group-0');
                     const unlistedGroup = getItem('Unlisted', 'group-X');
@@ -95,16 +111,23 @@ const App = () => {
                     ];
 
                     setGroupItems(fetchedGroups); // Set the complete group list
+
+//                     const fetchedGroups = response.data.map((group) => ({
+//                         label: group.groupName, // Use the correct property for the name
+//                         key: `group-${group.groupId}`, // Ensure the key is unique
+//                     }));
+//                     setGroupItems(fetchedGroups);
+
                 } else {
                     console.error('API response is not an array', response.data);
-                    setGroupItems([]); // Fallback to an empty array
+                    setGroupItems([]);
                 }
             })
             .catch((error) => {
                 console.error('Error fetching groups:', error);
-                setGroupItems([]); // Fallback to an empty array
+                setGroupItems([]);
             });
-    }, []); // Empty dependency array ensures it only runs once
+    }, []);
 
 
     // Set up click event listener to detect clicks outside search bar
@@ -193,6 +216,7 @@ const App = () => {
 
                 if (clickedGroup) {
                     const groupName = clickedGroup.label;
+
                     setBreadcrumbItems([
                         { title: 'Group' },
                         { title: groupName },
@@ -211,10 +235,12 @@ const App = () => {
                     .catch(error => {
                         console.error('Error fetching group details:', error);
                     });
+               } else if (key === 'logout') {
+            handleLogout();// Call logout function when logout menu item is clicke
             }
+
         }
     };
-
 
 
     const fetchDataForAllGroups = () => {
@@ -242,31 +268,53 @@ const App = () => {
 
 
     const onOpenChange = (keys) => {
-        setOpenKeys(keys); // Control open submenus
+        setOpenKeys(keys);
     };
 
-    // Sidebar menu items
-    const groupMenuItems = [
+ const groupMenuItems = [
         {
             label: 'About us',
             key: '1',
-            icon: <PieChartOutlined />
+            icon: <DesktopOutlined />,
         },
         {
             label: 'Passwords',
             key: '2',
-            icon: <DesktopOutlined />
+            icon: <PieChartOutlined />,
         },
         {
             label: 'Groups',
             key: 'sub1',
             icon: <UserOutlined />,
-            children: groupItems.length > 0 ? groupItems : [{ label: 'Loading...', key: 'loading' }],
+            children: groupItems.length > 0
+                ? groupItems
+                : [{ label: 'Loading...', key: 'loading' }],
+        },
+        {
+            label: 'Logout',
+            key: 'logout',
+            icon: <UserOutlined />,
         },
     ];
 
-    // User menu items for the bottom of the sidebar
-    const userItem = [getItem('User', '3', <DesktopOutlined />)];
+    const [breadcrumbItems, setBreadcrumbItems] = useState([
+        { title: 'Group' },
+        { title: 'Group-name' },
+    ]);
+
+    const onMenuSelect = ({ key }) => {
+        handleMenuClick(key);
+    };
+
+    const handleLogin = () => {
+        navigate('/login');
+        setShowAuthModal(false);
+    };
+
+    const handleRegister = () => {
+        navigate('/register');
+        setShowAuthModal(false);
+    };
 
     const onPasswordAdd = () => {
         fetchData();
@@ -276,24 +324,23 @@ const App = () => {
         { title: 'Group' },
         { title: 'All' },
     ]);
+    const handleLogout = () => {
+        localStorage.removeItem('token'); // Remove the token from local storage
+        setLoggedIn(false); // Update the loggedIn state
+        navigate('/login'); // Redirect to the login page
+    };
+
     return (
         <Layout style={{ minHeight: '100vh' }}>
             <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
                 <Menu
                     theme="dark"
                     mode="inline"
-                    selectedKeys={[selectedKey]} // Highlight the selected menu item
-                    openKeys={openKeys} // Control which menus are open
-                    onClick={({ key }) => handleMenuClick(key)} // Handle menu click
-                    onOpenChange={onOpenChange} // Handle submenu open/close
-                    items={groupMenuItems} // Use structured items
-                />
-                <Menu
-                    theme="dark"
-                    mode="inline"
-                    selectedKeys={[selectedKey]} // Ensure only one selected item at a time
-                    onClick={({ key }) => handleMenuClick(key)} // Handle user menu click
-                    items={userItem}
+                    selectedKeys={[selectedKey]}
+                    openKeys={openKeys}
+                    onClick={onMenuSelect}
+                    onOpenChange={onOpenChange}
+                    items={groupMenuItems}
                 />
             </Sider>
 
@@ -321,22 +368,33 @@ const App = () => {
                 {/* <Header style={{ padding: 0, background: colorBgContainer }} />*/}
 
                 <Content style={{margin: '0 16px'}}>
+
                     <Breadcrumb
                         style={{margin: '16px 0'}}
                         items={breadcrumbItems}
                     />
+
                     <MainPage
                         passwordItems={isSearching ? filteredItems : passwordItems} // Show search results or group data
                         groupId={selectedGroupId}
                         userId={userId}
                     />
+
+
+                    <Routes>
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/register" element={<Register />} />
+                        <Route path="/" element={<PrivateRoute><MainPage groupId={selectedGroupId} /></PrivateRoute>} exact />
+                    </Routes>
+
                     {/* Plus Button at the bottom-right corner under the table */}
+
                     <div
                         style={{
                             position: 'fixed',
                             bottom: 24,
                             right: 24,
-                            zIndex: 1000, // Ensure it's above other elements
+                            zIndex: 1000,
                         }}
                     >
                         <SaveNewPassword
@@ -350,6 +408,27 @@ const App = () => {
                 </Content>
                 <Footer style={{ textAlign: 'center' }}>© 2024 LockR</Footer>
             </Layout>
+
+            <Modal
+                title="Authentication"
+                visible={showAuthModal}
+                onCancel={() => setShowAuthModal(false)}
+                footer={null}
+            >
+                {loggedIn ? (
+                    <p>You are logged in.</p>
+                ) : (
+                    <div>
+                        <p>Please log in to continue.</p>
+                        <Button type="primary" onClick={handleLogin} style={{ marginRight: 8 }}>
+                            Login
+                        </Button>
+                        <Button type="default" onClick={handleRegister}>
+                            Create Account
+                        </Button>
+                    </div>
+                )}
+            </Modal>
         </Layout>
 
     );
@@ -357,6 +436,5 @@ const App = () => {
 
 };
 
-
-
 export default App;
+

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { PlusOutlined, UserOutlined, EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
 import { Button, Tooltip, Modal, Input, Select, message, Flex } from 'antd';
 import { addPasswordItem, config } from './crud_operation';
-import axios from 'axios';
+import axios from './axiosConfg';
 
 const { Option } = Select;
 
