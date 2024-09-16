@@ -106,14 +106,21 @@ const MainPage = ({ groupId, userId ,passwordItems }) => {
             const effectiveGroupId = groupId === -1 ? clickedRow.groupId : groupId;
 
             deleteData(clickedRow.id, effectiveGroupId)
-                .then(() => {
+                .then(response => {
                     message.success('Password item deleted successfully');
-                    setData(prevData => prevData.filter(item => item.id !== clickedRow.id));
+                    // Refresh data after delete
+                    if (effectiveGroupId === null) {
+                        fetchUnlistedPasswordItems(setData); // Fetch unlisted items
+                    } else {
+                        dataFetching(effectiveGroupId, setData); // Fetch items for the specific group
+                    }
                 })
                 .catch(error => {
                     message.error('Failed to delete password item');
                     console.error(error);
                 });
+
+
         } else if (key === 'read') {
             try {
                 const history = await fetchHistory(clickedRow.id);

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMxMzIyMzI0LCJpYXQiOjE3MjYxMzgzMjQsImp0aSI6ImRlMmEzYzAxNzE3ZjQ0YmE4MTliMzMzYjc1YjM1NWVlIiwidXNlcl9pZCI6MX0.-HnajkUUmPF64Z-xSch4WZ2eV8nreC_yQsPCPPm2y-s"
+const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzI2NDcwOTAwLCJpYXQiOjE3MjY0NjczMDAsImp0aSI6IjVlNDYzOTRhYjFlZjQzZWRhNGFlODFmYTQzNWFhNjExIiwidXNlcl9pZCI6MX0.2BiaB7clzXxEFeBxxiY2d_m6sR12_B-oXGSeFjmtDvE"
 export const config = {
     headers: { Authorization: `Bearer ${token}` }
 };
@@ -31,18 +31,26 @@ export function updatePasswordItem(id, groupId, updatedData) {
         });
 }
 
-
 export function deleteData(id, groupId) {
-    //delete password
+    // delete password
     return axios.delete(`http://127.0.0.1:8000/api/groups/${groupId}/password-items/${id}/`, config)
-        .then(() => {
-            //check if the group has any remaining items
-            return axios.get(`http://127.0.0.1:8000/api/groups/${groupId}/password-items/`, config);
+        .then((response) => {
+            if (response.status === 204) {
+                console.log('Item deleted successfully');
+                // Check if the groupId is null (unlisted)
+                if (groupId === null || groupId === 'null') {
+                    // Fetch unlisted password items (those with null groupId)
+                    return axios.get('http://127.0.0.1:8000/api/password-items/unlisted/', config);
+                } else {
+                    // Fetch remaining password items for the group
+                    return axios.get(`http://127.0.0.1:8000/api/groups/${groupId}/password-items/`, config);
+                }
+            }
         })
-        .then(response =>{
+        .then(response => {
             const remainingPasswords = response.data;
-            if (remainingPasswords.length === 0) {
-                //if no pass i the group delete group
+            if (remainingPasswords.length === 0 && groupId !== null) {
+                // If no passwords left in the group, delete the group
                 return axios.delete(`http://127.0.0.1:8000/api/groups/${groupId}/`, config)
                     .then(() => {
                         console.log(`Group ${groupId} deleted because it became empty.`);
@@ -54,6 +62,8 @@ export function deleteData(id, groupId) {
             throw error;
         });
 }
+
+
 
 export function fetchAllPasswordItems(setData) {
     axios.get('http://127.0.0.1:8000/api/password-items/', config) // Adjust the endpoint if needed
