@@ -1,29 +1,20 @@
-import React, { useEffect, useState,useRef } from 'react';
-import { Breadcrumb, Layout, Menu, theme, Input, Space, Button, Modal  } from 'antd';
-import { DesktopOutlined, PieChartOutlined, UserOutlined, AudioOutlined } from '@ant-design/icons';
-import axios from 'axios';
-import axios from './axiosConfg'; 
+import React, { useEffect, useState, useRef } from 'react';
+import { Breadcrumb, Layout, Menu, theme, Input, Button, Modal } from 'antd';
+import { DesktopOutlined, PieChartOutlined, UserOutlined } from '@ant-design/icons';
+import axios from './axiosConfg';
 import fuzzysort from 'fuzzysort';
 import MainPage from './main_page';
 import SaveNewPassword from './save_new_password';
-import { dataFetching } from './crud_operation';
-import { config, fetchAllPasswordItems, fetchUnlistedPasswordItems } from './crud_operation';
+import { dataFetching, config, fetchAllPasswordItems, fetchUnlistedPasswordItems } from './crud_operation';
 import './styles.css';
 import { Route, Routes, useNavigate } from 'react-router-dom';
 import Login from './auth'; // Import Login component
 import Register from './register'; // Import Register component
 import PrivateRoute from './PrivateRoute'; // Ensure this is the correct path
 
-
-const { Header, Content, Footer, Sider } = Layout;
-
-const suffix = (
-    <AudioOutlined style={{ fontSize: 16, color: '#1677ff' }} />
-);
-
-const onSearch = (value, _e, info) => console.log(info?.source, value);
-
+const { Content, Footer, Sider } = Layout;
 const { Search } = Input;
+
 // Function to get menu items for the sidebar
 function getItem(label, key, icon, children) {
     return {
@@ -48,10 +39,12 @@ const App = () => {
     const [isSearching, setIsSearching] = useState(false); // Flag to track whether search is active
     const searchRef = useRef(null);
     const searchInputRef = useRef(null); // Create ref for the actual input element
-  
+
     const [loggedIn, setLoggedIn] = useState(false); // State to track if user is logged in
     const [showAuthModal, setShowAuthModal] = useState(false); // State to control the authentication modal
-  
+
+    const navigate = useNavigate();
+
     // Focus on the input when the component mounts
     useEffect(() => {
         if (searchInputRef.current) {
@@ -63,8 +56,6 @@ const App = () => {
         token: { colorBgContainer },
     } = theme.useToken();
 
-    const navigate = useNavigate();
-
     // Check if the user is logged in
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -73,7 +64,7 @@ const App = () => {
 
     const fetchData = () => {
         if (selectedGroupId === -1) {
-            // Fetch data for a specific group
+            // Fetch data for all groups
             fetchAllPasswordItems(setPasswordItems);
         }
         else if (selectedGroupId) {
@@ -81,11 +72,10 @@ const App = () => {
             dataFetching(selectedGroupId, setPasswordItems);
         }
         else {
-            // Fetch all data when "All" is selected
+            // Fetch unlisted data
             fetchUnlistedPasswordItems(setPasswordItems);
         }
     };
-
 
     useEffect(() => {
         fetchData();
@@ -93,17 +83,16 @@ const App = () => {
 
     // Fetch all groups
     useEffect(() => {
-
         axios
             .get('http://127.0.0.1:8000/api/groups/', { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } })
             .then((response) => {
                 if (Array.isArray(response.data)) {
-                  
-                    // Create the default "All" group
+
+                    // Create the default "All" and "Unlisted" groups
                     const allGroup = getItem('All', 'group-0');
                     const unlistedGroup = getItem('Unlisted', 'group-X');
 
-                    // Map fetched groups and prepend "All" group
+                    // Map fetched groups and prepend "All" and "Unlisted" groups
                     const fetchedGroups = [
                         allGroup, // Insert "All" group first
                         unlistedGroup,
@@ -111,12 +100,6 @@ const App = () => {
                     ];
 
                     setGroupItems(fetchedGroups); // Set the complete group list
-
-//                     const fetchedGroups = response.data.map((group) => ({
-//                         label: group.groupName, // Use the correct property for the name
-//                         key: `group-${group.groupId}`, // Ensure the key is unique
-//                     }));
-//                     setGroupItems(fetchedGroups);
 
                 } else {
                     console.error('API response is not an array', response.data);
@@ -128,7 +111,6 @@ const App = () => {
                 setGroupItems([]);
             });
     }, []);
-
 
     // Set up click event listener to detect clicks outside search bar
     useEffect(() => {
@@ -183,8 +165,6 @@ const App = () => {
         setFilteredItems(filtered); // Update the filteredItems with the search results
     };
 
-
-
     const handleMenuClick = (key) => {
         setSelectedKey(key); // Set the selected key when a menu item is clicked
         setIsSearching(false); // Reset search state
@@ -235,13 +215,11 @@ const App = () => {
                     .catch(error => {
                         console.error('Error fetching group details:', error);
                     });
-               } else if (key === 'logout') {
-            handleLogout();// Call logout function when logout menu item is clicke
             }
-
+        } else if (key === 'logout') {
+            handleLogout(); // Call logout function when logout menu item is clicked
         }
     };
-
 
     const fetchDataForAllGroups = () => {
         axios
@@ -265,13 +243,11 @@ const App = () => {
             });
     };
 
-
-
     const onOpenChange = (keys) => {
         setOpenKeys(keys);
     };
 
- const groupMenuItems = [
+    const groupMenuItems = [
         {
             label: 'About us',
             key: '1',
@@ -299,7 +275,7 @@ const App = () => {
 
     const [breadcrumbItems, setBreadcrumbItems] = useState([
         { title: 'Group' },
-        { title: 'Group-name' },
+        { title: 'All' },
     ]);
 
     const onMenuSelect = ({ key }) => {
@@ -320,10 +296,6 @@ const App = () => {
         fetchData();
     };
 
-    const [breadcrumbItems, setBreadcrumbItems] = useState([
-        { title: 'Group' },
-        { title: 'All' },
-    ]);
     const handleLogout = () => {
         localStorage.removeItem('token'); // Remove the token from local storage
         setLoggedIn(false); // Update the loggedIn state
@@ -347,7 +319,6 @@ const App = () => {
             <Layout>
                 <div ref={searchRef}>
                     <Search
-
                         placeholder="input search text"
                         onSearch={onSearch}
                         style={{
@@ -356,7 +327,6 @@ const App = () => {
                             // width: 1050,
                             color: '#0a0a0a',
                         }}
-
                         ref={(input) => {
                             // Attach the ref to the input DOM element inside the Search component
                             if (input) {
@@ -367,28 +337,27 @@ const App = () => {
                 </div>
                 {/* <Header style={{ padding: 0, background: colorBgContainer }} />*/}
 
-                <Content style={{margin: '0 16px'}}>
-
-                    <Breadcrumb
-                        style={{margin: '16px 0'}}
-                        items={breadcrumbItems}
-                    />
-
-                    <MainPage
-                        passwordItems={isSearching ? filteredItems : passwordItems} // Show search results or group data
-                        groupId={selectedGroupId}
-                        userId={userId}
-                    />
-
-
+                <Content style={{ margin: '0 16px' }}>
                     <Routes>
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register />} />
-                        <Route path="/" element={<PrivateRoute><MainPage groupId={selectedGroupId} /></PrivateRoute>} exact />
+                        <Route
+                            path="/"
+                            element={
+                                <PrivateRoute>
+                                    <Breadcrumb style={{ margin: '16px 0' }} items={breadcrumbItems} />
+                                    <MainPage
+                                        passwordItems={isSearching ? filteredItems : passwordItems}
+                                        groupId={selectedGroupId}
+                                        userId={userId}
+                                    />
+                                </PrivateRoute>
+                            }
+                            exact
+                        />
                     </Routes>
 
                     {/* Plus Button at the bottom-right corner under the table */}
-
                     <div
                         style={{
                             position: 'fixed',
@@ -430,11 +399,7 @@ const App = () => {
                 )}
             </Modal>
         </Layout>
-
     );
-
-
 };
 
 export default App;
-
