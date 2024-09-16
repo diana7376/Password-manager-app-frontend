@@ -305,8 +305,8 @@ const App = () => {
                         onSearch={onSearch}
                         style={{
                             margin: '0 auto',
-                            padding: '50px 0',
-                            width: 1050,
+                            padding: '50px 10px',
+                            // width: 1050,
                             color: '#0a0a0a',
                         }}
 
