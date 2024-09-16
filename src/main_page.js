@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 import { Table, Modal, Dropdown, Menu, message, Input, Typography, Space } from 'antd';
-import { MoreOutlined, DownOutlined, SmileOutlined } from '@ant-design/icons';  // Import ellipsis icon
+import { MoreOutlined, DownOutlined, SmileOutlined , EyeOutlined, EyeInvisibleOutlined} from '@ant-design/icons';  // Import ellipsis icon
 import {
     dataFetching,
     deleteData,
@@ -216,6 +216,18 @@ const MainPage = ({ groupId, userId ,passwordItems }) => {
         </Menu>
     );
 
+    const togglePasswordVisibility = (recordId) => {
+
+        setVisiblePasswords((prev) => ({
+
+            ...prev,
+
+            [recordId]: !prev[recordId], // Toggle visibility
+
+        }));
+
+    };
+
     const columns = [
         {
             title: 'Name',
@@ -231,6 +243,48 @@ const MainPage = ({ groupId, userId ,passwordItems }) => {
             title: 'Password',
             dataIndex: 'password',
             key: 'password',
+            render: (text, record) => {
+
+                const isPasswordVisible = record.isPasswordVisible || false;  // Store visibility state in record
+
+                const passwordMasked = '*'.repeat(record.password.length);  // Mask password with stars
+
+
+
+                return (
+
+                    <span>
+
+                {isPasswordVisible ? record.password : passwordMasked}  {/* Display password or stars */}
+
+                        <span
+
+                            style={{ marginLeft: 8, cursor: 'pointer' }}
+
+                            onClick={() => {
+
+                                // Toggle visibility of the password for this row
+
+                                record.isPasswordVisible = !isPasswordVisible;
+
+                                // Trigger re-render
+
+                                setData([...data]);
+
+                            }}
+
+                        >
+
+                    {isPasswordVisible ? <EyeInvisibleOutlined /> : <EyeOutlined />}
+
+                </span>
+
+            </span>
+
+                );
+
+            },
+
         },
         {
             title: '',

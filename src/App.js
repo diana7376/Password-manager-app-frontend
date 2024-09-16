@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Breadcrumb, Layout, Menu, theme, Input, Button, Modal } from 'antd';
-import { DesktopOutlined, PieChartOutlined, UserOutlined } from '@ant-design/icons';
+import { Breadcrumb, Layout, Menu, theme, Input, Button, Modal, Space } from 'antd';
+import { DesktopOutlined, PieChartOutlined, UserOutlined, AudioOutlined } from '@ant-design/icons';
 import axios from './axiosConfg';
 import fuzzysort from 'fuzzysort';
 import MainPage from './main_page';
@@ -12,8 +12,18 @@ import Login from './auth'; // Import Login component
 import Register from './register'; // Import Register component
 import PrivateRoute from './PrivateRoute'; // Ensure this is the correct path
 
-const { Content, Footer, Sider } = Layout;
+
 const { Search } = Input;
+
+
+const { Header, Content, Footer, Sider } = Layout;
+
+
+const suffix = (
+    <AudioOutlined style={{ fontSize: 16, color: '#1677ff' }} />
+);
+
+const onSearch = (value, _e, info) => console.log(info?.source, value);
 
 // Function to get menu items for the sidebar
 function getItem(label, key, icon, children) {
@@ -291,6 +301,8 @@ const App = () => {
         navigate('/register');
         setShowAuthModal(false);
     };
+    // User menu items for the bottom of the sidebar
+    const userItem = [getItem('User', '3', <DesktopOutlined />)];
 
     const onPasswordAdd = () => {
         fetchData();
