@@ -179,7 +179,15 @@ const App = () => {
         setSelectedKey(key); // Set the selected key when a menu item is clicked
         setIsSearching(false); // Reset search state
 
-        if (key.startsWith('group-')) {
+        if (key === '2') {
+            // If "Passwords" is clicked, fetch all passwords (same as "All" group)
+            setSelectedGroupId(-1); // Treat it like the "All" group
+            setBreadcrumbItems([
+                { title: 'Passwords' },
+                { title: 'All' },
+            ]);
+            fetchDataForAllGroups(); // Fetch all password data
+        } else if (key.startsWith('group-')) {
             const groupId = key.split('-')[1]; // Extract the groupId
 
             if (groupId === '0') {
@@ -190,23 +198,20 @@ const App = () => {
                     { title: 'All' },
                 ]);
                 fetchDataForAllGroups();
-            }
-            else if (groupId === 'X') {
+            } else if (groupId === 'X') {
                 // "Unlisted" group selected, fetch all data
-                setSelectedGroupId(null); // Set -1 or some flag to indicate unlisted groups
+                setSelectedGroupId(null); // Set null or some flag to indicate unlisted groups
                 setBreadcrumbItems([
                     { title: 'Group' },
                     { title: 'Unlisted' },
                 ]);
                 fetchDataForUnlistedGroups();
-            }
-            else {
+            } else {
                 setSelectedGroupId(groupId); // Update the selected group ID
                 const clickedGroup = groupItems.find(item => item.key === key);
 
                 if (clickedGroup) {
                     const groupName = clickedGroup.label;
-
                     setBreadcrumbItems([
                         { title: 'Group' },
                         { title: groupName },
@@ -226,11 +231,8 @@ const App = () => {
                         console.error('Error fetching group details:', error);
                     });
             }
-        } else if (key === 'logout') {
-            handleLogout(); // Call logout function when logout menu item is clicked
         }
     };
-
     const fetchDataForAllGroups = () => {
         axios
             .get('http://127.0.0.1:8000/api/password-items/', config) // Adjust API endpoint if necessary
