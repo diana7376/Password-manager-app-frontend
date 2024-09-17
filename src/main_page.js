@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-
-import { Table, Modal, Dropdown, Menu, message, Input, Typography, Space } from 'antd';
-import { MoreOutlined, DownOutlined, SmileOutlined , EyeOutlined, EyeInvisibleOutlined} from '@ant-design/icons';  // Import ellipsis icon
+import { Table, Modal, Tabs, Input, Typography, Button, message } from 'antd';
+import { MoreOutlined, EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 import {
     dataFetching,
     deleteData,
@@ -12,132 +11,65 @@ import {
 } from './crud_operation';
 import './styles.css';
 
+const { TabPane } = Tabs;
 const { Text } = Typography;
-const { confirm } = Modal;
 
-const MainPage = ({ groupId, userId ,passwordItems }) => {
+const MainPage = ({ groupId, userId, passwordItems }) => {
     const [data, setData] = useState([]);
-    const [selectRow, setSelectRow] = useState(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
     const [clickedRow, setClickedRow] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const [historyData, setHistoryData] = useState([]);
-
-    // Form fields to store edited values
     const [editedItemName, setEditedItemName] = useState('');
     const [editedUserName, setEditedUserName] = useState('');
-    const [editedPassword, setEditedPassword] = useState('');    // Fetch data whenever groupId changes
+    const [editedPassword, setEditedPassword] = useState('');
     const [editedGroup, setEditedGroup] = useState('');
-    const [readModalOpen, setReadModalOpen] = useState(false);
-    const [readModalContent, setReadModalContent] = useState(null);
-
-    // Original values for comparison
     const [originalItemName, setOriginalItemName] = useState('');
     const [originalUserName, setOriginalUserName] = useState('');
     const [originalPassword, setOriginalPassword] = useState('');
     const [originalGroup, setOriginalGroup] = useState('');
-
-    // State for disabling/enabling the save button
     const [isSaveButtonDisabled, setIsSaveButtonDisabled] = useState(true);
 
-    const isSaveDisabled = () => {
-        return (
+    useEffect(() => {
+        setIsSaveButtonDisabled(
             editedItemName === originalItemName &&
             editedUserName === originalUserName &&
             editedPassword === originalPassword &&
-            String(editedGroup) === String(originalGroup)  // Convert both to strings for comparison
+            String(editedGroup) === String(originalGroup)
         );
-    };
-
-
-
-
-    //history drop down
-    const items = [
-        {
-            key: '1',
-            label: (
-                <a target="_blank" rel="noopener noreferrer">
-                    1st menu item
-                </a>
-            ),
-        },
-        {
-            key: '2',
-            label: (
-                <a target="_blank" rel="noopener noreferrer">
-                    2nd menu item
-                </a>
-            ),
-
-        },
-    ];
-
-
-    // Handle menu click (edit/delete actions)
-    const handleMenuClick = async ({key}) => {
-        if (!clickedRow || !clickedRow.id) {
-            console.error('No row selected or row has no id');
-            message.error('Failed to delete the password: no ID');
-            return;
-        }
-
-        console.log('clickedRow:', clickedRow);  // Debugging log for clickedRow
-        console.log('groupId:', groupId);  // Debugging log for groupId
-
-        if (key === 'edit') {
-            setEditedItemName(clickedRow.itemName);
-            setEditedUserName(clickedRow.userName);
-            setEditedPassword(clickedRow.password);
-            setEditedGroup(String(clickedRow.groupId));  // Ensure it's set correctly as a string
-
-
-            // Set original values for comparison
-            setOriginalItemName(clickedRow.itemName);
-            setOriginalUserName(clickedRow.userName);
-            setOriginalPassword(clickedRow.password);
-            setOriginalGroup(String(clickedRow.groupId));  // Ensure original value is a string
-
-            // Reset the Save button state
-            setIsSaveButtonDisabled(isSaveDisabled());
-
-            setIsModalOpen(true);
-        } else if (key === 'delete') {
-            // Use the item's groupId if we are in the "All" group view
-            const effectiveGroupId = groupId === -1 ? clickedRow.groupId : groupId;
-
-            deleteData(clickedRow.id, effectiveGroupId)
-                .then(response => {
-                    message.success('Password item deleted successfully');
-                    // Refresh data after delete
-                    if (effectiveGroupId === null) {
-                        fetchUnlistedPasswordItems(setData); // Fetch unlisted items
-                    } else {
-                        dataFetching(effectiveGroupId, setData); // Fetch items for the specific group
-                    }
-                })
-                .catch(error => {
-                    message.error('Failed to delete password item');
-                    console.error(error);
-                });
-
-
-        } else if (key === 'read') {
-            try {
-                const history = await fetchHistory(clickedRow.id);
-                setHistoryData(history);
-                setReadModalOpen(true);
-                setReadModalContent(clickedRow);
-            } catch (error) {
-                message.error('Failed to fetch history');
-            }
-        }
-    };
-
-    // Update the Save button's disabled state whenever edited values change
-    useEffect(() => {
-        setIsSaveButtonDisabled(isSaveDisabled());
     }, [editedItemName, editedUserName, editedPassword, editedGroup]);
 
+    useEffect(() => {
+        if (groupId === -1) {
+            fetchAllPasswordItems(setData);
+        } else if (groupId) {
+            dataFetching(groupId, setData);
+        } else {
+            fetchUnlistedPasswordItems(setData);
+        }
+    }, [groupId]);
+
+    const handleMenuClick = async (record) => {
+        setClickedRow(record);
+
+        try {
+            const history = await fetchHistory(record.id);
+            setHistoryData(history);
+        } catch (error) {
+            message.error('Failed to fetch history');
+        }
+
+        setEditedItemName(record.itemName);
+        setEditedUserName(record.userName);
+        setEditedPassword(record.password);
+        setEditedGroup(String(record.groupId));
+
+        setOriginalItemName(record.itemName);
+        setOriginalUserName(record.userName);
+        setOriginalPassword(record.password);
+        setOriginalGroup(String(record.groupId));
+
+        setIsModalOpen(true);
+    };
 
     const handleSaveChanges = () => {
         if (!userId) {
@@ -145,9 +77,7 @@ const MainPage = ({ groupId, userId ,passwordItems }) => {
             return;
         }
 
-        // Use clickedRow.groupId if groupId is -1 (i.e., "All" group)
         const effectiveGroupId = groupId === -1 ? clickedRow.groupId : groupId;
-
 
         const updatedData = {
             id: clickedRow.id,
@@ -158,74 +88,53 @@ const MainPage = ({ groupId, userId ,passwordItems }) => {
             userId: userId,
         };
 
-        // Send PUT request to update the data
         updatePasswordItem(clickedRow.id, effectiveGroupId, updatedData)
             .then(() => {
                 message.success('Password item updated successfully');
-                setIsModalOpen(false);  // Close the modal
-                // Update table with new data
+                setIsModalOpen(false);
                 setData(prevData => prevData.map(item => (item.id === clickedRow.id ? updatedData : item)));
-
-                // Update original values to match the saved data
                 setOriginalItemName(editedItemName);
                 setOriginalUserName(editedUserName);
                 setOriginalPassword(editedPassword);
-                setOriginalGroup(editedGroup);  // Update originalGroup to the saved group
+                setOriginalGroup(editedGroup);
             })
-            .catch((error) => {
+            .catch(error => {
                 message.error('Failed to update password item');
                 console.error(error);
             });
     };
 
+    const handleDelete = () => {
+        const effectiveGroupId = groupId === -1 ? clickedRow.groupId : groupId;
 
-    const showConfirmSave = () => {
-        confirm({
-            title: 'Are you sure you want to save these changes?',
-            content: 'This will overwrite the existing password information.',
-            okText: 'Yes',
-            cancelText: 'No',
+        Modal.confirm({
+            title: 'Are you sure you want to delete this?',
+            content: 'This action cannot be undone.',
+            okText: 'Delete',
+            okType: 'danger',
+            cancelText: 'Cancel',
             onOk() {
-                handleSaveChanges(); // Call function to save changes
+                deleteData(clickedRow.id, effectiveGroupId)
+                    .then(() => {
+                        message.success('Password item deleted successfully');
+                        setIsModalOpen(false);
+                        if (effectiveGroupId === null) {
+                            fetchUnlistedPasswordItems(setData);
+                        } else {
+                            dataFetching(effectiveGroupId, setData);
+                        }
+                    })
+                    .catch(error => {
+                        message.error('Failed to delete password item');
+                        console.error(error);
+                    });
             },
         });
     };
 
-
-    const historyMenuItems = historyData.map((entry, index) => ({
-        key: `${index}`,
-        label: (
-            <a target="_blank" rel="noopener noreferrer">
-                {entry.timestamp}: {entry.oldPassword} {/* Adjust based on your history data structure */}
-            </a>
-        ),
-    }));
-
     const handleModalClose = () => {
         setIsModalOpen(false);
-        setSelectRow(null);
-    };
-
-
-    // Define the dropdown menu (for edit/delete)
-    const menu = (
-        <Menu onClick={handleMenuClick}>
-            <Menu.Item key="read">Read</Menu.Item>
-            <Menu.Item key="edit">Edit</Menu.Item>
-            <Menu.Item key="delete">Delete</Menu.Item>
-        </Menu>
-    );
-
-    const togglePasswordVisibility = (recordId) => {
-
-        setVisiblePasswords((prev) => ({
-
-            ...prev,
-
-            [recordId]: !prev[recordId], // Toggle visibility
-
-        }));
-
+        setClickedRow(null);
     };
 
     const columns = [
@@ -235,7 +144,7 @@ const MainPage = ({ groupId, userId ,passwordItems }) => {
             key: 'itemName',
         },
         {
-            title: 'User_name',
+            title: 'User Name',
             dataIndex: 'userName',
             key: 'userName',
         },
@@ -244,167 +153,132 @@ const MainPage = ({ groupId, userId ,passwordItems }) => {
             dataIndex: 'password',
             key: 'password',
             render: (text, record) => {
-
-                const isPasswordVisible = record.isPasswordVisible || false;  // Store visibility state in record
-
-                const passwordMasked = '*'.repeat(record.password.length);  // Mask password with stars
-
-
+                const isPasswordVisible = record.isPasswordVisible || false;
+                const passwordMasked = '*'.repeat(record.password.length);
 
                 return (
-
                     <span>
-
-                {isPasswordVisible ? record.password : passwordMasked}  {/* Display password or stars */}
-
+                        {isPasswordVisible ? record.password : passwordMasked}
                         <span
-
                             style={{ marginLeft: 8, cursor: 'pointer' }}
-
                             onClick={() => {
-
-                                // Toggle visibility of the password for this row
-
                                 record.isPasswordVisible = !isPasswordVisible;
-
-                                // Trigger re-render
-
                                 setData([...data]);
-
                             }}
-
                         >
-
-                    {isPasswordVisible ? <EyeInvisibleOutlined /> : <EyeOutlined />}
-
-                </span>
-
-            </span>
-
+                            {isPasswordVisible ? <EyeInvisibleOutlined /> : <EyeOutlined />}
+                        </span>
+                    </span>
                 );
-
             },
-
         },
         {
             title: '',
             key: 'actions',
             render: (_, record) => (
-                <Dropdown
-                    overlay={menu}
-                    trigger={['click']}
-                    onOpenChange={(visible) => visible && setClickedRow(record)} // Set clicked row
-                >
-                    <MoreOutlined className="action-icon" style={{ cursor: 'pointer', fontSize: '24px' }} />
-                </Dropdown>
+                <MoreOutlined
+                    className="action-icon"
+                    style={{ cursor: 'pointer', fontSize: '24px' }}
+                    onClick={() => handleMenuClick(record)}
+                />
             ),
         },
     ];
 
-
-    useEffect(() => {
-        if (groupId === -1) {
-            // Fetch the password items for the selected group directly from the backend
-            fetchAllPasswordItems(setData);
-        }
-        else if (groupId) {
-            // Fetch the password items for the selected group directly from the backend
-            dataFetching(groupId, setData);
-        } else {
-            // Fetch all password items when "All" group is selected
-            fetchUnlistedPasswordItems(setData);
-        }
-    }, [groupId]);
-
-
-    // Filter data based on the selected groupId
-
-    //const filteredData = groupId ? data.filter(item => item.groupId === Number(groupId)) : data;
-
-    const handleRowClick = (record) => {
-        setSelectRow(record);
-        setIsModalOpen(true);
-    };
-
-
-
+    const historyMenuItems = historyData.map((entry, index) => ({
+        key: `${index}`,
+        label: (
+            <a target="_blank" rel="noopener noreferrer">
+                {entry.timestamp}: {entry.oldPassword}
+            </a>
+        ),
+    }));
 
     return (
         <div>
-            {/* Table to display password items */}
             <Table
-                dataSource={passwordItems} // Use the data fetched for the group
+                dataSource={passwordItems}
                 columns={columns}
                 rowKey={(record) => record.id}
-                onRow={(record) => ({
-                    onClick: () => setSelectRow(record),
-                })}
             />
 
-            {/* Modal for showing/editing details */}
             <Modal
-                title={clickedRow ? clickedRow.itemName : "Details"}
+                title="Password Item Details"
                 open={isModalOpen}
-                onOk={showConfirmSave}
                 onCancel={handleModalClose}
-                okText="Save"
-                cancelText="Close"
-                okButtonProps={{ disabled: isSaveButtonDisabled}}  // Disable Save button if no changes
-
+                footer={null}
             >
-                <Input
-                    placeholder="Item Name"
-                    value={editedItemName}
-                    onChange={(e) => setEditedItemName(e.target.value)}
-                    style={{ marginBottom: '10px' }}
-                />
-                <Input
-                    placeholder="User Name"
-                    value={editedUserName}
-                    onChange={(e) => setEditedUserName(e.target.value)}
-                    style={{ marginBottom: '10px' }}
-                />
-                <Input.Password
-                    placeholder="Password"
-                    value={editedPassword}
-                    onChange={(e) => setEditedPassword(e.target.value)}
-                    style={{ marginBottom: '10px' }}
-                />
-                <Input.Group
-                    placeholder="Group"
-                    value={editedGroup}
-                    onChange={(e) => setEditedGroup(e.target.value)}
-                    style={{ marginBottom: '10px' }}
-                />
-            </Modal>
-            <Modal
-                title="Read Password Details"
-                open={readModalOpen}
-                onOk={() => setReadModalOpen(false)}
-                onCancel={() => setReadModalOpen(false)}
-                okText="Close"
-                cancelText="Close"
-            >
-                {readModalContent && (
-                    <div>
-                        <p><strong>Name:</strong> {readModalContent.itemName}</p>
-                        <p><strong>User Name:</strong> {readModalContent.userName}</p>
-                        <p><strong>Password:</strong> {readModalContent.password}</p>
-                        <p><strong>Group:</strong> {readModalContent.group}</p>
-                        <Dropdown
-                            menu={{
-                                items: historyMenuItems, // Use historyMenuItems here
-                            }}
+                <Tabs defaultActiveKey="1">
+                    <TabPane tab="Details" key="1">
+                        {clickedRow && (
+                            <div>
+                                <p><strong>Name:</strong> {clickedRow.itemName}</p>
+                                <p><strong>User Name:</strong> {clickedRow.userName}</p>
+                                <p><strong>Password:</strong> {clickedRow.password}</p>
+                                <p><strong>Group:</strong> {clickedRow.groupId}</p>
+                            </div>
+                        )}
+                    </TabPane>
+                    <TabPane tab="History" key="2">
+                        {historyData.length > 0 ? (
+                            <ul>
+                                {historyData.map((entry, index) => (
+                                    <li key={index}>
+                                        {entry.timestamp}: {entry.oldPassword}
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <p>No history available.</p>
+                        )}
+                    </TabPane>
+                    <TabPane tab="Edit" key="3">
+                        {clickedRow && (
+                            <div>
+                                <Input
+                                    placeholder="Item Name"
+                                    value={editedItemName}
+                                    onChange={(e) => setEditedItemName(e.target.value)}
+                                    style={{ marginBottom: '10px' }}
+                                />
+                                <Input
+                                    placeholder="User Name"
+                                    value={editedUserName}
+                                    onChange={(e) => setEditedUserName(e.target.value)}
+                                    style={{ marginBottom: '10px' }}
+                                />
+                                <Input.Password
+                                    placeholder="Password"
+                                    value={editedPassword}
+                                    onChange={(e) => setEditedPassword(e.target.value)}
+                                    style={{ marginBottom: '10px' }}
+                                />
+                                <Input
+                                    placeholder="Group"
+                                    value={editedGroup}
+                                    onChange={(e) => setEditedGroup(e.target.value)}
+                                    style={{ marginBottom: '10px' }}
+                                />
+                                <Button
+                                    type="primary"
+                                    onClick={handleSaveChanges}
+                                    disabled={isSaveButtonDisabled}
+                                >
+                                    Save Changes
+                                </Button>
+                            </div>
+                        )}
+                    </TabPane>
+                    <TabPane tab="Delete" key="4">
+                        <Button
+                            type="primary"
+                            danger
+                            onClick={handleDelete}
                         >
-                            <a onClick={(e) => e.preventDefault()}>
-                                <Space>
-                                    History
-                                    <DownOutlined />
-                                </Space>
-                            </a>
-                        </Dropdown>
-                    </div>
-                )}
+                            Delete Password Item
+                        </Button>
+                    </TabPane>
+                </Tabs>
             </Modal>
         </div>
     );

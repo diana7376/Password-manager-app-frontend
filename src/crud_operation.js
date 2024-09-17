@@ -131,7 +131,7 @@ export function dataFetching(groupId, setData) {
 
 export const fetchHistory = async (passwordId) => {
     try {
-        //const response = await fetch(`/api/passwords/${passwordId}/history`);
+        const response = await fetch(`/api/password-history`);
         if (!response.ok) {
             throw new Error('Failed to fetch history');
         }
