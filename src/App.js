@@ -43,7 +43,7 @@ const App = () => {
     const [userId, setUserId] = useState(1);
     const [comment, setCommentId] = useState(null);
     const [url, setUrlId] = useState(null);
-    const [selectedKey, setSelectedKey] = useState('group-0'); // State to track selected menu item
+    const [selectedKey, setSelectedKey] = useState('2'); // State to track selected menu item
     const [openKeys, setOpenKeys] = useState([]); // Track open submenu keys
     const [filteredItems, setFilteredItems] = useState([]); // For storing search results
     const [isSearching, setIsSearching] = useState(false); // Flag to track whether search is active
@@ -179,15 +179,18 @@ const App = () => {
         setSelectedKey(key); // Set the selected key when a menu item is clicked
         setIsSearching(false); // Reset search state
 
-        if (key === '2') {
-            // If "Passwords" is clicked, fetch all passwords (same as "All" group)
-            setSelectedGroupId(-1); // Treat it like the "All" group
+
+        if (key === '2') { // If "Passwords" option is clicked (with key '2')
+            // "All" group selected, fetch all data
+            setSelectedGroupId(-1); // Set null or some flag to indicate all groups
             setBreadcrumbItems([
-                { title: 'Passwords' },
+                { title: 'Group' },
                 { title: 'All' },
             ]);
-            fetchDataForAllGroups(); // Fetch all password data
-        } else if (key.startsWith('group-')) {
+            fetchDataForAllGroups(); // Fetch data for all groups
+        }
+
+        else if (key.startsWith('group-')) {
             const groupId = key.split('-')[1]; // Extract the groupId
 
             if (groupId === '0') {
@@ -198,20 +201,23 @@ const App = () => {
                     { title: 'All' },
                 ]);
                 fetchDataForAllGroups();
-            } else if (groupId === 'X') {
+            }
+            else if (groupId === 'X') {
                 // "Unlisted" group selected, fetch all data
-                setSelectedGroupId(null); // Set null or some flag to indicate unlisted groups
+                setSelectedGroupId(null); // Set -1 or some flag to indicate unlisted groups
                 setBreadcrumbItems([
                     { title: 'Group' },
                     { title: 'Unlisted' },
                 ]);
                 fetchDataForUnlistedGroups();
-            } else {
+            }
+            else {
                 setSelectedGroupId(groupId); // Update the selected group ID
                 const clickedGroup = groupItems.find(item => item.key === key);
 
                 if (clickedGroup) {
                     const groupName = clickedGroup.label;
+
                     setBreadcrumbItems([
                         { title: 'Group' },
                         { title: groupName },
@@ -231,8 +237,11 @@ const App = () => {
                         console.error('Error fetching group details:', error);
                     });
             }
+        } else if (key === 'logout') {
+            handleLogout(); // Call logout function when logout menu item is clicked
         }
     };
+
     const fetchDataForAllGroups = () => {
         axios
             .get('http://127.0.0.1:8000/api/password-items/', config) // Adjust API endpoint if necessary
@@ -309,6 +318,13 @@ const App = () => {
     const onPasswordAdd = () => {
         fetchData();
     };
+
+    useEffect(() => {
+        if (selectedKey === '2') {
+            fetchDataForAllGroups(); // Fetch all password items for the default "Passwords" selection
+        }
+    }, [selectedKey]);
+
 
     const handleLogout = () => {
         localStorage.removeItem('token'); // Remove the token from local storage
