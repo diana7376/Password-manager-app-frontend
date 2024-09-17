@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from './axiosConfg'; // Ensure this is the correct path
-import './auth.css'; // Import the CSS file
+import axios from '../axiosConfg'; // Ensure this is the correct path
+import './login.css';
 
 const Login = ({ onLogout }) => {
     const [username, setUsername] = useState('');
@@ -46,6 +46,18 @@ const Login = ({ onLogout }) => {
                         />
                     </div>
                     <button type="submit" className="submit-btn">Login</button>
+                    <div className="new-user">
+                        <p className="new-to-lockr">
+                            New to LockR?
+                            <span
+                                className="register-link"
+                                onClick={() => navigate('/register')}
+                                style={{cursor: 'pointer', marginLeft: '5px'}}
+                            >
+                            Register here
+                        </span>
+                        </p>
+                    </div>
                 </form>
             </div>
         </div>

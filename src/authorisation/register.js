@@ -1,6 +1,7 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from './axiosConfg'; // Ensure this is the correct path
+import axios from '../axiosConfg';
+import './login.css';
 
 const Register = ({ onLogout }) => {
     const [username, setUsername] = useState('');
@@ -27,7 +28,7 @@ const Register = ({ onLogout }) => {
                 password2: confirmPassword // Include password2 in the request
             });
             localStorage.setItem('token', response.data.access); // Store the access token
-            navigate('/'); // Redirect to the main page
+            navigate('/login'); // Redirect to the main page
         } catch (error) {
             setError('Registration failed: ' + (error.response?.data?.detail || 'Unknown error'));
         }
@@ -76,6 +77,18 @@ const Register = ({ onLogout }) => {
                         />
                     </div>
                     <button type="submit" className="submit-btn">Register</button>
+                    <div className="old-user">
+                        <p className="have-an-acc">
+                            Already have an account?
+                            <span
+                                className="login-link"
+                                onClick={() => navigate('/login')}
+                                style={{cursor: 'pointer', marginLeft: '5px'}}
+                            >
+                            Login here
+                        </span>
+                        </p>
+                    </div>
                 </form>
             </div>
         </div>
