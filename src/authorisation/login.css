@@ -144,6 +144,37 @@ p.error {
   height: 24px;
   filter: invert(100%);
 }
+.new-to-lockr {
+  color: #ffffff;
+  font-size: 14px;
+}
+
+.register-link {
+  color:  #ffffff;
+  font-weight: bold;
+  cursor: pointer;
+  margin-left: 5px;
+}
+
+.register-link:hover {
+  text-decoration: underline;
+}
+
+.have-an-acc {
+  color: #ffffff;
+  font-size: 14px;
+}
+
+.login-link {
+  color:  #ffffff;
+  font-weight: bold;
+  cursor: pointer;
+  margin-left: 5px;
+}
+
+.login-link:hover {
+  text-decoration: underline;
+}
 
 /* Responsive Design */
 @media (max-width: 768px) {

@@ -1,16 +1,24 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Breadcrumb, Layout, Menu, theme, Input, Button, Modal, Space } from 'antd';
-import { DesktopOutlined, PieChartOutlined, UserOutlined, AudioOutlined } from '@ant-design/icons';
+import {
+    DesktopOutlined,
+    PieChartOutlined,
+    UserOutlined,
+    AudioOutlined,
+    LogoutOutlined,
+    LoginOutlined
+} from '@ant-design/icons';
 import axios from './axiosConfg';
 import fuzzysort from 'fuzzysort';
 import MainPage from './main_page';
 import SaveNewPassword from './save_new_password';
 import { dataFetching, config, fetchAllPasswordItems, fetchUnlistedPasswordItems } from './crud_operation';
 import './styles.css';
-import { Route, Routes, useNavigate } from 'react-router-dom';
-import Login from './auth'; // Import Login component
-import Register from './register'; // Import Register component
-import PrivateRoute from './PrivateRoute'; // Ensure this is the correct path
+import {Navigate, Route, Routes, useNavigate} from 'react-router-dom';
+import Login from './authorisation/login'; // Import Login component
+import Register from './authorisation/register'; // Import Register component
+import PrivateRoute from './authorisation/PrivateRoute';
+import AboutUs from "./aboutUs"; // Ensure this is the correct path
 
 
 const { Search } = Input;
@@ -270,30 +278,34 @@ const App = () => {
         setOpenKeys(keys);
     };
 
+
     const groupMenuItems = [
         {
             label: 'About us',
             key: '1',
             icon: <DesktopOutlined />,
+            onClick: () => navigate('/about'),
         },
+        ...(loggedIn ? [
+            {
+                label: 'Passwords',
+                key: '2',
+                icon: <PieChartOutlined />,
+                onClick: () => navigate('/passwords'),
+            },
+            {
+                label: 'Groups',
+                key: 'sub1',
+                icon: <UserOutlined />,
+                children: groupItems.length > 0 ? groupItems : [{ label: 'Loading...', key: 'loading' }],
+            }
+        ] : []),
         {
-            label: 'Passwords',
-            key: '2',
-            icon: <PieChartOutlined />,
-        },
-        {
-            label: 'Groups',
-            key: 'sub1',
-            icon: <UserOutlined />,
-            children: groupItems.length > 0
-                ? groupItems
-                : [{ label: 'Loading...', key: 'loading' }],
-        },
-        {
-            label: 'Logout',
-            key: 'logout',
-            icon: <UserOutlined />,
-        },
+            label: loggedIn ? 'Logout' : 'Login',
+            key: loggedIn ? 'logout' : 'login',
+            icon:loggedIn ? <LogoutOutlined /> : <LoginOutlined />,
+            onClick: () => loggedIn ? handleLogout() : navigate('/login')  // Navigate to /login when not logged in
+        }
     ];
 
     const [breadcrumbItems, setBreadcrumbItems] = useState([
@@ -389,9 +401,11 @@ const App = () => {
                     <Routes>
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register />} />
-                        <Route
-                            path="/"
-                            element={
+                        <Route path="/about" element={<AboutUs />} />
+
+                        <Route path="/" element={<Navigate to="/about" />} />
+
+                        <Route path="/passwords" element={
                                 <PrivateRoute>
                                     <Breadcrumb style={{ margin: '16px 0' }} items={breadcrumbItems} />
                                     <MainPage
