@@ -57,3 +57,297 @@ ul {
   visibility: visible;
   opacity: 1;
 }
+
+/* Custom styles for the search bar */
+/* Centering the search bar */
+/* Centering the search bar with margin */
+.custom-search-bar {
+    margin: 2% 0 2% 20%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    position: relative; /* For absolute positioning of pseudo-elements */
+    width: 60%; /* Ensure it does not overflow its container */
+    max-width: 100%; /* Restrict max-width */
+    overflow: hidden; /* Hide any overflow */
+}
+
+/* Custom styles for the search bar input */
+.custom-search-bar input {
+    width: 60%; /* Adjust width as needed */
+    max-width: 800px; /* Optional max-width */
+    padding: 15px 30px;
+    font-size: 18px;
+    border: none;
+    border-radius: 20px; /* More rounded corners */
+    outline: none;
+    transition: all 0.4s ease-in-out;
+    background: linear-gradient(145deg, #ffffff, #f0f0f0); /* Subtle gradient */
+    color: #333;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1), inset 0 -4px 8px rgba(255, 255, 255, 0.8); /* Dual shadow for depth */
+    position: relative;
+    z-index: 1; /* Ensure input is above pseudo-elements */
+}
+
+/* Neon glow effect on focus */
+.custom-search-bar input:focus {
+    border: none; /* Remove border to make space for the glow */
+    background: linear-gradient(145deg, #ffffff, rgba(231, 224, 255, 0.09)); /* Change gradient on focus */
+    box-shadow: 0 0 20px rgba(22, 119, 255, 0.8), inset 0 0 10px rgba(22, 119, 255, 0.3); /* Neon glow effect */
+    cursor: pointer; /* Change cursor to pointer on focus */
+}
+
+/* Placeholder animation */
+.custom-search-bar input::placeholder {
+    color: #888;
+    font-weight: 300; /* Lighter weight for placeholder text */
+    transition: all 0.4s ease;
+    opacity: 1;
+}
+
+.custom-search-bar input:focus::placeholder {
+    opacity: 0; /* Fade out placeholder on focus */
+    transform: translateY(-25px); /* Move placeholder up on focus */
+    font-size: 16px; /* Adjust font size */
+}
+
+/* Animated border effect */
+.custom-search-bar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 20px; /* Match the input's border-radius */
+    background: linear-gradient(145deg, rgba(22, 119, 255, 0.3), rgba(22, 119, 255, 0.7));
+    z-index: -1;
+    transition: all 0.4s ease;
+    filter: blur(8px);
+    opacity: 0.5;
+    transform: scale(1.05); /* Adjust to align with input */
+}
+
+.custom-search-bar input:focus ~ ::before {
+    opacity: 1; /* Enhance the border effect on focus */
+}
+
+/* Remove the search button styling */
+.custom-search-bar .ant-input-search-button {
+    height: 58px;
+    width: 58px;
+    border: none;
+    border-radius: 20px; /* Match the input's border-radius */
+    background: rgba(47, 114, 237, 0.68); /* Unique color */
+    color: #ffffff; /* Text color for the button */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.4s ease, box-shadow 0.4s ease; /* Smooth transition for background color and shadow */
+    cursor: pointer; /* Pointer cursor for button */
+}
+
+/* Custom styles for the sidebar menu */
+.ant-menu {
+    margin-top: 30px;
+    background-color: #001529; /* Dark background */
+    border-right: none; /* Remove border */
+}
+
+/* Custom styling for menu items */
+.ant-menu-item {
+    font-size: 14px; /* Adjust font size */
+    color: #fff; /* Text color */
+    transition: background-color 0.3s ease;
+}
+
+.ant-menu-item:hover {
+    background-color: rgba(255, 255, 255, 0.1); /* Subtle hover effect */
+}
+
+/* Custom styles for selected menu item */
+.ant-menu-item-selected {
+    background-color: rgba(255, 255, 255, 0.2); /* Highlight selected item */
+}
+
+/* Custom styles for submenu */
+.ant-menu-submenu-title {
+    font-size: 14px; /* Adjust font size */
+    color: #fff; /* Text color */
+}
+
+/* Custom styles for submenu items */
+.ant-menu-submenu > .ant-menu {
+    background-color: #001529; /* Same background color as the sidebar */
+}
+
+
+/* Custom styles for the modal */
+.ant-modal {
+    border-radius: 10px; /* Rounded corners */
+}
+
+.ant-modal-header {
+    background-color: #1677ff; /* Header background color */
+    color: #fff; /* Header text color */
+}
+
+.ant-modal-footer {
+    border-top: none; /* Remove border from footer */
+}
+
+.ant-btn-primary {
+    background-color: #1677ff; /* Button color */
+    border-color: #1677ff; /* Button border color */
+}
+
+.ant-btn-default {
+    color: #1677ff; /* Text color for default button */
+    border-color: #1677ff; /* Border color for default button */
+}
+
+
+/* Custom styles for the header */
+.ant-layout-header {
+    background-color: #fff; /* Background color */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Shadow effect */
+}
+
+/* Custom styles for the footer */
+.ant-layout-footer {
+    background-color: #001529; /* Background color */
+    color: #fff; /* Text color */
+}
+
+
+/* Custom styles for the content area */
+.ant-layout-content {
+    /*background-color: #f0f2f5; !* Light background color *!*/
+    padding: 16px; /* Padding around content */
+}
+
+/* Custom styles for breadcrumb */
+.ant-breadcrumb {
+    background-color: #fff; /* Background color */
+    border-radius: 4px; /* Rounded corners */
+    padding: 8px 16px; /* Padding */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Shadow effect */
+}
+
+
+/* Custom styles for buttons */
+.ant-btn {
+    border-radius: 4px; /* Rounded corners */
+    font-weight: 600; /* Font weight for better readability */
+}
+
+.ant-btn-primary {
+    background-color: #1677ff; /* Primary button background color */
+    border-color: #1677ff; /* Primary button border color */
+    transition: background-color 0.3s ease, border-color 0.3s ease; /* Smooth transition */
+}
+
+.ant-btn-primary:hover {
+    background-color: #0056b3; /* Darker color on hover */
+    border-color: #0056b3; /* Darker border color on hover */
+}
+
+
+/* General Reset */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Roboto', sans-serif; /* Modern, clean font */
+  margin: 0;
+  padding: 0;
+  background-color: #e8e8e8; /* Light grey background for the entire page */
+}
+
+/* Table Container */
+.ant-spin-container {
+  margin: 10px auto;
+  padding: 30px;
+  max-width: 100%;
+  background-color: #ffffff; /* White background for the table */
+  border-radius: 15px; /* Rounded corners */
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15); /* Enhanced shadow for floating effect */
+  overflow: hidden; /* Hide overflow for rounded corners */
+  position: relative;
+}
+
+/* Table Styles */
+.ant-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background-color: transparent; /* No background color */
+}
+
+/* Header Styling */
+.ant-table th {
+  background-color: #2c3e50; /* Dark background for header */
+  color: #ecf0f1; /* Light text color */
+  font-weight: 700; /* Bold headers */
+  padding: 16px 20px;
+  text-align: left;
+  border-bottom: 3px solid #34495e; /* Thick border for header */
+  position: relative;
+}
+
+.ant-table th::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: linear-gradient(to right, rgba(236, 240, 241, 0), rgba(236, 240, 241, 1));
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.ant-table th:hover::after {
+  transform: scaleX(1); /* Hover effect for headers */
+}
+
+/* Cell Styling */
+.ant-table td {
+  background-color: #ffffff; /* White background for cells */
+  color: #2c3e50; /* Dark text color */
+  padding: 12px 20px;
+  border-bottom: 1px solid #ecf0f1; /* Subtle border for cells */
+  border-radius: 8px; /* Rounded corners for cells */
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Row Styling */
+.ant-table tr {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.ant-table tr:hover {
+  background-color: #f4f4f4; /* Slight hover effect */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Shadow effect on hover */
+  transform: scale(1.02); /* Slightly zoom in effect on hover */
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .ant-table th, .ant-table td {
+    padding: 10px 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .ant-table {
+    font-size: 14px;
+  }
+
+  .ant-table th, .ant-table td {
+    padding: 8px 12px;
+  }
+}

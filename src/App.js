@@ -52,8 +52,10 @@ const App = () => {
 
     const [loggedIn, setLoggedIn] = useState(false); // State to track if user is logged in
     const [showAuthModal, setShowAuthModal] = useState(false); // State to control the authentication modal
-
+    const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
     const navigate = useNavigate();
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [selectedPasswordItem, setSelectedPasswordItem] = useState(null);
 
     // Focus on the input when the component mounts
     useEffect(() => {
@@ -238,7 +240,7 @@ const App = () => {
                     });
             }
         } else if (key === 'logout') {
-            handleLogout(); // Call logout function when logout menu item is clicked
+            showLogoutConfirmation(); // Show confirmation modal instead of logging out immediately
         }
     };
 
@@ -327,9 +329,29 @@ const App = () => {
 
 
     const handleLogout = () => {
-        localStorage.removeItem('token'); // Remove the token from local storage
-        setLoggedIn(false); // Update the loggedIn state
-        navigate('/login'); // Redirect to the login page
+        // Clear token and other logout operations
+        localStorage.removeItem('token');
+        setLoggedIn(false);
+        navigate('/');
+        setShowLogoutConfirm(false); // Close the confirmation modal
+    };
+
+    const showLogoutConfirmation = () => {
+        setShowLogoutConfirm(true);
+    };
+
+    const handleCancelLogout = () => {
+        setShowLogoutConfirm(false);
+        setSelectedKey('2');
+    };
+
+    const showModal = (item) => {
+    setSelectedPasswordItem(item); // Set the selected password item
+    setIsModalVisible(true); // Show the modal
+    };
+
+    const handleCancel = () => {
+    setIsModalVisible(false); // Hide the modal
     };
 
     return (
@@ -349,14 +371,10 @@ const App = () => {
             <Layout>
                 <div ref={searchRef}>
                     <Search
-                        placeholder="input search text"
+                        placeholder="What are you looking for?"
                         onSearch={onSearch}
-                        style={{
-                            margin: '0 auto',
-                            padding: '50px 10px',
-                            // width: 1050,
-                            color: '#0a0a0a',
-                        }}
+                        className = "custom-search-bar"
+
                         ref={(input) => {
                             // Attach the ref to the input DOM element inside the Search component
                             if (input) {
@@ -428,6 +446,35 @@ const App = () => {
                     </div>
                 )}
             </Modal>
+            <Modal
+                title="Confirm Logout"
+                visible={showLogoutConfirm}
+                onOk={handleLogout}
+                onCancel={handleCancelLogout}
+                okText="Yes"
+                cancelText="No"
+            >
+                <p>Are you sure you want to log out?</p>
+            </Modal>
+            <Modal
+            title="Password Details"
+            visible={isModalVisible}
+            onCancel={handleCancel}
+            footer={null} // You can add footer actions if needed
+        >
+            {selectedPasswordItem ? (
+                <div>
+                    <p><strong>Item Name:</strong> {selectedPasswordItem.itemName}</p>
+                    <p><strong>Username:</strong> {selectedPasswordItem.userName}</p>
+                    <p><strong>Password:</strong> {selectedPasswordItem.password}</p>
+                    <p><strong>URL:</strong> {selectedPasswordItem.url}</p>
+                    <p><strong>Comment:</strong> {selectedPasswordItem.comment}</p>
+                </div>
+            ) : (
+                <p>No details available</p>
+            )}
+             </Modal>
+
         </Layout>
     );
 };
