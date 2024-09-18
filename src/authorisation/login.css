@@ -4,6 +4,8 @@
   justify-content: center;
   align-items: center;
   height: 100vh;
+  margin: 0;
+  padding: 0;
   background: linear-gradient(135deg, #8e2de2, #4a00e0); /* Dark and sleek green-to-dark gradient */
   font-family: 'Poppins', sans-serif;
   position: relative;
@@ -22,6 +24,11 @@
   filter: blur(50px);
 }
 
+.ant-layout-content{
+  margin:0!important;
+  padding: 0!important;
+}
+
 /* Glassmorphism Form Wrapper */
 .form-wrapper {
   backdrop-filter: blur(15px);
@@ -31,6 +38,7 @@
   box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25);
   max-width: 450px;
   width: 100%;
+  margin: 0 auto;
   text-align: center;
   position: relative;
   z-index: 1;
@@ -174,6 +182,12 @@ p.error {
 
 .login-link:hover {
   text-decoration: underline;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 
