@@ -1,7 +1,5 @@
 import axios, {token} from './axiosConfg';
 
-
-//const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMxNjU1Mzk3LCJpYXQiOjE3MjY0NzEzOTcsImp0aSI6Ijg1MzhhZDc5ODg0OTQ0OGU4M2VhOTMyYTU1NmE5MDlmIiwidXNlcl9pZCI6MX0.S0LE2uQo1StzR3CVr7sMLBBVDxlEHd4l7L6Fg6F84n8"
 export const config = {
     headers: { Authorization: `Bearer ${token}` }
 };
