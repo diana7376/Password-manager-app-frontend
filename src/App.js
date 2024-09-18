@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Breadcrumb, Layout, Menu, theme, Input, Button, Modal, Space } from 'antd';
+import { Breadcrumb, Layout, Menu, theme, Input, Button, Modal, message } from 'antd';
 import {
     DesktopOutlined,
     PieChartOutlined,
@@ -338,6 +338,7 @@ const showLogoutConfirmation = () => {
 const handleLogout = () => {
     localStorage.removeItem('token'); // Remove the token
     setLoggedIn(false); // Update the login state
+    message.success('You have successfully logged out. See you soon..');
     setShowLogoutConfirm(false); // Close the logout confirmation modal
     navigate('/login'); // Redirect to the login page
 };
