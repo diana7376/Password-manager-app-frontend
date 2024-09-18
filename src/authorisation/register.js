@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from '../axiosConfg';
+import { message } from 'antd';
+
 import './login.css';
 
 const Register = ({ onLogout }) => {
@@ -11,7 +13,10 @@ const Register = ({ onLogout }) => {
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = (e) => {
+
+    //const handleSubmit = async (e) => {
+
         e.preventDefault(); // Prevent the default form submission
 
         // Check if passwords match
@@ -20,18 +25,34 @@ const Register = ({ onLogout }) => {
             return;
         }
 
-        try {
-            const response = await axios.post('/register/', {
-                username,
-                email,
-                password,
-                password2: confirmPassword // Include password2 in the request
+
+        // Registration request
+        axios.post('/register/', {
+            username,
+            email,
+            password,
+            password2: confirmPassword // Include password2 in the request
+        })
+            .then((response) => {
+                localStorage.setItem('token', response.data.access); // Store access token
+                // Success notification
+                message.success('Registration successful! Redirecting to login...');
+                setError(''); // Clear any previous error
+                // Redirect to the login page after 3 seconds
+                    navigate('/login');
+            })
+            .catch((error) => {
+                if (error.response) {
+                    console.log('Response error:', error.response.data);
+                    message.error('Registration failed: ' + (error.response?.data?.detail || 'Unknown error')); // Error notification
+                } else if (error.request) {
+                    console.log('No response received:', error.request);
+                    message.error('No response from the server'); // Error notification
+                } else {
+                    console.log('Error setting up request:', error.message);
+                    message.error('Error setting up request'); // Error notification
+                }
             });
-            localStorage.setItem('token', response.data.access); // Store the access token
-            navigate('/login'); // Redirect to the main page
-        } catch (error) {
-            setError('Registration failed: ' + (error.response?.data?.detail || 'Unknown error'));
-        }
     };
 
     return (
@@ -83,10 +104,12 @@ const Register = ({ onLogout }) => {
                             <span
                                 className="login-link"
                                 onClick={() => navigate('/login')}
-                                style={{cursor: 'pointer', marginLeft: '5px'}}
+
+                                style={{ cursor: 'pointer', marginLeft: '5px' }}
                             >
-                            Login here
-                        </span>
+                                Login here
+                            </span>
+
                         </p>
                     </div>
                 </form>
@@ -96,3 +119,4 @@ const Register = ({ onLogout }) => {
 };
 
 export default Register;
+
