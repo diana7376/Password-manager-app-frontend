@@ -19,7 +19,7 @@ import Login from './authorisation/login';
 import Register from './authorisation/register';
 import PrivateRoute from './authorisation/PrivateRoute';
 import AboutUs from "./aboutUs";
-
+import { useLocation } from 'react-router-dom';
 
 const { Search } = Input;
 
@@ -63,7 +63,10 @@ const App = () => {
     const navigate = useNavigate();
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [selectedPasswordItem, setSelectedPasswordItem] = useState(null);
+    const location = useLocation();  // Get the current route
 
+    const isLoginPage = location.pathname === '/login';
+    const isRegisterPage = location.pathname === '/register';
     // Focus on the input when the component mounts
     useEffect(() => {
         if (searchInputRef.current) {
@@ -76,7 +79,7 @@ const App = () => {
     } = theme.useToken();
 
     // Check if the user is logged in
-        useEffect(() => {
+    useEffect(() => {
         const token = localStorage.getItem('token');
         setLoggedIn(!!token);
     }, [loggedIn]);
@@ -371,6 +374,8 @@ const handleCancelLogout = () => {
             </Sider>
 
             <Layout>
+                {/* Conditionally render search bar and add password button */}
+                {!isLoginPage && !isRegisterPage && loggedIn && (
                 <div ref={searchRef}>
                     <Search
                         placeholder="What are you looking for?"
@@ -385,6 +390,7 @@ const handleCancelLogout = () => {
                         }}
                     />
                 </div>
+                )}
                 {/* <Header style={{ padding: 0, background: colorBgContainer }} />*/}
 
                 <Content style={{ margin: '0 16px' }}>
@@ -410,6 +416,8 @@ const handleCancelLogout = () => {
                     </Routes>
 
                     {/* Plus Button at the bottom-right corner under the table */}
+                    {/* Conditionally render the "Add New Password" button */}
+                    {!isLoginPage && !isRegisterPage && loggedIn && (
                     <div
                         style={{
                             position: 'fixed',
@@ -426,6 +434,7 @@ const handleCancelLogout = () => {
                             onPasswordAdd={onPasswordAdd}
                         />
                     </div>
+                    )}
                 </Content>
                 <Footer style={{ textAlign: 'center' }}>© 2024 LockR</Footer>
             </Layout>
