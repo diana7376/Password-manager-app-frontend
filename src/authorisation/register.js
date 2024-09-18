@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from '../axiosConfg';
 import { message } from 'antd';
+
 import './login.css';
 
 const Register = ({ onLogout }) => {
@@ -13,6 +14,9 @@ const Register = ({ onLogout }) => {
     const navigate = useNavigate();
 
     const handleSubmit = (e) => {
+
+    //const handleSubmit = async (e) => {
+
         e.preventDefault(); // Prevent the default form submission
 
         // Check if passwords match
@@ -20,6 +24,7 @@ const Register = ({ onLogout }) => {
             setError('Passwords do not match');
             return;
         }
+
 
         // Registration request
         axios.post('/register/', {
@@ -99,10 +104,12 @@ const Register = ({ onLogout }) => {
                             <span
                                 className="login-link"
                                 onClick={() => navigate('/login')}
+
                                 style={{ cursor: 'pointer', marginLeft: '5px' }}
                             >
                                 Login here
                             </span>
+
                         </p>
                     </div>
                 </form>
@@ -112,3 +119,4 @@ const Register = ({ onLogout }) => {
 };
 
 export default Register;
+

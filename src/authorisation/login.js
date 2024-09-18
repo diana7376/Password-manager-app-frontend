@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from '../axiosConfg';
 import { message } from 'antd';
+
 import './login.css';
 
 const Login = ({ onLogout }) => {
@@ -9,6 +10,7 @@ const Login = ({ onLogout }) => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
@@ -25,6 +27,7 @@ const Login = ({ onLogout }) => {
             .catch ((error)=>{
             setError('Invalid credentials: ' + (error.response?.data?.detail || 'Unknown error'));
         })
+
     };
 
     return (

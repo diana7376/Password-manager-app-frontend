@@ -77,10 +77,10 @@ const App = () => {
     } = theme.useToken();
 
     // Check if the user is logged in
-    useEffect(() => {
+        useEffect(() => {
         const token = localStorage.getItem('token');
         setLoggedIn(!!token);
-    }, []);
+    }, [loggedIn]);
 
     const fetchData = () => {
         if (selectedGroupId === -1) {
@@ -185,72 +185,62 @@ const App = () => {
         setFilteredItems(filtered); // Update the filteredItems with the search results
     };
 
-    const handleMenuClick = (key) => {
-        setSelectedKey(key); // Set the selected key when a menu item is clicked
-        setIsSearching(false); // Reset search state
+const handleMenuClick = (key) => {
+    setSelectedKey(key); // Set the selected key when a menu item is clicked
+    setIsSearching(false); // Reset search state
 
+    if (key === '2') {
+        setSelectedGroupId(-1); // Set the group ID to indicate all groups
+        setBreadcrumbItems([
+            { title: 'Group' },
+            { title: 'All' },
+        ]);
+        fetchDataForAllGroups();
+    } else if (key.startsWith('group-')) {
+        const groupId = key.split('-')[1]; // Extract the groupId
 
-        if (key === '2') { // If "Passwords" option is clicked (with key '2')
-            // "All" group selected, fetch all data
-            setSelectedGroupId(-1); // Set null or some flag to indicate all groups
+        if (groupId === '0') {
+            setSelectedGroupId(-1);
             setBreadcrumbItems([
                 { title: 'Group' },
                 { title: 'All' },
             ]);
-            fetchDataForAllGroups(); // Fetch data for all groups
-        }
+            fetchDataForAllGroups();
+        } else if (groupId === 'X') {
+            setSelectedGroupId(null);
+            setBreadcrumbItems([
+                { title: 'Group' },
+                { title: 'Unlisted' },
+            ]);
+            fetchDataForUnlistedGroups();
+        } else {
+            setSelectedGroupId(groupId);
+            const clickedGroup = groupItems.find(item => item.key === key);
 
-        else if (key.startsWith('group-')) {
-            const groupId = key.split('-')[1]; // Extract the groupId
-
-            if (groupId === '0') {
-                // "All" group selected, fetch all data
-                setSelectedGroupId(-1); // Set null or some flag to indicate all groups
+            if (clickedGroup) {
+                const groupName = clickedGroup.label;
                 setBreadcrumbItems([
                     { title: 'Group' },
-                    { title: 'All' },
+                    { title: groupName },
                 ]);
-                fetchDataForAllGroups();
             }
-            else if (groupId === 'X') {
-                // "Unlisted" group selected, fetch all data
-                setSelectedGroupId(null); // Set -1 or some flag to indicate unlisted groups
-                setBreadcrumbItems([
-                    { title: 'Group' },
-                    { title: 'Unlisted' },
-                ]);
-                fetchDataForUnlistedGroups();
-            }
-            else {
-                setSelectedGroupId(groupId); // Update the selected group ID
-                const clickedGroup = groupItems.find(item => item.key === key);
 
-                if (clickedGroup) {
-                    const groupName = clickedGroup.label;
-
+            axios.get(`http://127.0.0.1:8000/api/groups/${groupId}/`, config)
+                .then(response => {
+                    const groupName = response.data.groupName;
                     setBreadcrumbItems([
                         { title: 'Group' },
                         { title: groupName },
                     ]);
-                }
-
-                // Fetch group-specific data
-                axios.get(`http://127.0.0.1:8000/api/groups/${groupId}/`, config)
-                    .then(response => {
-                        const groupName = response.data.groupName;
-                        setBreadcrumbItems([
-                            { title: 'Group' },
-                            { title: groupName },
-                        ]);
-                    })
-                    .catch(error => {
-                        console.error('Error fetching group details:', error);
-                    });
-            }
-        } else if (key === 'logout') {
-            showLogoutConfirmation(); // Show confirmation modal instead of logging out immediately
+                })
+                .catch(error => {
+                    console.error('Error fetching group details:', error);
+                });
         }
-    };
+    } else if (key === 'logout') {
+        showLogoutConfirmation(); // Show the logout confirmation modal
+    }
+};
 
     const fetchDataForAllGroups = () => {
         axios
@@ -280,33 +270,35 @@ const App = () => {
 
 
     const groupMenuItems = [
+
+    {
+        label: 'About us',
+        key: '1',
+        icon: <DesktopOutlined />,
+        onClick: () => navigate('/about'),
+    },
+    ...(loggedIn ? [
         {
-            label: 'About us',
-            key: '1',
-            icon: <DesktopOutlined />,
-            onClick: () => navigate('/about'),
+            label: 'Passwords',
+            key: '2',
+            icon: <PieChartOutlined />,
+            onClick: () => navigate('/passwords'),
         },
-        ...(loggedIn ? [
-            {
-                label: 'Passwords',
-                key: '2',
-                icon: <PieChartOutlined />,
-                onClick: () => navigate('/passwords'),
-            },
-            {
-                label: 'Groups',
-                key: 'sub1',
-                icon: <UserOutlined />,
-                children: groupItems.length > 0 ? groupItems : [{ label: 'Loading...', key: 'loading' }],
-            }
-        ] : []),
         {
-            label: loggedIn ? 'Logout' : 'Login',
-            key: loggedIn ? 'logout' : 'login',
-            icon:loggedIn ? <LogoutOutlined /> : <LoginOutlined />,
-            onClick: () => loggedIn ? handleLogout() : navigate('/login')  // Navigate to /login when not logged in
+            label: 'Groups',
+            key: 'sub1',
+            icon: <UserOutlined />,
+            children: groupItems.length > 0 ? groupItems : [{ label: 'Loading...', key: 'loading' }],
         }
-    ];
+    ] : []),
+    {
+        label: loggedIn ? 'Logout' : 'Login',
+        key: loggedIn ? 'logout' : 'login',
+        icon: loggedIn ? <LogoutOutlined /> : <LoginOutlined />,
+        onClick: () => loggedIn ? showLogoutConfirmation() : navigate('/login')  // Show confirmation modal for logout
+    }
+];
+
 
     const [breadcrumbItems, setBreadcrumbItems] = useState([
         { title: 'Group' },
@@ -339,23 +331,21 @@ const App = () => {
         }
     }, [selectedKey]);
 
+const showLogoutConfirmation = () => {
+    setShowLogoutConfirm(true); // Show the logout confirmation modal
+};
 
-    const handleLogout = () => {
-        // Clear token and other logout operations
-        localStorage.removeItem('token');
-        setLoggedIn(false);
-        navigate('/');
-        setShowLogoutConfirm(false); // Close the confirmation modal
-    };
+const handleLogout = () => {
+    localStorage.removeItem('token'); // Remove the token
+    setLoggedIn(false); // Update the login state
+    setShowLogoutConfirm(false); // Close the logout confirmation modal
+    navigate('/login'); // Redirect to the login page
+};
 
-    const showLogoutConfirmation = () => {
-        setShowLogoutConfirm(true);
-    };
-
-    const handleCancelLogout = () => {
-        setShowLogoutConfirm(false);
-        setSelectedKey('2');
-    };
+const handleCancelLogout = () => {
+    setShowLogoutConfirm(false); // Close the confirmation modal without logging out
+    setSelectedKey('2');
+};
 
     const showModal = (item) => {
     setSelectedPasswordItem(item); // Set the selected password item

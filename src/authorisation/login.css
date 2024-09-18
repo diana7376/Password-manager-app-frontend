@@ -175,12 +175,6 @@ p.error {
 .login-link:hover {
   text-decoration: underline;
 }
-.success {
-  color: #4caf50; /* Green color for success */
-  font-size: 14px;
-  margin-bottom: 15px;
-  font-weight: 600;
-}
 
 
 /* Responsive Design */

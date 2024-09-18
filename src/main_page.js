@@ -28,6 +28,7 @@ const MainPage = ({ groupId, userId, passwordItems }) => {
     const [originalPassword, setOriginalPassword] = useState('');
     const [originalGroup, setOriginalGroup] = useState('');
     const [isSaveButtonDisabled, setIsSaveButtonDisabled] = useState(true);
+    const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
     useEffect(() => {
         setIsSaveButtonDisabled(
@@ -153,20 +154,19 @@ const MainPage = ({ groupId, userId, passwordItems }) => {
             dataIndex: 'password',
             key: 'password',
             render: (text, record) => {
-                const isPasswordVisible = record.isPasswordVisible || false;
                 const passwordMasked = '*'.repeat(record.password.length);
 
                 return (
                     <span>
-                        {isPasswordVisible ? record.password : passwordMasked}
+                        {record.isPasswordVisible ? record.password : passwordMasked}
                         <span
                             style={{ marginLeft: 8, cursor: 'pointer' }}
                             onClick={() => {
-                                record.isPasswordVisible = !isPasswordVisible;
+                                record.isPasswordVisible = !record.isPasswordVisible;
                                 setData([...data]);
                             }}
                         >
-                            {isPasswordVisible ? <EyeInvisibleOutlined /> : <EyeOutlined />}
+                            {record.isPasswordVisible ? <EyeInvisibleOutlined /> : <EyeOutlined />}
                         </span>
                     </span>
                 );
@@ -214,7 +214,16 @@ const MainPage = ({ groupId, userId, passwordItems }) => {
                             <div>
                                 <p><strong>Name:</strong> {clickedRow.itemName}</p>
                                 <p><strong>User Name:</strong> {clickedRow.userName}</p>
-                                <p><strong>Password:</strong> {clickedRow.password}</p>
+                                <p>
+                                    <strong>Password:</strong>
+                                    {isPasswordVisible ? clickedRow.password : '*'.repeat(clickedRow.password.length)}
+                                    <Button
+                                        type="link"
+                                        onClick={() => setIsPasswordVisible(!isPasswordVisible)}
+                                    >
+                                        {isPasswordVisible ? 'Hide' : 'Show'}
+                                    </Button>
+                                </p>
                                 <p><strong>Group:</strong> {clickedRow.groupId}</p>
                             </div>
                         )}
@@ -235,30 +244,38 @@ const MainPage = ({ groupId, userId, passwordItems }) => {
                     <TabPane tab="Edit" key="3">
                         {clickedRow && (
                             <div>
-                                <Input
-                                    placeholder="Item Name"
-                                    value={editedItemName}
-                                    onChange={(e) => setEditedItemName(e.target.value)}
-                                    style={{ marginBottom: '10px' }}
-                                />
-                                <Input
-                                    placeholder="User Name"
-                                    value={editedUserName}
-                                    onChange={(e) => setEditedUserName(e.target.value)}
-                                    style={{ marginBottom: '10px' }}
-                                />
-                                <Input.Password
-                                    placeholder="Password"
-                                    value={editedPassword}
-                                    onChange={(e) => setEditedPassword(e.target.value)}
-                                    style={{ marginBottom: '10px' }}
-                                />
-                                <Input
-                                    placeholder="Group"
-                                    value={editedGroup}
-                                    onChange={(e) => setEditedGroup(e.target.value)}
-                                    style={{ marginBottom: '10px' }}
-                                />
+                                <div style={{ marginBottom: '10px' }}>
+                                    <label style={{fontWeight: "bold"}}>Item Name</label>
+                                    <Input
+                                        placeholder="Item Name"
+                                        value={editedItemName}
+                                        onChange={(e) => setEditedItemName(e.target.value)}
+                                    />
+                                </div>
+                                <div style={{ marginBottom: '10px' }}>
+                                    <label style={{fontWeight: "bold"}}>User Name</label>
+                                    <Input
+                                        placeholder="User Name"
+                                        value={editedUserName}
+                                        onChange={(e) => setEditedUserName(e.target.value)}
+                                    />
+                                </div>
+                                <div style={{ marginBottom: '10px' }}>
+                                    <label style={{fontWeight: "bold"}}>Password</label>
+                                    <Input.Password
+                                        placeholder="Password"
+                                        value={editedPassword}
+                                        onChange={(e) => setEditedPassword(e.target.value)}
+                                    />
+                                </div>
+                                <div style={{ marginBottom: '10px' }}>
+                                    <label style={{fontWeight: "bold"}}>Group</label>
+                                    <Input
+                                        placeholder="Group"
+                                        value={editedGroup}
+                                        onChange={(e) => setEditedGroup(e.target.value)}
+                                    />
+                                </div>
                                 <Button
                                     type="primary"
                                     onClick={handleSaveChanges}
