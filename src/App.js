@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Breadcrumb, Layout, Menu, theme, Input, Button, Modal, Space } from 'antd';
+import { Breadcrumb, Layout, Menu, theme, Input, Button, Modal, message } from 'antd';
 import {
     DesktopOutlined,
     PieChartOutlined,
@@ -15,17 +15,16 @@ import SaveNewPassword from './save_new_password';
 import { dataFetching, config, fetchAllPasswordItems, fetchUnlistedPasswordItems } from './crud_operation';
 import './styles.css';
 import {Navigate, Route, Routes, useNavigate} from 'react-router-dom';
-import Login from './authorisation/login'; // Import Login component
-import Register from './authorisation/register'; // Import Register component
+import Login from './authorisation/login';
+import Register from './authorisation/register';
 import PrivateRoute from './authorisation/PrivateRoute';
-import AboutUs from "./aboutUs"; // Ensure this is the correct path
+import AboutUs from "./aboutUs";
 
 
 const { Search } = Input;
 
 
 const { Header, Content, Footer, Sider } = Layout;
-
 
 const suffix = (
     <AudioOutlined style={{ fontSize: 16, color: '#1677ff' }} />
@@ -338,6 +337,7 @@ const showLogoutConfirmation = () => {
 const handleLogout = () => {
     localStorage.removeItem('token'); // Remove the token
     setLoggedIn(false); // Update the login state
+    message.success('You have successfully logged out. See you soon..');
     setShowLogoutConfirm(false); // Close the logout confirmation modal
     navigate('/login'); // Redirect to the login page
 };
