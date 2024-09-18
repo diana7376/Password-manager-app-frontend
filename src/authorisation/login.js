@@ -1,24 +1,30 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from '../axiosConfg'; // Ensure this is the correct path
+import axios from '../axiosConfg';
+import { message } from 'antd';
 import './login.css';
 
 const Login = ({ onLogout }) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        try {
-            const response = await axios.post('/token/', { username, password });
-            localStorage.setItem('token', response.data.access); // Store the access token
-            navigate('/'); // Redirect to the main page
-        } catch (error) {
+        axios.post('/token/', { username, password })
+            .then((response) =>{
+                localStorage.setItem('token', response.data.access); // Store the access token
+                message.success('Login successful! Welcome...');
+                setError('');
+                navigate('/passwords');
+
+            })
+            .catch ((error)=>{
             setError('Invalid credentials: ' + (error.response?.data?.detail || 'Unknown error'));
-        }
+        })
     };
 
     return (
