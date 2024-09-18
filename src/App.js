@@ -15,17 +15,16 @@ import SaveNewPassword from './save_new_password';
 import { dataFetching, config, fetchAllPasswordItems, fetchUnlistedPasswordItems } from './crud_operation';
 import './styles.css';
 import {Navigate, Route, Routes, useNavigate} from 'react-router-dom';
-import Login from './authorisation/login'; // Import Login component
-import Register from './authorisation/register'; // Import Register component
+import Login from './authorisation/login';
+import Register from './authorisation/register';
 import PrivateRoute from './authorisation/PrivateRoute';
-import AboutUs from "./aboutUs"; // Ensure this is the correct path
+import AboutUs from "./aboutUs";
 
 
 const { Search } = Input;
 
 
 const { Header, Content, Footer, Sider } = Layout;
-
 
 const suffix = (
     <AudioOutlined style={{ fontSize: 16, color: '#1677ff' }} />
