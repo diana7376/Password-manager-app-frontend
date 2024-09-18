@@ -23,21 +23,25 @@ const MainPage = ({ groupId, userId, passwordItems }) => {
     const [editedUserName, setEditedUserName] = useState('');
     const [editedPassword, setEditedPassword] = useState('');
     const [editedGroup, setEditedGroup] = useState('');
+
     const [originalItemName, setOriginalItemName] = useState('');
     const [originalUserName, setOriginalUserName] = useState('');
     const [originalPassword, setOriginalPassword] = useState('');
     const [originalGroup, setOriginalGroup] = useState('');
+
     const [isSaveButtonDisabled, setIsSaveButtonDisabled] = useState(true);
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
     useEffect(() => {
-        setIsSaveButtonDisabled(
+
+        const isUnchanged =
             editedItemName === originalItemName &&
             editedUserName === originalUserName &&
             editedPassword === originalPassword &&
-            String(editedGroup) === String(originalGroup)
-        );
-    }, [editedItemName, editedUserName, editedPassword, editedGroup]);
+            editedGroup === originalGroup;
+
+        setIsSaveButtonDisabled(isUnchanged);
+    }, [editedItemName, editedUserName, editedPassword, editedGroup, originalItemName, originalUserName, originalPassword, originalGroup]);
 
     useEffect(() => {
         if (groupId === -1) {
@@ -62,12 +66,12 @@ const MainPage = ({ groupId, userId, passwordItems }) => {
         setEditedItemName(record.itemName);
         setEditedUserName(record.userName);
         setEditedPassword(record.password);
-        setEditedGroup(String(record.groupId));
+        setEditedGroup(record.groupName);
 
         setOriginalItemName(record.itemName);
         setOriginalUserName(record.userName);
         setOriginalPassword(record.password);
-        setOriginalGroup(String(record.groupId));
+        setOriginalGroup(record.groupName);
 
         setIsModalOpen(true);
     };
@@ -224,7 +228,7 @@ const MainPage = ({ groupId, userId, passwordItems }) => {
                                         {isPasswordVisible ? 'Hide' : 'Show'}
                                     </Button>
                                 </p>
-                                <p><strong>Group:</strong> {clickedRow.groupId}</p>
+                                <p><strong>Group:</strong> {clickedRow.groupName}</p>
                             </div>
                         )}
                     </TabPane>

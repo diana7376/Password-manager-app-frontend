@@ -111,17 +111,38 @@ export function fetchUnlistedPasswordItems(setData) {
 export function dataFetching(groupId, setData) {
     axios.get(`http://127.0.0.1:8000/api/groups/${groupId}/password-items/`, config)
         .then(response => {
-            const mappedData = response.data.map(item => ({
-                id: item.id,
-                itemName: item.itemName,
-                userName: item.userName,
-                password: item.password,
-                groupId: item.groupId,
-                userId: item.userId,
-                comment: item.comment,
-                url: item.url,
-            }));
-            setData(mappedData);
+            // Map through the password items and fetch group name for each item
+            const passwordItemsWithGroupNames = response.data.map(async (item) => {
+                try {
+                    // Fetch the group details using the groupId to get the groupName
+                    const groupResponse = await axios.get(`http://127.0.0.1:8000/api/groups/${item.groupId}/`, config);
+                    const groupName = groupResponse.data.groupName;
+
+                    // Return the updated password item with the group name
+                    return {
+                        id: item.id,
+                        itemName: item.itemName,
+                        userName: item.userName,
+                        password: item.password,
+                        groupId: item.groupId,
+                        groupName: groupName,
+                        userId: item.userId,
+                        comment: item.comment,
+                        url: item.url,
+                    };
+                } catch (error) {
+                    console.error(`Error fetching group name for groupId ${item.groupId}:`, error);
+                    return {
+                        ...item,
+                        groupName: 'Unknown',  // Fallback in case fetching groupName fails
+                    };
+                }
+            });
+
+            // Wait for all promises to resolve
+            Promise.all(passwordItemsWithGroupNames).then((resolvedItems) => {
+                setData(resolvedItems);
+            });
         })
         .catch(error => {
             console.error('Error fetching password items for group:', error);
