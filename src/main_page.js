@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Table, Modal, Tabs, Input, Typography, Button, message } from 'antd';
 import { MoreOutlined, EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
+import { PasswordContext } from './PasswordContext';
 import {
     dataFetching,
     deleteData,
@@ -14,8 +15,9 @@ import './styles.css';
 const { TabPane } = Tabs;
 const { Text } = Typography;
 
-const MainPage = ({ groupId, userId, passwordItems }) => {
+const MainPage = ({ groupId, userId}) => {
     const [data, setData] = useState([]);
+    const { passwordItems, setPasswordItems } = useContext(PasswordContext);
     const [clickedRow, setClickedRow] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [historyData, setHistoryData] = useState([]);
@@ -45,13 +47,13 @@ const MainPage = ({ groupId, userId, passwordItems }) => {
 
     useEffect(() => {
         if (groupId === -1) {
-            fetchAllPasswordItems(setData);
+            fetchAllPasswordItems(setPasswordItems);
         } else if (groupId) {
-            dataFetching(groupId, setData);
+            dataFetching(groupId, setPasswordItems);
         } else {
-            fetchUnlistedPasswordItems(setData);
+            fetchUnlistedPasswordItems(setPasswordItems);
         }
-    }, [groupId]);
+    }, [groupId, setPasswordItems]);
 
     const handleMenuClick = async (record) => {
         setClickedRow(record);
@@ -122,12 +124,9 @@ const MainPage = ({ groupId, userId, passwordItems }) => {
                 deleteData(clickedRow.id, effectiveGroupId)
                     .then(() => {
                         message.success('Password item deleted successfully');
+                        setPasswordItems(prevItems => prevItems.filter(item => item.id !== clickedRow.id));
                         setIsModalOpen(false);
-                        if (effectiveGroupId === null) {
-                            fetchUnlistedPasswordItems(setData);
-                        } else {
-                            dataFetching(effectiveGroupId, setData);
-                        }
+
                     })
                     .catch(error => {
                         message.error('Failed to delete password item');

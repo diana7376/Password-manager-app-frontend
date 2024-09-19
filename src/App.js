@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useContext } from 'react';
 import { Breadcrumb, Layout, Menu, theme, Input, Button, Modal, message } from 'antd';
 import {
     DesktopOutlined,
@@ -8,6 +8,7 @@ import {
     LogoutOutlined,
     LoginOutlined
 } from '@ant-design/icons';
+import { PasswordProvider } from './PasswordContext';
 import axios from './axiosConfg';
 import fuzzysort from 'fuzzysort';
 import MainPage from './main_page';
@@ -360,6 +361,7 @@ const handleCancelLogout = () => {
     };
 
     return (
+        <PasswordProvider>
         <Layout style={{ minHeight: '100vh' }}>
             <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
                 <Menu
@@ -489,6 +491,7 @@ const handleCancelLogout = () => {
              </Modal>
 
         </Layout>
+            </PasswordProvider>
     );
 };
 

@@ -44,6 +44,7 @@ export function deleteData(id, groupId) {
                     // Fetch remaining password items for the group
                     return axios.get(`http://127.0.0.1:8000/api/groups/${groupId}/password-items/`, config);
                 }
+                return Promise.resolve();
             }
         })
         .then(response => {
