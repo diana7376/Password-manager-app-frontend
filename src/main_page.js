@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Modal, Tabs, Input, Typography, Button, message } from 'antd';
 import { MoreOutlined, EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
+import { usePasswordContext } from './PasswordContext';
 import {
     dataFetching,
     deleteData,
@@ -14,7 +15,7 @@ import './styles.css';
 const { TabPane } = Tabs;
 const { Text } = Typography;
 
-const MainPage = ({ groupId, userId, passwordItems }) => {
+const MainPage = ({ groupId, userId }) => {
     const [data, setData] = useState([]);
     const [clickedRow, setClickedRow] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -31,9 +32,18 @@ const MainPage = ({ groupId, userId, passwordItems }) => {
 
     const [isSaveButtonDisabled, setIsSaveButtonDisabled] = useState(true);
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+    const { passwordItems, fetchPasswords } = usePasswordContext();
+    const { deletePassword } = usePasswordContext();
+    const { updatePassword } = usePasswordContext();
 
     useEffect(() => {
+        fetchPasswords();  // Fetch the passwords on component mount
+    }, [fetchPasswords]);
 
+
+
+    useEffect(() => {
+        fetchPasswords();
         const isUnchanged =
             editedItemName === originalItemName &&
             editedUserName === originalUserName &&
@@ -85,57 +95,54 @@ const MainPage = ({ groupId, userId, passwordItems }) => {
         const effectiveGroupId = groupId === -1 ? clickedRow.groupId : groupId;
 
         const updatedData = {
-            id: clickedRow.id,
             itemName: editedItemName,
             userName: editedUserName,
             password: editedPassword,
             groupId: effectiveGroupId,
             userId: userId,
         };
-
+        console.log('Updating password with data:', updatedData);
         updatePasswordItem(clickedRow.id, effectiveGroupId, updatedData)
-            .then(() => {
-                message.success('Password item updated successfully');
+            .then((response) => {
+                console.log('Update successful:', response);
+                setData(prevData =>
+                    prevData.map(item => (item.id === clickedRow.id ? updatedData : item))  // Update state with the updated data
+                );
+                updatePassword(updatedData);  // Update context
+                message.success('Item updated successfully');
                 setIsModalOpen(false);
-                setData(prevData => prevData.map(item => (item.id === clickedRow.id ? updatedData : item)));
-                setOriginalItemName(editedItemName);
-                setOriginalUserName(editedUserName);
-                setOriginalPassword(editedPassword);
-                setOriginalGroup(editedGroup);
             })
-            .catch(error => {
-                message.error('Failed to update password item');
-                console.error(error);
+            .catch((error) => {
+                console.error('Update failed:', error);
+                message.error('Failed to update item');
             });
     };
 
-    const handleDelete = () => {
-        const effectiveGroupId = groupId === -1 ? clickedRow.groupId : groupId;
 
+    const handleDelete = () => {
         Modal.confirm({
             title: 'Are you sure you want to delete this?',
-            content: 'This action cannot be undone.',
             okText: 'Delete',
-            okType: 'danger',
-            cancelText: 'Cancel',
             onOk() {
-                deleteData(clickedRow.id, effectiveGroupId)
-                    .then(() => {
-                        message.success('Password item deleted successfully');
-                        setIsModalOpen(false);
-                        if (effectiveGroupId === null) {
-                            fetchUnlistedPasswordItems(setData);
+                deleteData(clickedRow.id, clickedRow.groupId)
+                    .then((response) => {
+                        if (response && (response.status === 204 || response.status === 200)) {  // Ensure response and status exist
+                            setData(prevData => prevData.filter(item => item.id !== clickedRow.id));  // Remove from state
+                            deletePassword(clickedRow.id);  // Update context by removing the deleted password
+                            message.success('Password item deleted successfully');
+                            setIsModalOpen(false);
                         } else {
-                            dataFetching(effectiveGroupId, setData);
+                            message.error('Failed to delete password item');
                         }
                     })
                     .catch(error => {
+                        console.error('Error during deletion:', error);
                         message.error('Failed to delete password item');
-                        console.error(error);
                     });
             },
         });
     };
+
 
     const handleModalClose = () => {
         setIsModalOpen(false);
@@ -158,7 +165,8 @@ const MainPage = ({ groupId, userId, passwordItems }) => {
             dataIndex: 'password',
             key: 'password',
             render: (text, record) => {
-                const passwordMasked = '*'.repeat(record.password.length);
+                const passwordMasked = record.password ? '*'.repeat(record.password.length) : '';  // Check if password is defined
+
 
                 return (
                     <span>
@@ -201,7 +209,7 @@ const MainPage = ({ groupId, userId, passwordItems }) => {
     return (
         <div>
             <Table
-                dataSource={passwordItems}
+                dataSource={passwordItems}  // Use the updated password items from state
                 columns={columns}
                 rowKey={(record) => record.id}
             />
