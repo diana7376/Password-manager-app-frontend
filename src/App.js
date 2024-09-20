@@ -407,31 +407,32 @@ const handleCancelLogout = () => {
                         />
                     </Routes>
 
-                    {/* Plus Button at the bottom-right corner under the table */}
-                    {/* Conditionally render the "Add New Password" button */}
 
-                    {!isLoginPage && !isRegisterPage && !isAboutUsPage && loggedIn && (
-                    <div style={{
-                        position: 'fixed',
-                        bottom: 24,
-                        right: 24,
-                        zIndex: 1000,
-                    }}
-                    >
-                        <SaveNewPassword
-                            groupId={selectedGroupId}
-                            userId={userId}
-                            comment={comment}
-                            url={url}
-                            onPasswordAdd={onPasswordAdd}
-                        />
-                    </div>
-
-                    )}
                 </Content>
                 <Footer style={{ textAlign: 'center' }}>© 2024 LockR</Footer>
             </Layout>
 
+            {/* Plus Button at the bottom-right corner under the table */}
+            {/* Conditionally render the "Add New Password" button */}
+
+            {!isLoginPage && !isRegisterPage && !isAboutUsPage && loggedIn && (
+                <div style={{
+                    position: 'fixed',
+                    bottom: 24,
+                    right: 24,
+                    zIndex: 9999,
+                }}
+                >
+                    <SaveNewPassword
+                        groupId={selectedGroupId}
+                        userId={userId}
+                        comment={comment}
+                        url={url}
+                        onPasswordAdd={onPasswordAdd}
+                    />
+                </div>
+
+            )}
             <Modal
                 title="Authentication"
                 open={showAuthModal}
