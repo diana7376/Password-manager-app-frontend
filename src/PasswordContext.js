@@ -33,7 +33,7 @@ export const PasswordProvider = ({ children }) => {
     const updatePassword = (updatedPassword) => {
         setPasswordItems(prevItems => {
             return Array.isArray(prevItems)
-                ? prevItems.map(item => item.id === updatedPassword.id ? updatedPassword : item)
+                ? prevItems.map(item => item.passId === updatedPassword.passId ? updatedPassword : item)
                 : [updatedPassword];
         });
     };
@@ -41,7 +41,7 @@ export const PasswordProvider = ({ children }) => {
     const deletePassword = (passwordId) => {
         setPasswordItems(prevItems => {
             return Array.isArray(prevItems)
-                ? prevItems.filter(item => item.id !== passwordId)
+                ? prevItems.filter(item => item.passId !== passwordId)
                 : [];
         });
     };

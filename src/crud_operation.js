@@ -6,12 +6,20 @@ export const config = {
 console.log("used token:", token);
 
 export function addPasswordItem(newItem, groupId) {
-    return axios.post(`http://127.0.0.1:8000/api/groups/${groupId}/password-items/`,
-        newItem,
-        config)  // Use backticks for template literals
-        .then(response => {
-            return response.data;
-        })
+    // Create a copy of newItem to avoid directly modifying the original object
+    const payload = { ...newItem };
+
+    // Conditionally remove groupId if it's null
+    if (groupId === null) {
+        delete payload.groupId; // Omit groupId from the payload
+    }
+
+    const url = groupId === null || groupId === 'null'
+        ? 'http://127.0.0.1:8000/api/password-items/'
+        : `http://127.0.0.1:8000/api/groups/${groupId}/password-items/`;
+
+    return axios.post(url, payload, config)
+        .then(response => response.data)
         .catch(error => {
             console.log('Error in adding a new password', error);
             throw error;
@@ -19,26 +27,46 @@ export function addPasswordItem(newItem, groupId) {
 }
 
 
-export const updatePasswordItem = (id, groupId, updatedData, setData) => {
-    console.log(`Updating URL: http://127.0.0.1:8000/api/groups/${groupId}/password-items/${id}/`);
+export const updatePasswordItem = (passId, groupId, updatedData, setData) => {
+    // Adjust URL for unlisted items
+    const url = (groupId === null || groupId === 'null' || groupId === 0)
+        ? `http://127.0.0.1:8000/api/password-items/${passId}/`  // Use a different endpoint for unlisted items
+        : `http://127.0.0.1:8000/api/groups/${groupId}/password-items/${passId}/`;
 
-    return axios.put(`http://127.0.0.1:8000/api/groups/${groupId}/password-items/${id}/`, updatedData, config)
+    // Remove the groupId from the data if it's for unlisted items
+    const dataToSend = { ...updatedData };
+    if (groupId === null || groupId === 'null' || groupId === 0) {
+        delete dataToSend.groupId;  // Remove groupId when it's unlisted or null
+    }
+
+    console.log(`Updating URL: ${url}`);
+
+    return axios.put(url, dataToSend, config)
         .then(response => {
-            // Check if response.data.passwords is an array
-            if (Array.isArray(response.data.passwords)) {
-                const updatedPasswordItems = response.data.passwords.map(item => ({
-                    id: item.id,
-                    itemName: item.itemName,
-                    userName: item.userName,
-                    password: item.password,
-                    groupId: item.groupId,
-                    userId: item.userId,
-                    comment: item.comment,
-                    url: item.url,
-                }));
-                setData(updatedPasswordItems);  // Update the state with the latest data
+            if (response.data && typeof response.data === 'object') {
+                const updatedPasswordItem = {
+                    passId: response.data.passId,
+                    itemName: response.data.itemName,
+                    userName: response.data.userName,
+                    password: response.data.password,
+                    groupId: response.data.groupId,
+                    userId: response.data.userId,
+                    comment: response.data.comment,
+                    url: response.data.url,
+                };
+
+                // Call the passed-in setData function to update the state
+                if (typeof setData === 'function') {
+                    setData(prevData =>
+                        prevData.map(item =>
+                            item.passId === updatedPasswordItem.passId ? updatedPasswordItem : item
+                        )
+                    );
+                } else {
+                    console.error('setData is not a function');
+                }
             } else {
-                console.error('Unexpected response format, expected an array:', response.data);
+                console.error('Unexpected response format:', response.data);
             }
 
             return response.data;
@@ -49,51 +77,68 @@ export const updatePasswordItem = (id, groupId, updatedData, setData) => {
         });
 };
 
-
-
-
-export function deleteData(id, groupId, setData) {
-    // delete password
-    return axios.delete(`http://127.0.0.1:8000/api/groups/${groupId}/password-items/${id}/`, config)
+function deleteGroup(groupId, setGroupItems) {
+    axios.delete(`http://127.0.0.1:8000/api/groups/${groupId}/`, config)
         .then((response) => {
             if (response.status === 204) {
-                console.log('Item deleted successfully');
+                console.log(`Group ${groupId} deleted successfully`);
 
-                // Fetch remaining password items
-                if (groupId === null || groupId === 'null') {
-                    // Fetch unlisted password items (those with null groupId)
-                    return axios.get('http://127.0.0.1:8000/api/password-items/unlisted/', config);
-                } else {
-                    // Fetch remaining password items for the group
-                    return axios.get(`http://127.0.0.1:8000/api/groups/${groupId}/password-items/`, config);
-                }
+                // Update the sidebar to remove the deleted group
+                setGroupItems(prevGroupItems =>
+                    prevGroupItems.filter(group => group.key !== `group-${groupId}`)
+                );
             } else {
-                throw new Error('Failed to delete the item.');
-            }
-        })
-        .then((response) => {
-            // Check if response.data.passwords is an array
-            if (Array.isArray(response.data.passwords)) {
-                const mappedData = response.data.passwords.map(item => ({
-                    id: item.id,
-                    itemName: item.itemName,
-                    userName: item.userName,
-                    password: item.password,
-                    groupId: item.groupId,
-                    userId: item.userId,
-                    comment: item.comment,
-                    url: item.url,
-                }));
-                setData(mappedData);
-            } else {
-                console.error('Unexpected response format or data is not an array:', response.data);
+                throw new Error('Failed to delete the group.');
             }
         })
         .catch((error) => {
-            console.error('Error in deleteData', error);
+            console.error('Error deleting the group:', error);
+        });
+}
+
+
+function checkAndDeleteGroup(groupId, setData, setGroupItems) {
+    // Fetch all password items for this group to see if any are left
+    axios.get(`http://127.0.0.1:8000/api/groups/${groupId}/password-items/`, config)
+        .then(response => {
+            const remainingItems = response.data.passwords || [];
+
+            if (remainingItems.length === 0) {
+                // Group is empty, delete the group
+                deleteGroup(groupId, setGroupItems);
+            } else {
+                // Update state with remaining password items if group is not empty
+                setData(remainingItems);
+            }
+        })
+        .catch(error => {
+            console.error('Error checking if group is empty:', error);
+        });
+}
+
+
+export function deleteData(passId, groupId, setData, onSuccess, setGroupItems) {
+    // Delete password item
+    return axios.delete(`http://127.0.0.1:8000/api/groups/${groupId}/password-items/${passId}/`, config)
+        .then((response) => {
+            if (response.status === 204) {
+                console.log('Password item deleted successfully');
+
+                // After successful deletion, check if the group is empty
+                checkAndDeleteGroup(groupId, setData, setGroupItems);
+
+                // If deletion was successful, update the UI
+                onSuccess();  // Close the modal, update state, etc.
+            } else {
+                throw new Error('Failed to delete the password item.');
+            }
+        })
+        .catch((error) => {
+            console.error('Error during password item deletion:', error);
             throw error;
         });
 }
+
 
 
 
@@ -103,7 +148,7 @@ export function fetchAllPasswordItems(setData) {
             // Check if response.data is an array
             if (Array.isArray(response.data.passwords)) {
                 const mappedData = response.data.passwords.map(item => ({
-                    id: item.id,
+                    passId: item.passId,
                     itemName: item.itemName,
                     userName: item.userName,
                     password: item.password,
@@ -125,9 +170,9 @@ export function fetchAllPasswordItems(setData) {
 export function fetchUnlistedPasswordItems(setData) {
     axios.get('http://127.0.0.1:8000/api/password-items/unlisted/', config) // Adjust the endpoint if needed
         .then(response => {
-            if (response.data && Array.isArray(response.data)) {
-                const mappedData = response.data.map(item => ({
-                    id: item.id,
+            if (response.data && Array.isArray(response.data.passwords)) {
+                const mappedData = response.data.passwords.map(item => ({
+                    passId: item.passId,
                     itemName: item.itemName,
                     userName: item.userName,
                     password: item.password,
@@ -150,7 +195,7 @@ export function dataFetching(groupId, setData) {
     axios.get(`http://127.0.0.1:8000/api/groups/${groupId}/password-items/`, config)
         .then(response => {
             const passwordItemsWithGroupNames = response.data.passwords.map(item => ({
-                id: item.id,
+                passId: item.passId,
                 itemName: item.itemName,
                 userName: item.userName,
                 password: item.password,

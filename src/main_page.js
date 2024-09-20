@@ -14,7 +14,7 @@ import './styles.css';
 const { TabPane } = Tabs;
 const { Text } = Typography;
 
-const MainPage = ({ groupId, userId }) => {
+const MainPage = ({ groupId, userId, setGroupItems }) => {
     const [data, setData] = useState([]);  // Use 'data' to hold password items
     const [clickedRow, setClickedRow] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -57,7 +57,7 @@ const MainPage = ({ groupId, userId }) => {
         setClickedRow(record);
         console.log()
         try {
-            const history = await fetchHistory(record.id);
+            const history = await fetchHistory(record.passId);
             setHistoryData(history);
         } catch (error) {
             message.error('Failed to fetch history');
@@ -85,6 +85,7 @@ const MainPage = ({ groupId, userId }) => {
         const effectiveGroupId = groupId === -1 ? clickedRow.groupId : groupId;
 
         const updatedData = {
+            passId: clickedRow.passId,  // Keep the original passId
             itemName: editedItemName,
             userName: editedUserName,
             password: editedPassword,
@@ -92,11 +93,13 @@ const MainPage = ({ groupId, userId }) => {
             userId: userId,
         };
         console.log('Updating password with data:', updatedData);
-        updatePasswordItem(clickedRow.id, effectiveGroupId, updatedData)
+        updatePasswordItem(clickedRow.passId, effectiveGroupId, updatedData, setData)
             .then((response) => {
                 console.log('Update successful:', response);
                 setData(prevData =>
-                    prevData.map(item => (item.id === clickedRow.id ? updatedData : item))  // Update state with the updated data
+                    prevData.map(item =>
+                        item.passId === clickedRow.passId ? { ...updatedData, passId: clickedRow.passId } : item
+                    )
                 );
                 message.success('Item updated successfully');
                 setIsModalOpen(false);
@@ -107,33 +110,35 @@ const MainPage = ({ groupId, userId }) => {
             });
     };
 
-const handleDelete = () => {
-    Modal.confirm({
-        title: 'Are you sure you want to delete this?',
-        okText: 'Delete',
-        onOk() {
-            if (clickedRow && clickedRow.id) {
-                deleteData(clickedRow.id, clickedRow.groupId)  // Make sure clickedRow.id is defined
-                    .then((response) => {
-                        if (response && (response.status === 204 || response.status === 200)) {
-                            setData(prevData => prevData.filter(item => item.id !== clickedRow.id));  // Remove from state
-                            deletePassword(clickedRow.id);  // Update context by removing the deleted password
-                            message.success('Password item deleted successfully');
-                            setIsModalOpen(false);
-                        } else {
-                            message.error('Failed to delete password item');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error during deletion:', error);
-                        message.error('Failed to delete password item');
-                    });
-            } else {
-                message.error('No valid item selected for deletion.');
-            }
-        },
-    });
-};
+
+
+
+    const handleDelete = () => {
+        Modal.confirm({
+            title: 'Are you sure you want to delete this?',
+            okText: 'Delete',
+            onOk() {
+                if (clickedRow && clickedRow.passId) {
+                    deleteData(clickedRow.passId, clickedRow.groupId, setData, () => {
+                        // Success callback: Close the modal on successful deletion
+                        message.success('Password item deleted successfully');
+                        setIsModalOpen(false);  // Close the modal
+                    }, setGroupItems)  // Pass setGroupItems to handle group deletion
+                        .then(() => {
+                            message.success('Password item and group (if empty) deleted successfully');
+                        })
+                        .catch(error => {
+                            console.error('Error during deletion:', error);
+                            message.error('Failed to delete password item or group');
+                        });
+                } else {
+                    message.error('No valid item selected for deletion.');
+                }
+            },
+        });
+    };
+
+
 
 
     const handleModalClose = () => {
@@ -193,7 +198,7 @@ const handleDelete = () => {
             <Table
                 dataSource={data}  // Use 'data' instead of 'passwordItems' from context
                 columns={columns}
-                rowKey={(record) => record.id}
+                rowKey={(record) => record.passId}
             />
 
             <Modal

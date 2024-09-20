@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+
 import { Breadcrumb, Layout, Menu, theme, Input, Button, Modal, message } from 'antd';
 import {
     DesktopOutlined,
@@ -397,9 +398,9 @@ const handleCancelLogout = () => {
                             <PrivateRoute>
                                 <Breadcrumb style={{ margin: '16px 0' }} items={breadcrumbItems} />
                                 <MainPage
-                                    //passwordItems={isSearching ? filteredItems : passwordItems}
                                     groupId={selectedGroupId}
                                     userId={userId}
+                                    setGroupItems={setGroupItems}
                                 />
                             </PrivateRoute>
                         }
