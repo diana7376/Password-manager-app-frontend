@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from '../axiosConfg';
+import { EyeInvisibleOutlined, EyeOutlined } from '@ant-design/icons';
 import { message } from 'antd';
-
 import './login.css';
 
 const Login = ({ onLogout }) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    const [success, setSuccess] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
 
     const navigate = useNavigate();
 
@@ -17,17 +17,15 @@ const Login = ({ onLogout }) => {
         e.preventDefault();
 
         axios.post('/token/', { username, password })
-            .then((response) =>{
-                localStorage.setItem('token', response.data.access); // Store the access token
+            .then((response) => {
+                localStorage.setItem('token', response.data.access);
                 message.success('Login successful! Welcome...');
                 setError('');
                 navigate('/passwords');
-
             })
-            .catch ((error)=>{
-            setError('Invalid credentials: ' + (error.response?.data?.detail || 'Unknown error'));
-        })
-
+            .catch((error) => {
+                setError('Invalid credentials: ' + (error.response?.data?.detail || 'Unknown error'));
+            });
     };
 
     return (
@@ -47,12 +45,21 @@ const Login = ({ onLogout }) => {
                     </div>
                     <div className="input-group">
                         <label>Password:</label>
-                        <input
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                        />
+                        <div className="password-wrapper">
+                            <input
+                                type={showPassword ? 'text' : 'password'}
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                            />
+                            <span
+                                className="toggle-password"
+                                onClick={() => setShowPassword(!showPassword)}
+                                style={{ cursor: 'pointer' }}
+                            >
+                                {showPassword ? <EyeOutlined /> : <EyeInvisibleOutlined />}
+                            </span>
+                        </div>
                     </div>
                     <button type="submit" className="submit-btn">Login</button>
                     <div className="new-user">
@@ -61,10 +68,10 @@ const Login = ({ onLogout }) => {
                             <span
                                 className="register-link"
                                 onClick={() => navigate('/register')}
-                                style={{cursor: 'pointer', marginLeft: '5px'}}
+                                style={{ cursor: 'pointer', marginLeft: '5px' }}
                             >
-                            Register here
-                        </span>
+                                Register here
+                            </span>
                         </p>
                     </div>
                 </form>

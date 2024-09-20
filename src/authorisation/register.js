@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from '../axiosConfg';
 import { message } from 'antd';
+import { EyeInvisibleOutlined, EyeOutlined } from '@ant-design/icons'; // Import icons
 
 import './login.css';
 
@@ -11,12 +12,11 @@ const Register = ({ onLogout }) => {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const navigate = useNavigate();
 
     const handleSubmit = (e) => {
-
-    //const handleSubmit = async (e) => {
-
         e.preventDefault(); // Prevent the default form submission
 
         // Check if passwords match
@@ -24,7 +24,6 @@ const Register = ({ onLogout }) => {
             setError('Passwords do not match');
             return;
         }
-
 
         // Registration request
         axios.post('/register/', {
@@ -38,8 +37,8 @@ const Register = ({ onLogout }) => {
                 // Success notification
                 message.success('Registration successful! Redirecting to login...');
                 setError(''); // Clear any previous error
-                // Redirect to the login page after 3 seconds
-                    navigate('/login');
+                // Redirect to the login page
+                navigate('/login');
             })
             .catch((error) => {
                 if (error.response) {
@@ -81,21 +80,39 @@ const Register = ({ onLogout }) => {
                     </div>
                     <div className="input-group">
                         <label>Password:</label>
-                        <input
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                        />
+                        <div className="password-wrapper">
+                            <input
+                                type={showPassword ? 'text' : 'password'}
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                            />
+                            <span
+                                className="toggle-password"
+                                onClick={() => setShowPassword(!showPassword)}
+                                style={{ cursor: 'pointer' }}
+                            >
+                                {showPassword ? <EyeOutlined /> : <EyeInvisibleOutlined />}
+                            </span>
+                        </div>
                     </div>
                     <div className="input-group">
                         <label>Confirm Password:</label>
-                        <input
-                            type="password"
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                            required
-                        />
+                        <div className="password-wrapper">
+                            <input
+                                type={showConfirmPassword ? 'text' : 'password'}
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                required
+                            />
+                            <span
+                                className="toggle-password"
+                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                style={{ cursor: 'pointer' }}
+                            >
+                                {showConfirmPassword ? <EyeOutlined /> : <EyeInvisibleOutlined />}
+                            </span>
+                        </div>
                     </div>
                     <button type="submit" className="submit-btn">Register</button>
                     <div className="old-user">
@@ -104,12 +121,10 @@ const Register = ({ onLogout }) => {
                             <span
                                 className="login-link"
                                 onClick={() => navigate('/login')}
-
                                 style={{ cursor: 'pointer', marginLeft: '5px' }}
                             >
                                 Login here
                             </span>
-
                         </p>
                     </div>
                 </form>
@@ -119,4 +134,3 @@ const Register = ({ onLogout }) => {
 };
 
 export default Register;
-
