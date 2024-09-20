@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { PlusOutlined, UserOutlined, EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
-import { Button, Tooltip, Modal, Input, Select, message, Flex,FloatButton } from 'antd';
-import { addPasswordItem, config } from './crud_operation';
+import { Button, Tooltip, Modal, Input, Select, message } from 'antd';
+import { addPasswordItem } from './crud_operation';
 import axios from './axiosConfg';
 import { usePasswordContext } from './PasswordContext';
-
 
 const { Option } = Select;
 
@@ -17,12 +16,11 @@ const SaveNewPassword = ({ groupId, userId, comment, url, onPasswordAdd }) => {
     const [groupOptions, setGroupOptions] = useState([]);
     const [newGroupName, setNewGroupName] = useState('');
     const { addPassword } = usePasswordContext();
-    // Fetch existing groups
+
     useEffect(() => {
         axios.get('http://127.0.0.1:8000/api/groups/')
             .then(response => {
-                setGroupOptions(response.data); // Update group options
-                //addPassword(response.data);//context
+                setGroupOptions(response.data);
             })
             .catch(error => {
                 console.error('Error fetching groups:', error);
@@ -33,23 +31,21 @@ const SaveNewPassword = ({ groupId, userId, comment, url, onPasswordAdd }) => {
         setOpen(true);
     };
 
-
     const handleOk = () => {
         let groupIdToUse = selectedGroup;
 
-        // If a new group name is provided, create the new group
         if (newGroupName) {
             axios.post('http://127.0.0.1:8000/api/groups/', { groupName: newGroupName, userId: userId })
                 .then(response => {
-                    groupIdToUse = response.data.groupId;  // Use newly created group
-                    savePassword(groupIdToUse);  // Save the password with the new group ID
+                    groupIdToUse = response.data.groupId;
+                    savePassword(groupIdToUse);
                 })
                 .catch(error => {
                     console.error('Failed to create new group:', error);
                     message.error('Failed to create new group');
                 });
         } else {
-            savePassword(groupIdToUse);  // Save the password with the selected group ID
+            savePassword(groupIdToUse);
         }
     };
 
@@ -58,16 +54,16 @@ const SaveNewPassword = ({ groupId, userId, comment, url, onPasswordAdd }) => {
             itemName: fieldName,
             userName: username,
             password: password,
-            groupId: groupIdToUse,  // Use the selected or newly created group ID
+            groupId: groupIdToUse,
             userId: userId,
             comment: comment,
             url: url,
-        };  // Your password details
+        };
 
         addPasswordItem(newPasswordItem, groupIdToUse)
             .then((newItem) => {
                 message.success('New password added successfully');
-                onPasswordAdd(newItem);  // Ensure the table updates itself by passing newItem
+                onPasswordAdd(newItem);
                 setOpen(false);
             })
             .catch((error) => {
@@ -76,37 +72,51 @@ const SaveNewPassword = ({ groupId, userId, comment, url, onPasswordAdd }) => {
             });
     };
 
-
-
-
     const handleCancel = () => {
         setOpen(false);
     };
 
+    const generatePassword = () => {
+        axios.post('http://127.0.0.1:8000/api/password-items/generate/', { /* any necessary payload */ })
+            .then(response => {
+                // Log the entire response to check its structure
+                console.log('Generated password response:', response);
+
+                // Update the password state with the correct key
+                if (response.data && response.data.generated_password) {
+                    setPassword(response.data.generated_password); // Update the password state to auto-fill
+                    message.success('Password generated successfully');
+                } else {
+                    message.error('Unexpected response structure');
+                }
+            })
+            .catch(error => {
+                console.error('Error generating password:', error);
+                message.error('Failed to generate password');
+            });
+    };
+
     return (
         <>
-            {/* Plus button to open modal */}
             <Tooltip title="Add new password">
                 <Button
                     type="primary"
                     shape="circle"
                     icon={<PlusOutlined />}
-                    onClick={showModal} // Show modal when button is clicked
+                    onClick={showModal}
                 />
             </Tooltip>
 
-            {/* Modal definition */}
             <Modal
                 title="Add New Password"
                 centered
                 open={open}
                 onOk={handleOk}
                 onCancel={handleCancel}
-                width={600}  // You can adjust the width if needed
+                width={600}
             >
                 <p>Enter the new password details here...</p>
 
-                {/* Form for password details */}
                 <Input
                     placeholder="Field name"
                     value={fieldName}
@@ -125,11 +135,12 @@ const SaveNewPassword = ({ groupId, userId, comment, url, onPasswordAdd }) => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
-                    style={{ width: '45%', marginBottom: '10px',  }}
+                    style={{ width: '45%', marginBottom: '10px' }}
                 />
-                <Button type="primary" style={{ width: '45%', marginBottom: '10px', marginLeft: '9.5%'}}>Generate password</Button>
+                <Button type="primary" style={{ width: '45%', marginBottom: '10px', marginLeft: '9.5%' }} onClick={generatePassword}>
+                    Generate password
+                </Button>
 
-                {/* Group Selection */}
                 <Select
                     style={{ width: '100%', marginBottom: '10px' }}
                     placeholder="Select an existing group"
@@ -142,7 +153,6 @@ const SaveNewPassword = ({ groupId, userId, comment, url, onPasswordAdd }) => {
                     ))}
                 </Select>
 
-                {/* New Group Input */}
                 <Input
                     placeholder="Or enter new group name"
                     value={newGroupName}
@@ -153,4 +163,5 @@ const SaveNewPassword = ({ groupId, userId, comment, url, onPasswordAdd }) => {
         </>
     );
 };
+
 export default SaveNewPassword;
