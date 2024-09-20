@@ -15,7 +15,7 @@ const { TabPane } = Tabs;
 const { Text } = Typography;
 
 const MainPage = ({ groupId, userId }) => {
-    const [data, setData] = useState([]);  // Use 'data' to hold password items
+    const [data, setData] = useState([]);
     const [clickedRow, setClickedRow] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [historyData, setHistoryData] = useState([]);
@@ -23,16 +23,17 @@ const MainPage = ({ groupId, userId }) => {
     const [editedUserName, setEditedUserName] = useState('');
     const [editedPassword, setEditedPassword] = useState('');
     const [editedGroup, setEditedGroup] = useState('');
+    const [editedComment, setEditedComment] = useState(''); // Added for comments
 
     const [originalItemName, setOriginalItemName] = useState('');
     const [originalUserName, setOriginalUserName] = useState('');
     const [originalPassword, setOriginalPassword] = useState('');
     const [originalGroup, setOriginalGroup] = useState('');
+    const [originalComment, setOriginalComment] = useState(''); // Added for original comments
 
     const [isSaveButtonDisabled, setIsSaveButtonDisabled] = useState(true);
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
-    // Fetch password items based on groupId
     useEffect(() => {
         if (groupId === -1) {
             fetchAllPasswordItems(setData);
@@ -48,14 +49,14 @@ const MainPage = ({ groupId, userId }) => {
             editedItemName === originalItemName &&
             editedUserName === originalUserName &&
             editedPassword === originalPassword &&
-            editedGroup === originalGroup;
+            editedGroup === originalGroup &&
+            editedComment === originalComment; // Include comments in the check
 
         setIsSaveButtonDisabled(isUnchanged);
-    }, [editedItemName, editedUserName, editedPassword, editedGroup, originalItemName, originalUserName, originalPassword, originalGroup]);
+    }, [editedItemName, editedUserName, editedPassword, editedGroup, editedComment, originalItemName, originalUserName, originalPassword, originalGroup, originalComment]);
 
     const handleMenuClick = async (record) => {
         setClickedRow(record);
-        console.log()
         try {
             const history = await fetchHistory(record.id);
             setHistoryData(history);
@@ -67,11 +68,13 @@ const MainPage = ({ groupId, userId }) => {
         setEditedUserName(record.userName);
         setEditedPassword(record.password);
         setEditedGroup(record.groupName);
+        setEditedComment(record.comment); // Set the comment from the record
 
         setOriginalItemName(record.itemName);
         setOriginalUserName(record.userName);
         setOriginalPassword(record.password);
         setOriginalGroup(record.groupName);
+        setOriginalComment(record.comment); // Set original comment
 
         setIsModalOpen(true);
     };
@@ -90,13 +93,12 @@ const MainPage = ({ groupId, userId }) => {
             password: editedPassword,
             groupId: effectiveGroupId,
             userId: userId,
+            comment: editedComment, // Include the comment in the updated data
         };
-        console.log('Updating password with data:', updatedData);
         updatePasswordItem(clickedRow.id, effectiveGroupId, updatedData)
             .then((response) => {
-                console.log('Update successful:', response);
                 setData(prevData =>
-                    prevData.map(item => (item.id === clickedRow.id ? updatedData : item))  // Update state with the updated data
+                    prevData.map(item => (item.id === clickedRow.id ? updatedData : item))
                 );
                 message.success('Item updated successfully');
                 setIsModalOpen(false);
@@ -107,34 +109,32 @@ const MainPage = ({ groupId, userId }) => {
             });
     };
 
-const handleDelete = () => {
-    Modal.confirm({
-        title: 'Are you sure you want to delete this?',
-        okText: 'Delete',
-        onOk() {
-            if (clickedRow && clickedRow.id) {
-                deleteData(clickedRow.id, clickedRow.groupId)  // Make sure clickedRow.id is defined
-                    .then((response) => {
-                        if (response && (response.status === 204 || response.status === 200)) {
-                            setData(prevData => prevData.filter(item => item.id !== clickedRow.id));  // Remove from state
-                            deletePassword(clickedRow.id);  // Update context by removing the deleted password
-                            message.success('Password item deleted successfully');
-                            setIsModalOpen(false);
-                        } else {
+    const handleDelete = () => {
+        Modal.confirm({
+            title: 'Are you sure you want to delete this?',
+            okText: 'Delete',
+            onOk() {
+                if (clickedRow && clickedRow.id) {
+                    deleteData(clickedRow.id, clickedRow.groupId)
+                        .then((response) => {
+                            if (response && (response.status === 204 || response.status === 200)) {
+                                setData(prevData => prevData.filter(item => item.id !== clickedRow.id));
+                                message.success('Password item deleted successfully');
+                                setIsModalOpen(false);
+                            } else {
+                                message.error('Failed to delete password item');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error during deletion:', error);
                             message.error('Failed to delete password item');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error during deletion:', error);
-                        message.error('Failed to delete password item');
-                    });
-            } else {
-                message.error('No valid item selected for deletion.');
-            }
-        },
-    });
-};
-
+                        });
+                } else {
+                    message.error('No valid item selected for deletion.');
+                }
+            },
+        });
+    };
 
     const handleModalClose = () => {
         setIsModalOpen(false);
@@ -157,7 +157,7 @@ const handleDelete = () => {
             dataIndex: 'password',
             key: 'password',
             render: (text, record) => {
-                const passwordMasked = record.password ? '*'.repeat(record.password.length) : '';  // Check if password is defined
+                const passwordMasked = record.password ? '*'.repeat(record.password.length) : '';
 
                 return (
                     <span>
@@ -191,7 +191,7 @@ const handleDelete = () => {
     return (
         <div>
             <Table
-                dataSource={data}  // Use 'data' instead of 'passwordItems' from context
+                dataSource={data}
                 columns={columns}
                 rowKey={(record) => record.id}
             />
@@ -219,6 +219,7 @@ const handleDelete = () => {
                                     </Button>
                                 </p>
                                 <p><strong>Group:</strong> {clickedRow.groupName}</p>
+                                <p><strong>Comment:</strong> {clickedRow.comment}</p> {/* Display comment */}
                             </div>
                         )}
                     </TabPane>
@@ -268,6 +269,14 @@ const handleDelete = () => {
                                         placeholder="Group"
                                         value={editedGroup}
                                         onChange={(e) => setEditedGroup(e.target.value)}
+                                    />
+                                </div>
+                                <div style={{ marginBottom: '10px' }}>
+                                    <label style={{ fontWeight: 'bold' }}>Comment</label>
+                                    <Input
+                                        placeholder="Comment"
+                                        value={editedComment}
+                                        onChange={(e) => setEditedComment(e.target.value)}
                                     />
                                 </div>
                                 <Button
