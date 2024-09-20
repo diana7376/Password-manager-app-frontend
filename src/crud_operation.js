@@ -1,9 +1,7 @@
 import axios, {token} from './axiosConfg';
 
-
-//const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMxNjU1Mzk3LCJpYXQiOjE3MjY0NzEzOTcsImp0aSI6Ijg1MzhhZDc5ODg0OTQ0OGU4M2VhOTMyYTU1NmE5MDlmIiwidXNlcl9pZCI6MX0.S0LE2uQo1StzR3CVr7sMLBBVDxlEHd4l7L6Fg6F84n8"
 export const config = {
-    headers: { Authorization: `Bearer ${token}` }
+    headers: { Authorization: `Bearer ${token}` }  // Correct usage of token for authorization
 };
 console.log("used token:", token);
 
@@ -21,7 +19,7 @@ export function addPasswordItem(newItem, groupId) {
 }
 
 
-export function updatePasswordItem(id, groupId, updatedData) {
+export const updatePasswordItem = (id, groupId, updatedData) => {
     return axios.put(`http://127.0.0.1:8000/api/groups/${groupId}/password-items/${id}/`, updatedData, config)
         .then(response => {
             return response.data;
@@ -30,7 +28,11 @@ export function updatePasswordItem(id, groupId, updatedData) {
             console.error('Error updating the password item:', error);
             throw error;
         });
-}
+    console.log(`Updating URL: http://127.0.0.1:8000/api/groups/${groupId}/password-items/${id}/`);
+
+};
+
+
 
 export function deleteData(id, groupId) {
     // delete password
@@ -48,17 +50,11 @@ export function deleteData(id, groupId) {
                 }
             }
         })
-        .then(response => {
-            const remainingPasswords = response.data;
-            if (remainingPasswords.length === 0 && groupId !== null) {
-                // If no passwords left in the group, delete the group
-                return axios.delete(`http://127.0.0.1:8000/api/groups/${groupId}/`, config)
-                    .then(() => {
-                        console.log(`Group ${groupId} deleted because it became empty.`);
-                    });
-            }
+        .then((response) => {
+            console.log('Item deleted successfully');
+            return response;  // Return the response to access the status later
         })
-        .catch(error => {
+        .catch((error) => {
             console.error('Error in deleteData', error);
             throw error;
         });
@@ -105,49 +101,29 @@ export function fetchUnlistedPasswordItems(setData) {
             console.error('Error fetching unlisted password items:', error);
         });
 }
-
-
-
 export function dataFetching(groupId, setData) {
     axios.get(`http://127.0.0.1:8000/api/groups/${groupId}/password-items/`, config)
         .then(response => {
-            // Map through the password items and fetch group name for each item
-            const passwordItemsWithGroupNames = response.data.map(async (item) => {
-                try {
-                    // Fetch the group details using the groupId to get the groupName
-                    const groupResponse = await axios.get(`http://127.0.0.1:8000/api/groups/${item.groupId}/`, config);
-                    const groupName = groupResponse.data.groupName;
-
-                    // Return the updated password item with the group name
-                    return {
-                        id: item.id,
-                        itemName: item.itemName,
-                        userName: item.userName,
-                        password: item.password,
-                        groupId: item.groupId,
-                        groupName: groupName,
-                        userId: item.userId,
-                        comment: item.comment,
-                        url: item.url,
-                    };
-                } catch (error) {
-                    console.error(`Error fetching group name for groupId ${item.groupId}:`, error);
-                    return {
-                        ...item,
-                        groupName: 'Unknown',  // Fallback in case fetching groupName fails
-                    };
-                }
-            });
-
-            // Wait for all promises to resolve
-            Promise.all(passwordItemsWithGroupNames).then((resolvedItems) => {
-                setData(resolvedItems);
-            });
+            const passwordItemsWithGroupNames = response.data.map(item => ({
+                id: item.id,
+                itemName: item.itemName,
+                userName: item.userName,
+                password: item.password,
+                groupId: item.groupId,
+                groupName: item.groupName,
+                userId: item.userId,
+                comment: item.comment,
+                url: item.url,
+            }));
+            setData(passwordItemsWithGroupNames);
         })
         .catch(error => {
             console.error('Error fetching password items for group:', error);
         });
 }
+
+
+
 
 
 export const fetchHistory = async (passwordId) => {

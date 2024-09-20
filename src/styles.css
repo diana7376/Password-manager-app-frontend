@@ -2,6 +2,10 @@
     box-sizing: border-box;
 }
 
+html {
+    scroll-behavior: smooth;
+}
+
 body {
   font-family: sans-serif;
   margin: 0;
@@ -353,3 +357,8 @@ body {
     padding: 8px 12px;
   }
 }
+
+
+
+
+
