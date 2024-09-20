@@ -67,6 +67,7 @@ const App = () => {
     const isRegisterPage = location.pathname === '/register';
     const isAboutUsPage = location.pathname === '/about';
 
+
     // Focus on the input when the component mounts
 
     useEffect(() => {
@@ -214,7 +215,7 @@ const App = () => {
                     ]);
                 }
 
-                axios.get(`http://127.0.0.1:8000/api/groups/${groupId}/`, config)
+                axios.get(`http://127.0.0.1:8000/api/groups/${groupId}/password-items/`, config)
                     .then(response => {
                         const groupName = response.data.groupName;
                         setBreadcrumbItems([
@@ -235,7 +236,7 @@ const App = () => {
         axios
             .get('http://127.0.0.1:8000/api/password-items/', config)
             .then((response) => {
-                setPasswordItems(response.data);
+                setPasswordItems(response.data.passwords);
             })
             .catch((error) => {
                 console.error('Error fetching all password items:', error);
@@ -246,7 +247,7 @@ const App = () => {
         axios
             .get('http://127.0.0.1:8000/api/password-items/unlisted/', config)
             .then((response) => {
-                setPasswordItems(response.data);
+                setPasswordItems(response.data.passwords);
             })
             .catch((error) => {
                 console.error('Error fetching unlisted password items:', error);
@@ -345,7 +346,7 @@ const handleCancelLogout = () => {
     };
 
     return (
-
+        <PasswordProvider>
         <Layout style={{ minHeight: '100vh' }}>
             <Sider collapsible
                    collapsed={collapsed}
@@ -365,7 +366,7 @@ const handleCancelLogout = () => {
             <Layout>
                 {/* Conditionally render search bar and add password button */}
 
-                {!isLoginPage && !isRegisterPage && !isAboutUsPage && loggedIn && (
+                {!isLoginPage && !isRegisterPage && !isAboutUsPage && loggedIn &&  (
                 <div ref={searchRef}>
                     <Search
                         placeholder="What are you looking for?"
@@ -433,7 +434,7 @@ const handleCancelLogout = () => {
 
             <Modal
                 title="Authentication"
-                visible={showAuthModal}
+                open={showAuthModal}
                 onCancel={() => setShowAuthModal(false)}
                 footer={null}
             >
@@ -463,7 +464,7 @@ const handleCancelLogout = () => {
             </Modal>
             <Modal
                 title="Password Details"
-                visible={isModalVisible}
+                open={isModalVisible}
                 onCancel={handleCancel}
                 footer={null} // You can add footer actions if needed
             >

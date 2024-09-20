@@ -1,4 +1,3 @@
-/* Ensure a modern, clean font is used throughout */
 html {
     scroll-behavior: smooth;
 }
@@ -21,9 +20,9 @@ body {
     background-size: 40%;
 }
 
-.custom-search-bar{
-    display: none;
-}
+/*.custom-search-bar{*/
+/*    display: none;*/
+/*}*/
 
 .ant-layout-footer{
     display: none;

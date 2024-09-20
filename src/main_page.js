@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Modal, Tabs, Input, Typography, Button, message } from 'antd';
 import { MoreOutlined, EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
-import { usePasswordContext } from './PasswordContext';
 import {
     dataFetching,
     deleteData,
@@ -16,7 +15,7 @@ const { TabPane } = Tabs;
 const { Text } = Typography;
 
 const MainPage = ({ groupId, userId }) => {
-    const [data, setData] = useState([]);
+    const [data, setData] = useState([]);  // Use 'data' to hold password items
     const [clickedRow, setClickedRow] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [historyData, setHistoryData] = useState([]);
@@ -32,27 +31,8 @@ const MainPage = ({ groupId, userId }) => {
 
     const [isSaveButtonDisabled, setIsSaveButtonDisabled] = useState(true);
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-    const { passwordItems, fetchPasswords } = usePasswordContext();
-    const { deletePassword } = usePasswordContext();
-    const { updatePassword } = usePasswordContext();
 
-    useEffect(() => {
-        fetchPasswords();  // Fetch the passwords on component mount
-    }, [fetchPasswords]);
-
-
-
-    useEffect(() => {
-        fetchPasswords();
-        const isUnchanged =
-            editedItemName === originalItemName &&
-            editedUserName === originalUserName &&
-            editedPassword === originalPassword &&
-            editedGroup === originalGroup;
-
-        setIsSaveButtonDisabled(isUnchanged);
-    }, [editedItemName, editedUserName, editedPassword, editedGroup, originalItemName, originalUserName, originalPassword, originalGroup]);
-
+    // Fetch password items based on groupId
     useEffect(() => {
         if (groupId === -1) {
             fetchAllPasswordItems(setData);
@@ -63,9 +43,19 @@ const MainPage = ({ groupId, userId }) => {
         }
     }, [groupId]);
 
+    useEffect(() => {
+        const isUnchanged =
+            editedItemName === originalItemName &&
+            editedUserName === originalUserName &&
+            editedPassword === originalPassword &&
+            editedGroup === originalGroup;
+
+        setIsSaveButtonDisabled(isUnchanged);
+    }, [editedItemName, editedUserName, editedPassword, editedGroup, originalItemName, originalUserName, originalPassword, originalGroup]);
+
     const handleMenuClick = async (record) => {
         setClickedRow(record);
-
+        console.log()
         try {
             const history = await fetchHistory(record.id);
             setHistoryData(history);
@@ -108,7 +98,6 @@ const MainPage = ({ groupId, userId }) => {
                 setData(prevData =>
                     prevData.map(item => (item.id === clickedRow.id ? updatedData : item))  // Update state with the updated data
                 );
-                updatePassword(updatedData);  // Update context
                 message.success('Item updated successfully');
                 setIsModalOpen(false);
             })
@@ -118,15 +107,15 @@ const MainPage = ({ groupId, userId }) => {
             });
     };
 
-
-    const handleDelete = () => {
-        Modal.confirm({
-            title: 'Are you sure you want to delete this?',
-            okText: 'Delete',
-            onOk() {
-                deleteData(clickedRow.id, clickedRow.groupId)
+const handleDelete = () => {
+    Modal.confirm({
+        title: 'Are you sure you want to delete this?',
+        okText: 'Delete',
+        onOk() {
+            if (clickedRow && clickedRow.id) {
+                deleteData(clickedRow.id, clickedRow.groupId)  // Make sure clickedRow.id is defined
                     .then((response) => {
-                        if (response && (response.status === 204 || response.status === 200)) {  // Ensure response and status exist
+                        if (response && (response.status === 204 || response.status === 200)) {
                             setData(prevData => prevData.filter(item => item.id !== clickedRow.id));  // Remove from state
                             deletePassword(clickedRow.id);  // Update context by removing the deleted password
                             message.success('Password item deleted successfully');
@@ -139,9 +128,12 @@ const MainPage = ({ groupId, userId }) => {
                         console.error('Error during deletion:', error);
                         message.error('Failed to delete password item');
                     });
-            },
-        });
-    };
+            } else {
+                message.error('No valid item selected for deletion.');
+            }
+        },
+    });
+};
 
 
     const handleModalClose = () => {
@@ -166,7 +158,6 @@ const MainPage = ({ groupId, userId }) => {
             key: 'password',
             render: (text, record) => {
                 const passwordMasked = record.password ? '*'.repeat(record.password.length) : '';  // Check if password is defined
-
 
                 return (
                     <span>
@@ -197,19 +188,10 @@ const MainPage = ({ groupId, userId }) => {
         },
     ];
 
-    const historyMenuItems = historyData.map((entry, index) => ({
-        key: `${index}`,
-        label: (
-            <a target="_blank" rel="noopener noreferrer">
-                {entry.timestamp}: {entry.oldPassword}
-            </a>
-        ),
-    }));
-
     return (
         <div>
             <Table
-                dataSource={passwordItems}  // Use the updated password items from state
+                dataSource={data}  // Use 'data' instead of 'passwordItems' from context
                 columns={columns}
                 rowKey={(record) => record.id}
             />
@@ -257,7 +239,7 @@ const MainPage = ({ groupId, userId }) => {
                         {clickedRow && (
                             <div>
                                 <div style={{ marginBottom: '10px' }}>
-                                    <label style={{fontWeight: "bold"}}>Item Name</label>
+                                    <label style={{ fontWeight: 'bold' }}>Item Name</label>
                                     <Input
                                         placeholder="Item Name"
                                         value={editedItemName}
@@ -265,7 +247,7 @@ const MainPage = ({ groupId, userId }) => {
                                     />
                                 </div>
                                 <div style={{ marginBottom: '10px' }}>
-                                    <label style={{fontWeight: "bold"}}>User Name</label>
+                                    <label style={{ fontWeight: 'bold' }}>User Name</label>
                                     <Input
                                         placeholder="User Name"
                                         value={editedUserName}
@@ -273,7 +255,7 @@ const MainPage = ({ groupId, userId }) => {
                                     />
                                 </div>
                                 <div style={{ marginBottom: '10px' }}>
-                                    <label style={{fontWeight: "bold"}}>Password</label>
+                                    <label style={{ fontWeight: 'bold' }}>Password</label>
                                     <Input.Password
                                         placeholder="Password"
                                         value={editedPassword}
@@ -281,7 +263,7 @@ const MainPage = ({ groupId, userId }) => {
                                     />
                                 </div>
                                 <div style={{ marginBottom: '10px' }}>
-                                    <label style={{fontWeight: "bold"}}>Group</label>
+                                    <label style={{ fontWeight: 'bold' }}>Group</label>
                                     <Input
                                         placeholder="Group"
                                         value={editedGroup}

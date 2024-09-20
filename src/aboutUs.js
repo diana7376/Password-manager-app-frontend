@@ -1,5 +1,5 @@
 import React from 'react';
-import './aboutUs.css'; // Ensure this file is correctly linked
+import './aboutUs.css';
 import { ParallaxProvider, Parallax } from 'react-scroll-parallax';
 
 const AboutUs = () => {
@@ -17,7 +17,7 @@ const AboutUs = () => {
                     </div>
                 </div>
 
-                <Parallax className="image-container" y={[-20, 20]} tagOuter="div">
+                <Parallax className="image-container" y={[-20, 20]} >
                     <img
                         src="https://i.imgur.com/HQXSdzF.png"
                         alt="LockR Showcase"
@@ -27,7 +27,7 @@ const AboutUs = () => {
             </div>
 
             <section className="features-section" id="features">
-                <Parallax className="features-background" y={[10, -10]} tagOuter="div">
+                <Parallax className="features-background" y={[10, -10]} >
                     <h2 className="section-title">Features That Set Us Apart</h2>
                     <div className="features-container">
                         <div className="feature-card">
@@ -50,7 +50,7 @@ const AboutUs = () => {
             </section>
 
             <section className="community" id="contact">
-                <Parallax className="community-background" y={[5, -5]} tagOuter="div">
+                <Parallax className="community-background" y={[5, -5]} >
                     <h2>Join the LockR Community</h2>
                     <p>Connect with other users, stay updated with our latest news, and engage with our vibrant community through social media.</p>
                 </Parallax>

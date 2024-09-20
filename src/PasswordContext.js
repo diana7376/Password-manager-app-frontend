@@ -12,29 +12,39 @@ export const PasswordProvider = ({ children }) => {
     const fetchPasswords = () => {
         axios.get('http://127.0.0.1:8000/api/password-items/', config)
             .then(response => {
-                setPasswordItems(response.data);  // Update context state with fresh data
+                if (Array.isArray(response.data.passwords)) {
+                    setPasswordItems(response.data.passwords);  // Update context state with fresh data
+                } else {
+                    console.error('Unexpected response format, expected an array:', response.data);
+                }
             })
             .catch(error => {
                 console.error('Error fetching passwords:', error);
             });
     };
 
-
-
     const addPassword = (newPassword) => {
-        setPasswordItems(prevItems => [...prevItems, newPassword]);  // Add the new password to the context state
+        setPasswordItems(prevItems => {
+            // Ensure prevItems is an array
+            return Array.isArray(prevItems) ? [...prevItems, newPassword] : [newPassword];
+        });
     };
 
     const updatePassword = (updatedPassword) => {
-        setPasswordItems(prevItems =>
-            prevItems.map(item => item.id === updatedPassword.id ? updatedPassword : item)
-        );  // Update the specific item in the context
+        setPasswordItems(prevItems => {
+            return Array.isArray(prevItems)
+                ? prevItems.map(item => item.id === updatedPassword.id ? updatedPassword : item)
+                : [updatedPassword];
+        });
     };
 
     const deletePassword = (passwordId) => {
-        setPasswordItems(prevItems => prevItems.filter(item => item.id !== passwordId));  // Remove the deleted item from context
+        setPasswordItems(prevItems => {
+            return Array.isArray(prevItems)
+                ? prevItems.filter(item => item.id !== passwordId)
+                : [];
+        });
     };
-
 
     return (
         <PasswordContext.Provider value={{

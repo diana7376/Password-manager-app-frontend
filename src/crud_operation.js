@@ -19,28 +19,47 @@ export function addPasswordItem(newItem, groupId) {
 }
 
 
-export const updatePasswordItem = (id, groupId, updatedData) => {
+export const updatePasswordItem = (id, groupId, updatedData, setData) => {
+    console.log(`Updating URL: http://127.0.0.1:8000/api/groups/${groupId}/password-items/${id}/`);
+
     return axios.put(`http://127.0.0.1:8000/api/groups/${groupId}/password-items/${id}/`, updatedData, config)
         .then(response => {
+            // Check if response.data.passwords is an array
+            if (Array.isArray(response.data.passwords)) {
+                const updatedPasswordItems = response.data.passwords.map(item => ({
+                    id: item.id,
+                    itemName: item.itemName,
+                    userName: item.userName,
+                    password: item.password,
+                    groupId: item.groupId,
+                    userId: item.userId,
+                    comment: item.comment,
+                    url: item.url,
+                }));
+                setData(updatedPasswordItems);  // Update the state with the latest data
+            } else {
+                console.error('Unexpected response format, expected an array:', response.data);
+            }
+
             return response.data;
         })
         .catch(error => {
             console.error('Error updating the password item:', error);
             throw error;
         });
-    console.log(`Updating URL: http://127.0.0.1:8000/api/groups/${groupId}/password-items/${id}/`);
-
 };
 
 
 
-export function deleteData(id, groupId) {
+
+export function deleteData(id, groupId, setData) {
     // delete password
     return axios.delete(`http://127.0.0.1:8000/api/groups/${groupId}/password-items/${id}/`, config)
         .then((response) => {
             if (response.status === 204) {
                 console.log('Item deleted successfully');
-                // Check if the groupId is null (unlisted)
+
+                // Fetch remaining password items
                 if (groupId === null || groupId === 'null') {
                     // Fetch unlisted password items (those with null groupId)
                     return axios.get('http://127.0.0.1:8000/api/password-items/unlisted/', config);
@@ -48,11 +67,27 @@ export function deleteData(id, groupId) {
                     // Fetch remaining password items for the group
                     return axios.get(`http://127.0.0.1:8000/api/groups/${groupId}/password-items/`, config);
                 }
+            } else {
+                throw new Error('Failed to delete the item.');
             }
         })
         .then((response) => {
-            console.log('Item deleted successfully');
-            return response;  // Return the response to access the status later
+            // Check if response.data.passwords is an array
+            if (Array.isArray(response.data.passwords)) {
+                const mappedData = response.data.passwords.map(item => ({
+                    id: item.id,
+                    itemName: item.itemName,
+                    userName: item.userName,
+                    password: item.password,
+                    groupId: item.groupId,
+                    userId: item.userId,
+                    comment: item.comment,
+                    url: item.url,
+                }));
+                setData(mappedData);
+            } else {
+                console.error('Unexpected response format or data is not an array:', response.data);
+            }
         })
         .catch((error) => {
             console.error('Error in deleteData', error);
@@ -65,17 +100,22 @@ export function deleteData(id, groupId) {
 export function fetchAllPasswordItems(setData) {
     axios.get('http://127.0.0.1:8000/api/password-items/', config) // Adjust the endpoint if needed
         .then(response => {
-            const mappedData = response.data.map(item => ({
-                id: item.id,
-                itemName: item.itemName,
-                userName: item.userName,
-                password: item.password,
-                groupId: item.groupId,  // Assuming the groupId is part of the response
-                userId: item.userId,
-                comment: item.comment,
-                url: item.url,
-            }));
-            setData(mappedData);
+            // Check if response.data is an array
+            if (Array.isArray(response.data.passwords)) {
+                const mappedData = response.data.passwords.map(item => ({
+                    id: item.id,
+                    itemName: item.itemName,
+                    userName: item.userName,
+                    password: item.password,
+                    groupId: item.groupId,  // Assuming the groupId is part of the response
+                    userId: item.userId,
+                    comment: item.comment,
+                    url: item.url,
+                }));
+                setData(mappedData);
+            } else {
+                console.error('Unexpected response format, expected an array:', response.data);
+            }
         })
         .catch(error => {
             console.error('Error fetching all password items:', error);
@@ -85,26 +125,31 @@ export function fetchAllPasswordItems(setData) {
 export function fetchUnlistedPasswordItems(setData) {
     axios.get('http://127.0.0.1:8000/api/password-items/unlisted/', config) // Adjust the endpoint if needed
         .then(response => {
-            const mappedData = response.data.map(item => ({
-                id: item.id,
-                itemName: item.itemName,
-                userName: item.userName,
-                password: item.password,
-                groupId: item.groupId,  // Assuming the groupId is part of the response
-                userId: item.userId,
-                comment: item.comment,
-                url: item.url,
-            }));
-            setData(mappedData);
+            if (response.data && Array.isArray(response.data)) {
+                const mappedData = response.data.map(item => ({
+                    id: item.id,
+                    itemName: item.itemName,
+                    userName: item.userName,
+                    password: item.password,
+                    groupId: item.groupId,  // Assuming the groupId is part of the response
+                    userId: item.userId,
+                    comment: item.comment,
+                    url: item.url,
+                }));
+                setData(mappedData);
+            } else {
+                console.error('Unexpected response format or data is not an array:', response.data);
+            }
         })
         .catch(error => {
             console.error('Error fetching unlisted password items:', error);
         });
 }
+
 export function dataFetching(groupId, setData) {
     axios.get(`http://127.0.0.1:8000/api/groups/${groupId}/password-items/`, config)
         .then(response => {
-            const passwordItemsWithGroupNames = response.data.map(item => ({
+            const passwordItemsWithGroupNames = response.data.passwords.map(item => ({
                 id: item.id,
                 itemName: item.itemName,
                 userName: item.userName,
@@ -128,7 +173,7 @@ export function dataFetching(groupId, setData) {
 
 export const fetchHistory = async (passwordId) => {
     try {
-        const response = await fetch(`/api/password-history`);
+        const response = await fetch(`/api/password-history/${passwordId}`); // Include passwordId in the URL
         if (!response.ok) {
             throw new Error('Failed to fetch history');
         }
@@ -138,3 +183,4 @@ export const fetchHistory = async (passwordId) => {
         throw error;
     }
 };
+
