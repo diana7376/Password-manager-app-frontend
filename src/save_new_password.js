@@ -16,6 +16,7 @@ const SaveNewPassword = ({ groupId, userId, comment, url, onPasswordAdd }) => {
     const [groupOptions, setGroupOptions] = useState([]);
     const [newGroupName, setNewGroupName] = useState('');
     const { addPassword } = usePasswordContext();
+    const [comments, setComments] = useState(''); // New comments state
 
     useEffect(() => {
         axios.get('http://127.0.0.1:8000/api/groups/')
@@ -56,7 +57,7 @@ const SaveNewPassword = ({ groupId, userId, comment, url, onPasswordAdd }) => {
             password: password,
             groupId: groupIdToUse,
             userId: userId,
-            comment: comment,
+            comment: comments, // Include comments here
             url: url,
         };
 
@@ -79,12 +80,9 @@ const SaveNewPassword = ({ groupId, userId, comment, url, onPasswordAdd }) => {
     const generatePassword = () => {
         axios.post('http://127.0.0.1:8000/api/password-items/generate/', { /* any necessary payload */ })
             .then(response => {
-                // Log the entire response to check its structure
                 console.log('Generated password response:', response);
-
-                // Update the password state with the correct key
                 if (response.data && response.data.generated_password) {
-                    setPassword(response.data.generated_password); // Update the password state to auto-fill
+                    setPassword(response.data.generated_password);
                     message.success('Password generated successfully');
                 } else {
                     message.error('Unexpected response structure');
@@ -95,6 +93,37 @@ const SaveNewPassword = ({ groupId, userId, comment, url, onPasswordAdd }) => {
                 message.error('Failed to generate password');
             });
     };
+
+    const getPasswordStrength = (value) => {
+        let score = 0;
+        const length = value.length;
+        const hasUppercase = /[A-Z]/.test(value);
+        const hasLowercase = /[a-z]/.test(value);
+        const hasNumbers = /[0-9]/.test(value);
+        const hasSymbols = /[^0-9a-zA-Z]/.test(value);
+
+        if (length >= 8) score++;
+        if (length >= 12) score++;
+        if (hasUppercase) score++;
+        if (hasLowercase) score++;
+        if (hasNumbers) score++;
+        if (hasSymbols) score++;
+
+        return {
+            score,
+            message: ["Very Weak", "Weak", "Medium", "Strong", "Very Strong"][score],
+        };
+    };
+
+    const handlePasswordChange = (e) => {
+        setPassword(e.target.value);
+        const { score, message } = getPasswordStrength(e.target.value);
+        setStrengthMessage(message);
+        setStrengthScore(score);
+    };
+
+    const [strengthMessage, setStrengthMessage] = useState('');
+    const [strengthScore, setStrengthScore] = useState(0);
 
     return (
         <>
@@ -130,10 +159,22 @@ const SaveNewPassword = ({ groupId, userId, comment, url, onPasswordAdd }) => {
                     onChange={(e) => setUsername(e.target.value)}
                     style={{ marginBottom: '10px' }}
                 />
+
+                {/* Password Strength Meter */}
+                <div style={{ marginBottom: '10px' }}>
+                    <div style={{
+                        height: '10px',
+                        width: `${strengthScore * 25}%`,
+                        backgroundColor: ['#D73F40', '#DC6551', '#F2B84F', '#BDE952', '#3ba62f'][strengthScore],
+                        transition: 'width 0.3s',
+                    }} />
+                    <span>{strengthMessage}</span>
+                </div>
+
                 <Input.Password
                     placeholder="Input password"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={handlePasswordChange}
                     iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
                     style={{ width: '45%', marginBottom: '10px' }}
                 />
@@ -157,6 +198,14 @@ const SaveNewPassword = ({ groupId, userId, comment, url, onPasswordAdd }) => {
                     placeholder="Or enter new group name"
                     value={newGroupName}
                     onChange={(e) => setNewGroupName(e.target.value)}
+                    style={{ marginBottom: '10px' }}
+                />
+
+                {/* New Comments Input */}
+                <Input.TextArea
+                    placeholder="Enter comments"
+                    value={comments}
+                    onChange={(e) => setComments(e.target.value)}
                     style={{ marginBottom: '10px' }}
                 />
             </Modal>
