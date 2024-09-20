@@ -67,6 +67,8 @@ const App = () => {
 
     const isLoginPage = location.pathname === '/login';
     const isRegisterPage = location.pathname === '/register';
+    const isAboutUsPage = location.pathname === '/about';
+
     // Focus on the input when the component mounts
     useEffect(() => {
         if (searchInputRef.current) {
@@ -361,7 +363,9 @@ const handleCancelLogout = () => {
 
     return (
         <Layout style={{ minHeight: '100vh' }}>
-            <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
+            <Sider collapsible
+                   collapsed={collapsed}
+                   onCollapse={(value) => setCollapsed(value)}>
                 <Menu
                     theme="dark"
                     mode="inline"
@@ -375,7 +379,7 @@ const handleCancelLogout = () => {
 
             <Layout>
                 {/* Conditionally render search bar and add password button */}
-                {!isLoginPage && !isRegisterPage && loggedIn && (
+                {!isLoginPage && !isRegisterPage && !isAboutUsPage && loggedIn && (
                 <div ref={searchRef}>
                     <Search
                         placeholder="What are you looking for?"
@@ -417,14 +421,13 @@ const handleCancelLogout = () => {
 
                     {/* Plus Button at the bottom-right corner under the table */}
                     {/* Conditionally render the "Add New Password" button */}
-                    {!isLoginPage && !isRegisterPage && loggedIn && (
-                    <div
-                        style={{
-                            position: 'fixed',
-                            bottom: 24,
-                            right: 24,
-                            zIndex: 1000,
-                        }}
+                    {!isLoginPage && !isRegisterPage && !isAboutUsPage && loggedIn && (
+                    <div style={{
+                        position: 'fixed',
+                        bottom: 24,
+                        right: 24,
+                        zIndex: 1000,
+                    }}
                     >
                         <SaveNewPassword
                             groupId={selectedGroupId}
