@@ -65,6 +65,9 @@ const App = () => {
 
     const isLoginPage = location.pathname === '/login';
     const isRegisterPage = location.pathname === '/register';
+    const isAboutUsPage = location.pathname === '/about';
+
+    // Focus on the input when the component mounts
 
     useEffect(() => {
         if (searchInputRef.current) {
@@ -342,9 +345,12 @@ const handleCancelLogout = () => {
     };
 
     return (
-        <PasswordProvider>
-            <Layout style={{ minHeight: '100vh' }}>
-            <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
+
+        <Layout style={{ minHeight: '100vh' }}>
+            <Sider collapsible
+                   collapsed={collapsed}
+                   onCollapse={(value) => setCollapsed(value)}>
+
                 <Menu
                     theme="dark"
                     mode="inline"
@@ -358,21 +364,23 @@ const handleCancelLogout = () => {
 
             <Layout>
                 {/* Conditionally render search bar and add password button */}
-                {!isLoginPage && !isRegisterPage && loggedIn && (
-                    <div ref={searchRef}>
-                        <Search
-                            placeholder="What are you looking for?"
-                            onSearch={onSearch}
-                            className = "custom-search-bar"
 
-                            ref={(input) => {
-                                // Attach the ref to the input DOM element inside the Search component
-                                if (input) {
-                                    searchInputRef.current = input.input;
-                                }
-                            }}
-                        />
-                    </div>
+                {!isLoginPage && !isRegisterPage && !isAboutUsPage && loggedIn && (
+                <div ref={searchRef}>
+                    <Search
+                        placeholder="What are you looking for?"
+                        onSearch={onSearch}
+                        className = "custom-search-bar"
+
+                        ref={(input) => {
+                            // Attach the ref to the input DOM element inside the Search component
+                            if (input) {
+                                searchInputRef.current = input.input;
+                            }
+                        }}
+                    />
+                </div>
+
                 )}
                 {/* <Header style={{ padding: 0, background: colorBgContainer }} />*/}
 
@@ -400,23 +408,24 @@ const handleCancelLogout = () => {
 
                     {/* Plus Button at the bottom-right corner under the table */}
                     {/* Conditionally render the "Add New Password" button */}
-                    {!isLoginPage && !isRegisterPage && loggedIn && (
-                        <div
-                            style={{
-                                position: 'fixed',
-                                bottom: 24,
-                                right: 24,
-                                zIndex: 1000,
-                            }}
-                        >
-                            <SaveNewPassword
-                                groupId={selectedGroupId}
-                                userId={userId}
-                                comment={comment}
-                                url={url}
-                                onPasswordAdd={onPasswordAdd}
-                            />
-                        </div>
+
+                    {!isLoginPage && !isRegisterPage && !isAboutUsPage && loggedIn && (
+                    <div style={{
+                        position: 'fixed',
+                        bottom: 24,
+                        right: 24,
+                        zIndex: 1000,
+                    }}
+                    >
+                        <SaveNewPassword
+                            groupId={selectedGroupId}
+                            userId={userId}
+                            comment={comment}
+                            url={url}
+                            onPasswordAdd={onPasswordAdd}
+                        />
+                    </div>
+
                     )}
                 </Content>
                 <Footer style={{ textAlign: 'center' }}>© 2024 LockR</Footer>
