@@ -124,6 +124,9 @@ export function deleteData(passId, groupId, setData, onSuccess, setGroupItems) {
             if (response.status === 204) {
                 console.log('Password item deleted successfully');
 
+                // Update the table by removing the deleted item from the data state
+                setData(prevData => prevData.filter(item => item.passId !== passId));
+
                 // After successful deletion, check if the group is empty
                 checkAndDeleteGroup(groupId, setData, setGroupItems);
 

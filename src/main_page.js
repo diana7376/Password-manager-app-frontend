@@ -125,7 +125,7 @@ const MainPage = ({ groupId, userId, setGroupItems }) => {
                         setIsModalOpen(false);  // Close the modal
                     }, setGroupItems)  // Pass setGroupItems to handle group deletion
                         .then(() => {
-                            message.success('Password item and group (if empty) deleted successfully');
+                            // message.success('Password item and group (if empty) deleted successfully');
                         })
                         .catch(error => {
                             console.error('Error during deletion:', error);
@@ -137,6 +137,7 @@ const MainPage = ({ groupId, userId, setGroupItems }) => {
             },
         });
     };
+
 
 
 
