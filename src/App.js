@@ -429,7 +429,10 @@ const handleCancelLogout = () => {
                         userId={userId}
                         comment={comment}
                         url={url}
-                        onPasswordAdd={onPasswordAdd}
+                        onPasswordAdd={(newItem) => {
+                            setPasswordItems((prevItems) => [...prevItems, newItem]);  // Add new password to the table
+                        }}
+                        setGroupItems={setGroupItems}
                     />
                 </div>
 

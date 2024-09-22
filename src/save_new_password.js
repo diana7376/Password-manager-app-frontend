@@ -7,7 +7,7 @@ import { usePasswordContext } from './PasswordContext';
 
 const { Option } = Select;
 
-const SaveNewPassword = ({ groupId, userId, comment, url, onPasswordAdd }) => {
+const SaveNewPassword = ({ groupId, userId, comment, url, onPasswordAdd,  setGroupItems }) => {
     const [open, setOpen] = useState(false);
     const [fieldName, setFieldName] = useState('');
     const [username, setUsername] = useState('');
@@ -38,6 +38,7 @@ const SaveNewPassword = ({ groupId, userId, comment, url, onPasswordAdd }) => {
             axios.post('http://127.0.0.1:8000/api/groups/', { groupName: newGroupName, userId: userId })
                 .then(response => {
                     groupIdToUse = response.data.groupId;
+                    setGroupItems(prev => [...prev, { key: `group-${groupIdToUse}`, label: newGroupName }]);  // Update the sidebar with the new group
                     savePassword(groupIdToUse);
                 })
                 .catch(error => {
