@@ -15,6 +15,7 @@ const SaveNewPassword = ({ groupId, userId, comment, url, onPasswordAdd,  setGro
     const [selectedGroup, setSelectedGroup] = useState(null);
     const [groupOptions, setGroupOptions] = useState([]);
     const [newGroupName, setNewGroupName] = useState('');
+    const [comments, setComments] = useState(''); // New comments state
     const { addPassword } = usePasswordContext();
 
     useEffect(() => {
@@ -57,7 +58,7 @@ const SaveNewPassword = ({ groupId, userId, comment, url, onPasswordAdd,  setGro
             password: password,
             groupId: groupIdToUse,
             userId: userId,
-            comment: comment,
+            comment: comments,
             url: url,
         };
 
@@ -97,6 +98,38 @@ const SaveNewPassword = ({ groupId, userId, comment, url, onPasswordAdd,  setGro
             });
     };
 
+    const getPasswordStrength = (value) => {
+        let score = 0;
+        const length = value.length;
+        const hasUppercase = /[A-Z]/.test(value);
+        const hasLowercase = /[a-z]/.test(value);
+        const hasNumbers = /[0-9]/.test(value);
+        const hasSymbols = /[^0-9a-zA-Z]/.test(value);
+
+        if (length >= 8) score++;
+        if (length >= 12) score++;
+        if (hasUppercase) score++;
+        if (hasLowercase) score++;
+        if (hasNumbers) score++;
+        if (hasSymbols) score++;
+
+        return {
+            score,
+            message: ["Very Weak", "Weak", "Medium", "Strong", "Very Strong"][score],
+        };
+    };
+
+    const handlePasswordChange = (e) => {
+        setPassword(e.target.value);
+        const { score, message } = getPasswordStrength(e.target.value);
+        setStrengthMessage(message);
+        setStrengthScore(score);
+    };
+
+    const [strengthMessage, setStrengthMessage] = useState('');
+    const [strengthScore, setStrengthScore] = useState(0);
+
+
     return (
         <>
             <Tooltip title="Add new password">
@@ -131,10 +164,22 @@ const SaveNewPassword = ({ groupId, userId, comment, url, onPasswordAdd,  setGro
                     onChange={(e) => setUsername(e.target.value)}
                     style={{ marginBottom: '10px' }}
                 />
+
+                {/* Password Strength Meter */}
+                <div style={{ marginBottom: '10px' }}>
+                    <div style={{
+                        height: '10px',
+                        width: `${strengthScore * 25}%`,
+                        backgroundColor: ['#D73F40', '#DC6551', '#F2B84F', '#BDE952', '#3ba62f'][strengthScore],
+                        transition: 'width 0.3s',
+                    }} />
+                    <span>{strengthMessage}</span>
+                </div>
+
                 <Input.Password
                     placeholder="Input password"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={handlePasswordChange}
                     iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
                     style={{ width: '45%', marginBottom: '10px' }}
                 />
@@ -158,6 +203,13 @@ const SaveNewPassword = ({ groupId, userId, comment, url, onPasswordAdd,  setGro
                     placeholder="Or enter new group name"
                     value={newGroupName}
                     onChange={(e) => setNewGroupName(e.target.value)}
+                    style={{ marginBottom: '10px' }}
+                />
+                {/* New Comments Input */}
+                <Input.TextArea
+                    placeholder="Enter comments"
+                    value={comments}
+                    onChange={(e) => setComments(e.target.value)}
                     style={{ marginBottom: '10px' }}
                 />
             </Modal>

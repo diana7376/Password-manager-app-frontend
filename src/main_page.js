@@ -23,11 +23,13 @@ const MainPage = ({ groupId, userId, setGroupItems,passwordItems,setPasswordItem
     const [editedUserName, setEditedUserName] = useState('');
     const [editedPassword, setEditedPassword] = useState('');
     const [editedGroup, setEditedGroup] = useState('');
+    const [editedComment, setEditedComment] = useState(''); // Added for comments
 
     const [originalItemName, setOriginalItemName] = useState('');
     const [originalUserName, setOriginalUserName] = useState('');
     const [originalPassword, setOriginalPassword] = useState('');
     const [originalGroup, setOriginalGroup] = useState('');
+    const [originalComment, setOriginalComment] = useState(''); // Added for original comments
 
     const [isSaveButtonDisabled, setIsSaveButtonDisabled] = useState(true);
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -48,10 +50,11 @@ const MainPage = ({ groupId, userId, setGroupItems,passwordItems,setPasswordItem
             editedItemName === originalItemName &&
             editedUserName === originalUserName &&
             editedPassword === originalPassword &&
-            editedGroup === originalGroup;
+            editedGroup === originalGroup &&
+            editedComment === originalComment; // Include comments in the check
 
         setIsSaveButtonDisabled(isUnchanged);
-    }, [editedItemName, editedUserName, editedPassword, editedGroup, originalItemName, originalUserName, originalPassword, originalGroup]);
+    }, [editedItemName, editedUserName, editedPassword, editedGroup, editedComment, originalItemName, originalUserName, originalPassword, originalGroup]);
 
     const handleMenuClick = async (record) => {
         setClickedRow(record);
@@ -67,11 +70,15 @@ const MainPage = ({ groupId, userId, setGroupItems,passwordItems,setPasswordItem
         setEditedUserName(record.userName);
         setEditedPassword(record.password);
         setEditedGroup(record.groupName);
+        setEditedComment(record.comment); // Set the comment from the record
+
 
         setOriginalItemName(record.itemName);
         setOriginalUserName(record.userName);
         setOriginalPassword(record.password);
         setOriginalGroup(record.groupName);
+        setOriginalComment(record.comment); // Set original comment
+
 
         setIsModalOpen(true);
     };
@@ -91,6 +98,8 @@ const MainPage = ({ groupId, userId, setGroupItems,passwordItems,setPasswordItem
             password: editedPassword,
             groupId: effectiveGroupId,
             userId: userId,
+            comment: editedComment, // Include the comment in the updated data
+
         };
         console.log('Updating password with data:', updatedData);
         updatePasswordItem(clickedRow.passId, effectiveGroupId, updatedData, setData)
@@ -227,6 +236,8 @@ const MainPage = ({ groupId, userId, setGroupItems,passwordItems,setPasswordItem
                                     </Button>
                                 </p>
                                 <p><strong>Group:</strong> {clickedRow.groupName}</p>
+                                <p><strong>Comment:</strong> {clickedRow.comment}</p> {/* Display comment */}
+
                             </div>
                         )}
                     </TabPane>
@@ -276,6 +287,14 @@ const MainPage = ({ groupId, userId, setGroupItems,passwordItems,setPasswordItem
                                         placeholder="Group"
                                         value={editedGroup}
                                         onChange={(e) => setEditedGroup(e.target.value)}
+                                    />
+                                </div>
+                                <div style={{ marginBottom: '10px' }}>
+                                    <label style={{ fontWeight: 'bold' }}>Comment</label>
+                                    <Input
+                                        placeholder="Comment"
+                                        value={editedComment}
+                                        onChange={(e) => setEditedComment(e.target.value)}
                                     />
                                 </div>
                                 <Button
