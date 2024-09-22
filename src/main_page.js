@@ -14,7 +14,7 @@ import './styles.css';
 const { TabPane } = Tabs;
 const { Text } = Typography;
 
-const MainPage = ({ groupId, userId, setGroupItems }) => {
+const MainPage = ({ groupId, userId, setGroupItems,passwordItems,setPasswordItems }) => {
     const [data, setData] = useState([]);  // Use 'data' to hold password items
     const [clickedRow, setClickedRow] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -96,7 +96,7 @@ const MainPage = ({ groupId, userId, setGroupItems }) => {
         updatePasswordItem(clickedRow.passId, effectiveGroupId, updatedData, setData)
             .then((response) => {
                 console.log('Update successful:', response);
-                setData(prevData =>
+                setPasswordItems(prevData =>
                     prevData.map(item =>
                         item.passId === clickedRow.passId ? { ...updatedData, passId: clickedRow.passId } : item
                     )
@@ -119,7 +119,7 @@ const MainPage = ({ groupId, userId, setGroupItems }) => {
             okText: 'Delete',
             onOk() {
                 if (clickedRow && clickedRow.passId) {
-                    deleteData(clickedRow.passId, clickedRow.groupId, setData, () => {
+                    deleteData(clickedRow.passId, clickedRow.groupId, setPasswordItems, () => {
                         // Success callback: Close the modal on successful deletion
                         message.success('Password item deleted successfully');
                         setIsModalOpen(false);  // Close the modal
@@ -172,7 +172,9 @@ const MainPage = ({ groupId, userId, setGroupItems }) => {
                             style={{ marginLeft: 8, cursor: 'pointer' }}
                             onClick={() => {
                                 record.isPasswordVisible = !record.isPasswordVisible;
-                                setData([...data]);
+                                // setData([...data]);
+                                setPasswordItems([...passwordItems]);  // Update the table with visibility toggled
+
                             }}
                         >
                             {record.isPasswordVisible ? <EyeInvisibleOutlined /> : <EyeOutlined />}
@@ -197,7 +199,7 @@ const MainPage = ({ groupId, userId, setGroupItems }) => {
     return (
         <div>
             <Table
-                dataSource={data}  // Use 'data' instead of 'passwordItems' from context
+                dataSource={passwordItems}  // Use 'data' instead of 'passwordItems' from context
                 columns={columns}
                 rowKey={(record) => record.passId}
             />

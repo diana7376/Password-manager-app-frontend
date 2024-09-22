@@ -401,6 +401,8 @@ const handleCancelLogout = () => {
                                     groupId={selectedGroupId}
                                     userId={userId}
                                     setGroupItems={setGroupItems}
+                                    passwordItems={passwordItems} // Pass down the password items
+                                    setPasswordItems={setPasswordItems}
                                 />
                             </PrivateRoute>
                         }

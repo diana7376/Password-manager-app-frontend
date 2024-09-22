@@ -19,13 +19,28 @@ export function addPasswordItem(newItem, groupId) {
         : `http://127.0.0.1:8000/api/groups/${groupId}/password-items/`;
 
     return axios.post(url, payload, config)
-        .then(response => response.data)
+        .then(response => {
+            const createdPassId = response.data.passId; // Get the ID of the newly created password item
+            return fetchPasswordById(createdPassId, groupId); // Fetch the newly created item with decrypted password
+        })
         .catch(error => {
-            console.log('Error in adding a new password', error);
+            console.error('Error in adding a new password', error);
             throw error;
         });
 }
 
+// Helper function to fetch a password item by its ID
+export const fetchPasswordById = (passId,groupId) => {
+    return axios.get(`http://127.0.0.1:8000/api/groups/${groupId}/password-items/${passId}/`, config)
+        .then(response => {
+            // Return the decrypted password item
+            return response.data;
+        })
+        .catch(error => {
+            console.error('Error fetching password by ID:', error);
+            throw error;
+        });
+};
 
 export const updatePasswordItem = (passId, groupId, updatedData, setData) => {
     // Adjust URL for unlisted items
