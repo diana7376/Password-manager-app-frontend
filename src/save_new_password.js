@@ -35,6 +35,11 @@ const SaveNewPassword = ({ groupId, userId, comment, url, onPasswordAdd, setGrou
     };
 
     const handleOk = () => {
+        if (selectedGroup && newGroupName) {
+            message.error("You cannot create a new group and select an existing group at the same time.");
+            return;
+        }
+
         let groupIdToUse = selectedGroup;
 
         // URL validation check
