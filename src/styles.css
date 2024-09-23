@@ -7,113 +7,95 @@ html {
 }
 
 body {
-  font-family: sans-serif;
-  margin: 0;
-  padding: 0;
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #e8e8e8;
+    font-size: 16px;
 }
 
-h1 {
-  margin-top: 0;
-  font-size: 22px;
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+    margin-top: 0;
 }
 
-h2 {
-  margin-top: 0;
-  font-size: 20px;
-}
+h1 { font-size: 1.375rem; }
+h2 { font-size: 1.25rem; }
+h3 { font-size: 1.125rem; }
+h4 { font-size: 1rem; }
+h5 { font-size: 0.875rem; }
+h6 { font-size: 0.75rem; }
 
-h3 {
-  margin-top: 0;
-  font-size: 18px;
-}
-
-h4 {
-  margin-top: 0;
-  font-size: 16px;
-}
-
-h5 {
-  margin-top: 0;
-  font-size: 14px;
-}
-
-h6 {
-  margin-top: 0;
-  font-size: 12px;
-}
-
+/* Code styling */
 code {
-  font-size: 1.2em;
+    font-size: 1.2em;
 }
 
+/* List styling */
 ul {
-  padding-inline-start: 20px;
+    padding-inline-start: 1.25rem;
 }
+
 /* Hide action icons by default */
 .ant-table-row .action-icon {
-  visibility: hidden;
-  opacity: 0;
-  transition: opacity 0.3s ease-in-out;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
 }
 
 /* Show action icons when row is hovered */
 .ant-table-row:hover .action-icon {
-  visibility: visible;
-  opacity: 1;
+    visibility: visible;
+    opacity: 1;
 }
 
 /* Custom styles for the search bar */
-/* Centering the search bar */
-/* Centering the search bar with margin */
 .custom-search-bar {
-    margin: 2% 0 2% 20%;
+    margin: 2% auto;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 20px;
-    position: relative; /* For absolute positioning of pseudo-elements */
-    width: 60%; /* Ensure it does not overflow its container */
-    max-width: 100%; /* Restrict max-width */
-    overflow: hidden; /* Hide any overflow */
+    padding: 1rem;
+    width: 80%;
+    max-width: 50rem;
+    position: relative;
+    overflow: hidden;
+    background: rgba(253, 253, 253, 0.87);
+    border-radius: 20px;
 }
 
 /* Custom styles for the search bar input */
 .custom-search-bar input {
-    width: 60%; /* Adjust width as needed */
-    max-width: 800px; /* Optional max-width */
-    padding: 15px 30px;
-    font-size: 18px;
+    width: 100%;
+    padding: 0.9375rem 1.875rem;
+    font-size: 1.125rem;
     border: none;
-    border-radius: 20px; /* More rounded corners */
+    border-radius: 1.25rem;
     outline: none;
     transition: all 0.4s ease-in-out;
-    background: linear-gradient(145deg, #ffffff, #f0f0f0); /* Subtle gradient */
+    background: linear-gradient(145deg, #ffffff, #f0f0f0);
     color: #333;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1), inset 0 -4px 8px rgba(255, 255, 255, 0.8); /* Dual shadow for depth */
-    position: relative;
-    z-index: 1; /* Ensure input is above pseudo-elements */
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1), inset 0 -0.25rem 0.5rem rgba(255, 255, 255, 0.8);
 }
 
 /* Neon glow effect on focus */
 .custom-search-bar input:focus {
-    border: none; /* Remove border to make space for the glow */
-    background: linear-gradient(145deg, #ffffff, rgba(231, 224, 255, 0.09)); /* Change gradient on focus */
-    box-shadow: 0 0 20px rgba(22, 119, 255, 0.8), inset 0 0 10px rgba(22, 119, 255, 0.3); /* Neon glow effect */
-    cursor: pointer; /* Change cursor to pointer on focus */
+    background: linear-gradient(145deg, #ffffff, rgba(231, 224, 255, 0.09));
+    /*box-shadow: 0 0 1.25rem rgba(22, 119, 255, 0.8), inset 0 0 0.625rem rgba(22, 119, 255, 0.3);*/
+    cursor: pointer;
 }
 
 /* Placeholder animation */
 .custom-search-bar input::placeholder {
     color: #888;
-    font-weight: 300; /* Lighter weight for placeholder text */
+    font-weight: 300;
     transition: all 0.4s ease;
-    opacity: 1;
 }
 
 .custom-search-bar input:focus::placeholder {
-    opacity: 0; /* Fade out placeholder on focus */
-    transform: translateY(-25px); /* Move placeholder up on focus */
-    font-size: 16px; /* Adjust font size */
+    opacity: 0;
+    transform: translateY(-1.5625rem);
+    font-size: 1rem;
 }
 
 /* Animated border effect */
@@ -124,241 +106,297 @@ ul {
     left: 0;
     width: 100%;
     height: 100%;
-    border-radius: 20px; /* Match the input's border-radius */
+    border-radius: 1.25rem;
     background: linear-gradient(145deg, rgba(22, 119, 255, 0.3), rgba(22, 119, 255, 0.7));
     z-index: -1;
     transition: all 0.4s ease;
-    filter: blur(8px);
+    filter: blur(0.5rem);
     opacity: 0.5;
-    transform: scale(1.05); /* Adjust to align with input */
+    transform: scale(1.05);
 }
 
 .custom-search-bar input:focus ~ ::before {
-    opacity: 1; /* Enhance the border effect on focus */
+    opacity: 1;
 }
 
 /* Remove the search button styling */
 .custom-search-bar .ant-input-search-button {
-    height: 58px;
-    width: 58px;
+    height: 3.625rem;
+    width: 3.625rem;
     border: none;
-    border-radius: 20px; /* Match the input's border-radius */
-    background: rgba(47, 114, 237, 0.68); /* Unique color */
-    color: #ffffff; /* Text color for the button */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    border-radius: 1.25rem;
+    background: rgba(47, 114, 237, 0.68);
+    color: #ffffff;
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: background-color 0.4s ease, box-shadow 0.4s ease; /* Smooth transition for background color and shadow */
-    cursor: pointer; /* Pointer cursor for button */
+    transition: background-color 0.4s ease, box-shadow 0.4s ease;
+    cursor: pointer;
 }
 
 /* Custom styles for the sidebar menu */
 .ant-menu {
     position: sticky;
     top: 0;
-    margin-top: 30px;
-    background-color: #001529; /* Dark background */
-    border-right: none; /* Remove border */
+    margin-top: 1.875rem;
+    background-color: #001529;
+    border-right: none;
 }
 
 /* Custom styling for menu items */
 .ant-menu-item {
-    font-size: 14px; /* Adjust font size */
-    color: #fff; /* Text color */
+    font-size: 0.875rem;
+    color: #fff;
     transition: background-color 0.3s ease;
 }
 
 .ant-menu-item:hover {
-    background-color: rgba(255, 255, 255, 0.1); /* Subtle hover effect */
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 /* Custom styles for selected menu item */
 .ant-menu-item-selected {
-    background-color: rgba(255, 255, 255, 0.2); /* Highlight selected item */
+    background-color: rgba(255, 255, 255, 0.2);
 }
 
 /* Custom styles for submenu */
 .ant-menu-submenu-title {
-    font-size: 14px; /* Adjust font size */
-    color: #fff; /* Text color */
+    font-size: 0.875rem;
+    color: #fff;
 }
 
 /* Custom styles for submenu items */
 .ant-menu-submenu > .ant-menu {
-    background-color: #001529; /* Same background color as the sidebar */
+    background-color: #001529;
 }
-
 
 /* Custom styles for the modal */
 .ant-modal {
-    border-radius: 10px; /* Rounded corners */
+    border-radius: 0.625rem;
 }
 
 .ant-modal-header {
-    background-color: #1677ff; /* Header background color */
-    color: #fff; /* Header text color */
+    background-color: #1677ff;
+    color: #fff;
 }
 
 .ant-modal-footer {
-    border-top: none; /* Remove border from footer */
+    border-top: none;
 }
 
 .ant-btn-primary {
-    background-color: #1677ff; /* Button color */
-    border-color: #1677ff; /* Button border color */
+    background-color: #1677ff;
+    border-color: #1677ff;
 }
 
 .ant-btn-default {
-    color: #1677ff; /* Text color for default button */
-    border-color: #1677ff; /* Border color for default button */
+    color: #1677ff;
+    border-color: #1677ff;
 }
-
 
 /* Custom styles for the header */
 .ant-layout-header {
-    background-color: #fff; /* Background color */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Shadow effect */
+    background-color: #fff;
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
 }
 
 /* Custom styles for the footer */
 .ant-layout-footer {
-    background-color: #001529; /* Background color */
-    color: #fff; /* Text color */
+    background-color: #001529;
+    color: #fff;
 }
-
 
 /* Custom styles for the content area */
 .ant-layout-content {
-    /*background-color: #f0f2f5; !* Light background color *!*/
-    padding: 16px; /* Padding around content */
+    padding: 1rem;
 }
 
 /* Custom styles for breadcrumb */
 .ant-breadcrumb {
-    background-color: #fff; /* Background color */
-    border-radius: 4px; /* Rounded corners */
-    padding: 8px 16px; /* Padding */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Shadow effect */
+    background-color: #fff;
+    border-radius: 0.25rem;
+    padding: 0.5rem 1rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
 }
-
 
 /* Custom styles for buttons */
 .ant-btn {
-    border-radius: 4px; /* Rounded corners */
-    font-weight: 600; /* Font weight for better readability */
+    border-radius: 0.25rem;
+    font-weight: 600;
 }
 
 .ant-btn-primary {
-    background-color: #1677ff; /* Primary button background color */
-    border-color: #1677ff; /* Primary button border color */
-    transition: background-color 0.3s ease, border-color 0.3s ease; /* Smooth transition */
+    background-color: #1677ff;
+    border-color: #1677ff;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .ant-btn-primary:hover {
-    background-color: #0056b3; /* Darker color on hover */
-    border-color: #0056b3; /* Darker border color on hover */
-}
-
-
-/* General Reset */
-* {
-  box-sizing: border-box;
-}
-
-body {
-  font-family: 'Roboto', sans-serif; /* Modern, clean font */
-  margin: 0;
-  padding: 0;
-  background-color: #e8e8e8; /* Light grey background for the entire page */
+    background-color: #0056b3;
+    border-color: #0056b3;
 }
 
 /* Table Container */
 .ant-spin-container {
-  margin: 10px auto;
-  padding: 30px;
-  max-width: 100%;
-  background-color: #ffffff; /* White background for the table */
-  border-radius: 15px; /* Rounded corners */
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15); /* Enhanced shadow for floating effect */
-  overflow: hidden; /* Hide overflow for rounded corners */
-  position: relative;
-}
-
-/* Table Styles */
-.ant-table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  background-color: transparent; /* No background color */
+    margin: 0.625rem auto;
+    padding: 1.875rem;
+    max-width: 100%;
+    background-color: #ffffff;
+    border-radius: 0.625rem;
+    box-shadow: 0 0.625rem 1.25rem rgba(0, 0, 0, 0.1);
 }
 
 /* Header Styling */
 .ant-table th {
-  background-color: #2c3e50; /* Dark background for header */
-  color: #ecf0f1; /* Light text color */
-  font-weight: 700; /* Bold headers */
-  padding: 16px 20px;
-  text-align: left;
-  border-bottom: 3px solid #34495e; /* Thick border for header */
-  position: relative;
+    background-color: #f5f5f5;
+    color: #2c3e50;
+    padding: 1.25rem;
+    font-size: 1rem;
+    position: relative;
+    border-bottom: 3px solid #34495e;
 }
 
-.ant-table th::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 2px;
-  background: linear-gradient(to right, rgba(236, 240, 241, 0), rgba(236, 240, 241, 1));
-  transform: scaleX(0);
-  transition: transform 0.3s ease;
-}
-
+/* Header hover effect */
 .ant-table th:hover::after {
-  transform: scaleX(1); /* Hover effect for headers */
+    transform: scaleX(1);
 }
 
 /* Cell Styling */
 .ant-table td {
-  background-color: #ffffff; /* White background for cells */
-  color: #2c3e50; /* Dark text color */
-  padding: 12px 20px;
-  border-bottom: 1px solid #ecf0f1; /* Subtle border for cells */
-  border-radius: 8px; /* Rounded corners for cells */
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    background-color: #ffffff;
+    color: #2c3e50;
+    padding: 0.75rem 1.25rem;
+    border-bottom: 1px solid #ecf0f1;
+    border-radius: 0.5rem;
 }
 
 /* Row Styling */
-.ant-table tr {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+.ant-table tr:hover {
+    background-color: #f4f4f4;
 }
 
-.ant-table tr:hover {
-  background-color: #f4f4f4; /* Slight hover effect */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Shadow effect on hover */
-  transform: scale(1.02); /* Slightly zoom in effect on hover */
+/* Pagination styles */
+.ant-pagination {
+    margin: 1.25rem 0;
 }
 
 /* Responsive Adjustments */
-@media (max-width: 768px) {
-  .ant-table th, .ant-table td {
-    padding: 10px 15px;
-  }
+@media (max-width: 48rem) { /* 768px */
+    .custom-search-bar {
+        width: 90%;
+    }
+
+    .ant-table th, .ant-table td {
+        padding: 0.625rem 0.9375rem;
+        font-size: 0.875rem;
+    }
 }
 
-@media (max-width: 480px) {
-  .ant-table {
-    font-size: 14px;
-  }
+@media (max-width: 30rem) { /* 480px */
+    .custom-search-bar {
+        flex-direction: column; /* Stack elements for mobile */
+        padding: 0.625rem; /* Less padding */
+        width: 95%; /* Adjust width for mobile */
+    }
 
-  .ant-table th, .ant-table td {
-    padding: 8px 12px;
-  }
+    .custom-search-bar input {
+        padding: 0.625rem; /* Adjust input padding */
+        font-size: 1rem; /* Adjust font size */
+    }
+
+    .ant-table {
+        font-size: 0.75rem; /* Smaller font size for mobile */
+    }
+
+    .ant-table th, .ant-table td {
+        padding: 0.5rem 0.625rem; /* Adjust padding for mobile */
+    }
+
+    h1 { font-size: 1.25rem; } /* 20px */
+    h2 { font-size: 1.125rem; } /* 18px */
+    h3 { font-size: 1rem; } /* 16px */
+}
+
+/* Miscellaneous styles */
+.hidden {
+    display: none;
+}
+
+/* Transition styles */
+.transition {
+    transition: all 0.3s ease;
+}
+
+/* Scrollbar styles */
+::-webkit-scrollbar {
+    width: 0.5rem;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 0.625rem;
+}
+
+::-webkit-scrollbar-track {
+    background-color: #f0f0f0;
 }
 
 
+/* Base styles for the hamburger menu */
 
+
+/* Mobile layout styles */
+@media (max-width: 75rem) { /* 1200px */
+
+    .sidebar {
+        display: none; /* Hide the sidebar */
+    }
+
+    .main-content {
+        width: 100vw; /* Full width for main content */
+        padding: 2vh; /* Padding for main content */
+    }
+
+    .ant-layout-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center; /* Align items in header */
+        padding: 0 2vw; /* Use vw for padding */
+    }
+
+    /* Ensure table responsiveness */
+    .ant-table {
+        width: 100%; /* Full width for table */
+        overflow-x: auto; /* Allow horizontal scrolling */
+        display: block; /* Allow block display for better responsiveness */
+    }
+
+    .ant-table thead, .ant-table tbody {
+        display: block; /* Keep thead and tbody block for responsive layout */
+    }
+
+    .ant-table tr {
+        display: table; /* Keep rows as table elements */
+        width: 100%; /* Ensure rows take full width */
+        margin-bottom: 1vh; /* Space between rows */
+    }
+
+    .ant-table th, .ant-table td {
+        width: auto; /* Let columns adjust to content */
+        padding: 0.75rem; /* Maintain padding for readability */
+    }
+
+    .custom-search-bar {
+        flex-direction: column; /* Stack elements */
+        width: 100%; /* Full width */
+        margin: 0 auto; /* Center */
+    }
+
+    .custom-search-bar input {
+        width: 100%; /* Full width */
+        margin-bottom: 1vh; /* Space between input and button */
+    }
+}
 
 
