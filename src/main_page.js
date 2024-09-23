@@ -233,7 +233,7 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
                             <ul>
                                 {historyData.map((entry, index) => (
                                     <li key={index}>
-                                        {entry.timestamp}: {entry.oldPassword}
+                                        {entry.updatedAt} : {entry.oldPassword}
                                     </li>
                                 ))}
                             </ul>
