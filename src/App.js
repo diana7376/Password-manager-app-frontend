@@ -12,7 +12,7 @@ import axios from './axiosConfg';
 import fuzzysort from 'fuzzysort';
 import MainPage from './main_page';
 import SaveNewPassword from './save_new_password';
-import { dataFetching, config, fetchAllPasswordItems, fetchUnlistedPasswordItems } from './crud_operation';
+import {dataFetching, config, fetchAllPasswordItems, fetchUnlistedPasswordItems, fetchHistory} from './crud_operation';
 import './styles.css';
 import {Navigate, Route, Routes, useNavigate} from 'react-router-dom';
 import Login from './authorisation/login';
@@ -60,12 +60,14 @@ const App = () => {
     const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
     const navigate = useNavigate();
     const [isModalVisible, setIsModalVisible] = useState(false);
-    const [selectedPasswordItem, setSelectedPasswordItem] = useState(null);
+
     const location = useLocation();
 
     const isLoginPage = location.pathname === '/login';
     const isRegisterPage = location.pathname === '/register';
     const isAboutUsPage = location.pathname === '/about';
+    const [selectedPasswordItem, setSelectedPasswordItem] = useState(null);
+
 
 
     // Focus on the input when the component mounts
@@ -174,67 +176,34 @@ const App = () => {
         setFilteredItems(filtered);
     };
 
-    const handleMenuClick = (key) => {
-        setSelectedKey(key);
-        setIsSearching(false);
-
-        if (key === '2') {
-            setSelectedGroupId(-1);
-            setBreadcrumbItems([
-                { title: 'Group' },
-                { title: 'All' },
-            ]);
-            fetchDataForAllGroups();
-        } else if (key.startsWith('group-')) {
-            const groupId = key.split('-')[1];
-            setSelectedGroupId(groupId);
-
-            if (groupId === '0') {
-                setSelectedGroupId(-1);
-                setBreadcrumbItems([
-                    { title: 'Group' },
-                    { title: 'All' },
-                ]);
-                fetchDataForAllGroups();
-            } else if (groupId === 'X') {
-                setSelectedGroupId(null);
-                setBreadcrumbItems([
-                    { title: 'Group' },
-                    { title: 'Unlisted' },
-                ]);
-                fetchDataForUnlistedGroups();
-            } else {
-                setSelectedGroupId(groupId);
-                const clickedGroup = groupItems.find(item => item.key === key);
-
-                if (clickedGroup) {
-                    const groupName = clickedGroup.label;
-                    setBreadcrumbItems([
-                        { title: 'Group' },
-                        { title: groupName },
-                    ]);
-                }
-
-                axios.get(`http://127.0.0.1:8000/api/groups/${groupId}/password-items/`, config)
-                    .then(response => {
-                        const groupName = response.data.groupName;
-                        setBreadcrumbItems([
-                            { title: 'Group' },
-                            { title: groupName },
-                        ]);
-                    })
-                    .catch(error => {
-                        console.error('Error fetching group details:', error);
-                    });
-            }
-        } else if (key === 'logout') {
-            showLogoutConfirmation();
+    const handleMenuClick = (record) => {
+        if (!record || !record.id) {
+            console.error('Invalid item or missing ID:', record);  // Log the invalid item
+            message.error('Failed to fetch password details. Please try again.');
+            return;  // Exit the function if item is invalid
         }
+
+        setSelectedPasswordItem(record);  // Set the clicked item as the selected password item
+
+        const passId = record.id;  // Get the password item's ID
+        console.log("Password ID:", passId);  // Log passId to debug
+
+        try {
+            fetchHistory(passId).then((history) => {
+                setHistoryData(history);
+            }).catch((error) => {
+                message.error('Failed to fetch history');
+            });
+        } catch (error) {
+            message.error('Failed to fetch history');
+        }
+
+        setIsModalVisible(true);  // Open the modal and update other fields if needed
     };
 
     const fetchDataForAllGroups = () => {
         axios
-            .get('http://127.0.0.1:8000/api/password-items/', config)
+            .get('http://127.0.0.1:8000/api/password-items/')
             .then((response) => {
                 setPasswordItems(response.data.passwords);
             })
@@ -245,7 +214,7 @@ const App = () => {
 
     const fetchDataForUnlistedGroups = () => {
         axios
-            .get('http://127.0.0.1:8000/api/password-items/unlisted/', config)
+            .get('http://127.0.0.1:8000/api/password-items/unlisted/')
             .then((response) => {
                 setPasswordItems(response.data.passwords);
             })
@@ -346,7 +315,8 @@ const handleCancelLogout = () => {
     };
 
     return (
-        <PasswordProvider>
+        <PasswordProvider >
+            <div className={"header"}>
         <Layout style={{ minHeight: '100vh' }}>
             <Sider collapsible
                    collapsed={collapsed}
@@ -363,7 +333,7 @@ const handleCancelLogout = () => {
                 />
             </Sider>
 
-            <Layout>
+            <Layout >
                 {/* Conditionally render search bar and add password button */}
 
                 {!isLoginPage && !isRegisterPage && !isAboutUsPage && loggedIn &&  (
@@ -454,7 +424,7 @@ const handleCancelLogout = () => {
             </Modal>
             <Modal
                 title="Confirm Logout"
-                visible={showLogoutConfirm}
+                open={showLogoutConfirm}
                 onOk={handleLogout}
                 onCancel={handleCancelLogout}
                 okText="Yes"
@@ -482,6 +452,7 @@ const handleCancelLogout = () => {
             </Modal>
 
         </Layout>
+            </div>
         </PasswordProvider>
     );
 };

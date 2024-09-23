@@ -31,6 +31,9 @@ const MainPage = ({ groupId, userId }) => {
 
     const [isSaveButtonDisabled, setIsSaveButtonDisabled] = useState(true);
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+    const [selectedPasswordItem, setSelectedPasswordItem] = useState(null);
+
+
 
     // Fetch password items based on groupId
     useEffect(() => {
@@ -53,28 +56,32 @@ const MainPage = ({ groupId, userId }) => {
         setIsSaveButtonDisabled(isUnchanged);
     }, [editedItemName, editedUserName, editedPassword, editedGroup, originalItemName, originalUserName, originalPassword, originalGroup]);
 
-    const handleMenuClick = async (record) => {
-        setClickedRow(record);
-        console.log()
+    const handleMenuClick = async () => {
+        if (!selectedPasswordItem || !selectedPasswordItem.id) {
+            console.error('Invalid selectedPasswordItem or missing ID:', selectedPasswordItem);  // Log the invalid item
+            message.error('Failed to fetch password details. Please try again.');
+            return;  // Exit the function if selectedPasswordItem is invalid
+        }
+
+        const passId = selectedPasswordItem.id;  // Get the password item's ID
+        console.log("Password ID:", passId);  // Log passId to debug
+
         try {
-            const history = await fetchHistory(record.id);
+            const history = await fetchHistory(passId);  // Fetch the history using the valid passId
             setHistoryData(history);
         } catch (error) {
             message.error('Failed to fetch history');
         }
 
-        setEditedItemName(record.itemName);
-        setEditedUserName(record.userName);
-        setEditedPassword(record.password);
-        setEditedGroup(record.groupName);
-
-        setOriginalItemName(record.itemName);
-        setOriginalUserName(record.userName);
-        setOriginalPassword(record.password);
-        setOriginalGroup(record.groupName);
+        // Update other details
+        setEditedItemName(selectedPasswordItem.itemName);
+        setEditedUserName(selectedPasswordItem.userName);
+        setEditedPassword(selectedPasswordItem.password);
+        setEditedGroup(selectedPasswordItem.groupName);
 
         setIsModalOpen(true);
     };
+
 
     const handleSaveChanges = () => {
         if (!userId) {
@@ -191,9 +198,14 @@ const handleDelete = () => {
     return (
         <div>
             <Table
-                dataSource={data}  // Use 'data' instead of 'passwordItems' from context
-                columns={columns}
-                rowKey={(record) => record.id}
+                dataSource={data}  // Data for the table
+                columns={columns}  // Columns for the table
+                rowKey={(record) => record.id}  // Unique key for each row
+                onRow={(record) => {
+                    return {
+                        onClick: () => handleMenuClick(record),  // Pass the clicked item to handleMenuClick
+                    };
+                }}
             />
 
             <Modal
