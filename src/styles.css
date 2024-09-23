@@ -49,6 +49,11 @@ code {
 ul {
   padding-inline-start: 20px;
 }
+
+.header{
+    background: url('https://i.imgur.com/GCvLquU.png') repeat;
+
+}
 /* Hide action icons by default */
 .ant-table-row .action-icon {
   visibility: hidden;
