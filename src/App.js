@@ -49,25 +49,33 @@ const App = () => {
     const [userId, setUserId] = useState(1);
     const [comment, setCommentId] = useState(null);
     const [url, setUrlId] = useState(null);
-    const [selectedKey, setSelectedKey] = useState('1');
     const [openKeys, setOpenKeys] = useState([]);
     const [filteredItems, setFilteredItems] = useState([]);
     const [isSearching, setIsSearching] = useState(false);
     const searchRef = useRef(null);
     const searchInputRef = useRef(null);
+    const initialLoggedInState = !!localStorage.getItem('token');
 
-    const [loggedIn, setLoggedIn] = useState(false);
-    const [showAuthModal, setShowAuthModal] = useState(false);
+    const [loggedIn, setLoggedIn] = useState(initialLoggedInState); // Initialize loggedIn state correctly    const [showAuthModal, setShowAuthModal] = useState(false);
     const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
     const navigate = useNavigate();
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [selectedPasswordItem, setSelectedPasswordItem] = useState(null);
     const location = useLocation();
-
+    const [selectedKey, setSelectedKey] = useState(initialLoggedInState ? '2' : 'login'); // Based on loggedIn, decide selected key
     const isLoginPage = location.pathname === '/login';
     const isRegisterPage = location.pathname === '/register';
     const isAboutUsPage = location.pathname === '/about';
+    const [showAuthModal, setShowAuthModal] = useState(false); // Add state for auth modal
 
+    // Update login status when location changes (e.g., after login/logout)
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        setLoggedIn(!!token); // Update loggedIn state based on token presence
+        if (!token) {
+            setSelectedKey('login'); // Set the selected key to 'login' when logged out
+        }
+    }, [location]);
 
     // Focus on the input when the component mounts
 
@@ -80,6 +88,21 @@ const App = () => {
     const {
         token: { colorBgContainer },
     } = theme.useToken();
+
+    // This effect will set the selected key based on the current path
+    useEffect(() => {
+        const path = location.pathname;
+
+        if (path === '/about') {
+            setSelectedKey('1'); // '1' for "About Us"
+        } else if (path === '/passwords' && loggedIn) {
+            setSelectedKey('2'); // '2' for "Passwords"
+        } else if (path === '/login') {
+            setSelectedKey('login'); // 'login' for Login page
+        } else {
+            setSelectedKey('login'); // Default to 'login' if no other match
+        }
+    }, [location, loggedIn]);
 
     // Check if the user is logged in and automatically fetch groups after login
     useEffect(() => {
@@ -179,57 +202,61 @@ const App = () => {
         setSelectedKey(key);
         setIsSearching(false);
 
-        if (key === '2') {
-            setSelectedGroupId(-1);
-            setBreadcrumbItems([
-                { title: 'Group' },
-                { title: 'All' },
-            ]);
-            fetchDataForAllGroups();
-        } else if (key.startsWith('group-')) {
-            const groupId = key.split('-')[1];
-            setSelectedGroupId(groupId);
+        if (key === 'logout') {
+            showLogoutConfirmation();
+        }
+        else {
 
-            if (groupId === '0') {
+            if (key === '2') {
                 setSelectedGroupId(-1);
                 setBreadcrumbItems([
-                    { title: 'Group' },
-                    { title: 'All' },
+                    {title: 'Group'},
+                    {title: 'All'},
                 ]);
                 fetchDataForAllGroups();
-            } else if (groupId === 'X') {
-                setSelectedGroupId(null);
-                setBreadcrumbItems([
-                    { title: 'Group' },
-                    { title: 'Unlisted' },
-                ]);
-                fetchDataForUnlistedGroups();
-            } else {
+            } else if (key.startsWith('group-')) {
+                const groupId = key.split('-')[1];
                 setSelectedGroupId(groupId);
-                const clickedGroup = groupItems.find(item => item.key === key);
 
-                if (clickedGroup) {
-                    const groupName = clickedGroup.label;
+                if (groupId === '0') {
+                    setSelectedGroupId(-1);
                     setBreadcrumbItems([
-                        { title: 'Group' },
-                        { title: groupName },
+                        {title: 'Group'},
+                        {title: 'All'},
                     ]);
-                }
+                    fetchDataForAllGroups();
+                } else if (groupId === 'X') {
+                    setSelectedGroupId(null);
+                    setBreadcrumbItems([
+                        {title: 'Group'},
+                        {title: 'Unlisted'},
+                    ]);
+                    fetchDataForUnlistedGroups();
+                } else {
+                    setSelectedGroupId(groupId);
+                    const clickedGroup = groupItems.find(item => item.key === key);
 
-                axios.get(`http://127.0.0.1:8000/api/groups/${groupId}/password-items/`, config)
-                    .then(response => {
-                        const groupName = response.data.groupName;
+                    if (clickedGroup) {
+                        const groupName = clickedGroup.label;
                         setBreadcrumbItems([
-                            { title: 'Group' },
-                            { title: groupName },
+                            {title: 'Group'},
+                            {title: groupName},
                         ]);
-                    })
-                    .catch(error => {
-                        console.error('Error fetching group details:', error);
-                    });
+                    }
+
+                    axios.get(`http://127.0.0.1:8000/api/groups/${groupId}/password-items/`, config)
+                        .then(response => {
+                            const groupName = response.data.groupName;
+                            setBreadcrumbItems([
+                                {title: 'Group'},
+                                {title: groupName},
+                            ]);
+                        })
+                        .catch(error => {
+                            console.error('Error fetching group details:', error);
+                        });
+                }
             }
-        } else if (key === 'logout') {
-            showLogoutConfirmation();
         }
     };
 
@@ -329,6 +356,7 @@ const handleLogout = () => {
     setLoggedIn(false); // Update the login state
     message.success('You have successfully logged out. See you soon..');
     setShowLogoutConfirm(false); // Close the logout confirmation modal
+    setSelectedKey('login'); // Reset selected key to 'login'
     navigate('/login'); // Redirect to the login page
 };
 

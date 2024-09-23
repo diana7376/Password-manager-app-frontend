@@ -1,9 +1,9 @@
-import axios, {token} from './axiosConfg';
+import axios from './axiosConfg';
 
 export const config = {
-    headers: { Authorization: `Bearer ${token}` }  // Correct usage of token for authorization
+    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }  // Correct usage of token for authorization
 };
-console.log("used token:", token);
+console.log(`used token: ${localStorage.getItem('token')}`);
 
 export function addPasswordItem(newItem, groupId) {
     // Create a copy of newItem to avoid directly modifying the original object
