@@ -230,20 +230,18 @@ export function dataFetching(groupId, setData) {
         });
 }
 
-
-
-
-
 export const fetchHistory = async (passwordId) => {
     try {
-        const response = await fetch(`/api/password-history/${passwordId}`); // Include passwordId in the URL
-        if (!response.ok) {
-            throw new Error('Failed to fetch history');
-        }
-        return await response.json();
+        const response = await axios.get(`http://127.0.0.1:8000/api/password-history/${passwordId}/`);
+        console.log('History response:', response.data.passwords); // Log the successful response
+        return response.data.passwords;
     } catch (error) {
-        console.error('Error fetching history:', error);
+        console.error('Error fetching history:', error.response || error); // Log the entire error object
+        if (error.response && error.response.data) {
+            message.error(`Error: ${error.response.data.message || 'Failed to fetch history'}`);
+        } else {
+            message.error('Failed to fetch history');
+        }
         throw error;
     }
 };
-
