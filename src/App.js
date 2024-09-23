@@ -114,11 +114,10 @@ const App = () => {
                 .get('http://127.0.0.1:8000/api/groups/', { headers: { Authorization: `Bearer ${token}` } })
                 .then((response) => {
                     if (Array.isArray(response.data)) {
-                        const allGroup = getItem('All', 'group-0');
+
                         const unlistedGroup = getItem('Unlisted', 'group-X');
 
                         const fetchedGroups = [
-                            allGroup,
                             unlistedGroup,
                             ...response.data.map((group) => getItem(group.groupName, `group-${group.groupId}`))
                         ];
@@ -218,14 +217,7 @@ const App = () => {
                 const groupId = key.split('-')[1];
                 setSelectedGroupId(groupId);
 
-                if (groupId === '0') {
-                    setSelectedGroupId(-1);
-                    setBreadcrumbItems([
-                        {title: 'Group'},
-                        {title: 'All'},
-                    ]);
-                    fetchDataForAllGroups();
-                } else if (groupId === 'X') {
+                if (groupId === 'X') {
                     setSelectedGroupId(null);
                     setBreadcrumbItems([
                         {title: 'Group'},
@@ -244,17 +236,7 @@ const App = () => {
                         ]);
                     }
 
-                    axios.get(`http://127.0.0.1:8000/api/groups/${groupId}/password-items/`, config)
-                        .then(response => {
-                            const groupName = response.data.groupName;
-                            setBreadcrumbItems([
-                                {title: 'Group'},
-                                {title: groupName},
-                            ]);
-                        })
-                        .catch(error => {
-                            console.error('Error fetching group details:', error);
-                        });
+
                 }
             }
         }
