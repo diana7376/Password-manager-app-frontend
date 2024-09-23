@@ -49,7 +49,7 @@ const App = () => {
     const [userId, setUserId] = useState(1);
     const [comment, setCommentId] = useState(null);
     const [url, setUrlId] = useState(null);
-    const [selectedKey, setSelectedKey] = useState('2');
+    const [selectedKey, setSelectedKey] = useState('1');
     const [openKeys, setOpenKeys] = useState([]);
     const [filteredItems, setFilteredItems] = useState([]);
     const [isSearching, setIsSearching] = useState(false);
