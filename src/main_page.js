@@ -41,6 +41,12 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
     const [loading, setLoading] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);  // State to track the current page number
 
+    // Pagination state for the history table
+    const [historyCurrentPage, setHistoryCurrentPage] = useState(1);
+    const [historyNextPage, setHistoryNextPage] = useState(null);
+    const [historyPrevPage, setHistoryPrevPage] = useState(null);
+    const [historyLoading, setHistoryLoading] = useState(false);  // History loading state
+
 
 
     // Function to fetch data based on the group
@@ -97,8 +103,30 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
         setIsSaveButtonDisabled(isUnchanged);
     }, [editedItemName, editedUserName, editedPassword, editedGroup, editedComment, editedUrl, originalItemName, originalUserName, originalPassword, originalGroup, originalComment, originalUrl]);
 
+    // Fetch history data for a specific password item with pagination
+    const fetchHistoryData = (passId, url = null, page = 1) => {
+        setHistoryLoading(true);
+        let endpoint = url || `http://127.0.0.1:8000/api/password-history/${passId}/?page=${page}`;
+
+        axios.get(endpoint)
+            .then((response) => {
+                const data = response.data;
+                setHistoryData(data.passwords);  // Set history data
+                setHistoryNextPage(data.next_page);  // Set next page
+                setHistoryPrevPage(data.previous_page);  // Set previous page
+                setHistoryCurrentPage(page);  // Update current history page
+            })
+            .catch((error) => {
+                console.error('Error fetching history data:', error);
+            })
+            .finally(() => {
+                setHistoryLoading(false);
+            });
+    };
+
     const handleMenuClick = async (record) => {
         setClickedRow(record);
+        fetchHistoryData(record.passId);  // Fetch first page of history when opening the modal
         try {
             const history = await fetchHistory(record.passId);
             // Ensure that if no history exists, historyData is set to an empty array
@@ -331,11 +359,42 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
                     </TabPane>
                     <TabPane tab="History" key="2">
                         {historyData.length > 0 ? (
-                            <Table
-                                columns={history_columns}
-                                dataSource={historyData}
-                                rowKey={(record) => record.updatedAt}
-                            />
+                            <div>
+                                <Table
+                                    columns={history_columns}
+                                    dataSource={historyData}
+                                    rowKey={(record) => record.updatedAt}
+                                    loading={historyLoading}
+                                    pagination={false}
+                                />
+                                <div style={{ display: 'flex', justifyContent: 'center', marginTop: 16 }}>
+                                    <Button
+                                        onClick={() => fetchHistoryData(clickedRow.passId, historyPrevPage, historyCurrentPage - 1)}
+                                        disabled={!historyPrevPage}
+                                        style={{ marginRight: 8 }}
+                                    >
+                                        Previous Page
+                                    </Button>
+                                    <div style={{
+                                        width: '40px',
+                                        height: '40px',
+                                        lineHeight: '40px',
+                                        textAlign: 'center',
+                                        border: '1px solid #d9d9d9',
+                                        borderRadius: '4px',
+                                        margin: '0 12px',
+                                        fontSize: '16px',
+                                    }}>
+                                        {historyCurrentPage}
+                                    </div>
+                                    <Button
+                                        onClick={() => fetchHistoryData(clickedRow.passId, historyNextPage, historyCurrentPage + 1)}
+                                        disabled={!historyNextPage}
+                                    >
+                                        Next Page
+                                    </Button>
+                                </div>
+                            </div>
                         ) : (
                             <p>No history available.</p>
                         )}
