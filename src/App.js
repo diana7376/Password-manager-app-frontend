@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 
-import { Breadcrumb, Layout, Menu, theme, Input, Button, Modal, message } from 'antd';
+import {Breadcrumb, Layout, Menu, theme, Input, Button, Modal, message, Flex} from 'antd';
 import {
     DesktopOutlined,
     PieChartOutlined,
@@ -15,502 +15,528 @@ import MainPage from './main_page';
 import SaveNewPassword from './save_new_password';
 import { dataFetching, config, fetchAllPasswordItems, fetchUnlistedPasswordItems } from './crud_operation';
 import './styles.css';
-import {Navigate, Route, Routes, useNavigate} from 'react-router-dom';
+import {Navigate, Route, Routes, useNavigate, BrowserRouter} from 'react-router-dom';
 import Login from './authorisation/login';
 import Register from './authorisation/register';
 import PrivateRoute from './authorisation/PrivateRoute';
 import AboutUs from "./aboutUs";
+import AboutUsPage from "./pages/AboutUsPage";
 import { useLocation } from 'react-router-dom';
 import { PasswordProvider } from './PasswordContext';
+import SidebarMenu from './components/SidebarMenu'
+import LoginPage from './pages/LoginPage'
+import RegistrationPage from './pages/RegistrationPage'
+import {useAppContext} from "./AppContext";
+import PasswordItemsPage from "./pages/PasswordItemsPage";
 
 const { Search } = Input;
 const { Header, Content, Footer, Sider } = Layout;
 
-const suffix = (
-    <AudioOutlined style={{ fontSize: 16, color: '#1677ff' }} />
-);
-
-
-
-
-function getItem(label, key, icon, children) {
-    return {
-        key,
-        icon,
-        children,
-        label,
-    };
-}
+// const suffix = (
+//     <AudioOutlined style={{ fontSize: 16, color: '#1677ff' }} />
+// );
+//
+//
+//
+//
+// function getItem(label, key, icon, children) {
+//     return {
+//         key,
+//         icon,
+//         children,
+//         label,
+//     };
+// }
 
 const App = () => {
-    const [collapsed, setCollapsed] = useState(false);
-    const [passwordItems, setPasswordItems] = useState([]);
-    const [groupItems, setGroupItems] = useState([]);
-    const [selectedGroupId, setSelectedGroupId] = useState(-1);
-    const [userId, setUserId] = useState(1);
-    const [comment, setCommentId] = useState(null);
-    const [url, setUrlId] = useState(null);
-    const [openKeys, setOpenKeys] = useState([]);
-    const [filteredItems, setFilteredItems] = useState([]);
-    const [isSearching, setIsSearching] = useState(false);
-    const searchRef = useRef(null);
-    const searchInputRef = useRef(null);
-    const initialLoggedInState = !!localStorage.getItem('token');
-
-    const [loggedIn, setLoggedIn] = useState(initialLoggedInState); // Initialize loggedIn state correctly    const [showAuthModal, setShowAuthModal] = useState(false);
-    const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-    const navigate = useNavigate();
-    const [isModalVisible, setIsModalVisible] = useState(false);
-    const [selectedPasswordItem, setSelectedPasswordItem] = useState(null);
-    const location = useLocation();
-    const [selectedKey, setSelectedKey] = useState(initialLoggedInState ? '2' : 'login'); // Based on loggedIn, decide selected key
-    const isLoginPage = location.pathname === '/login';
-    const isRegisterPage = location.pathname === '/register';
-    const isAboutUsPage = location.pathname === '/about';
-    const [showAuthModal, setShowAuthModal] = useState(false); // Add state for auth modal
-
-
-
-
-    // Update login status when location changes (e.g., after login/logout)
-    useEffect(() => {
-        const token = localStorage.getItem('token');
-        setLoggedIn(!!token); // Update loggedIn state based on token presence
-        if (!token) {
-            setSelectedKey('login'); // Set the selected key to 'login' when logged out
-        }
-    }, [location]);
-
-    // Focus on the input when the component mounts
-
-    useEffect(() => {
-        if (searchInputRef.current || (loggedIn && !isLoginPage && !isRegisterPage && !isAboutUsPage && searchInputRef.current)) {
-            searchInputRef.current.focus();
-        }
-    }, [selectedGroupId,loggedIn, isLoginPage, isRegisterPage, isAboutUsPage]);
-
-
-
-    const {
-        token: { colorBgContainer },
-    } = theme.useToken();
-
-    // This effect will set the selected key based on the current path
-    useEffect(() => {
-        const path = location.pathname;
-
-        if (path === '/about') {
-            setSelectedKey('1'); // '1' for "About Us"
-        } else if (path === '/passwords' && loggedIn) {
-            setSelectedKey('2'); // '2' for "Passwords"
-        } else if (path === '/login') {
-            setSelectedKey('login'); // 'login' for Login page
-        } else {
-            setSelectedKey('login'); // Default to 'login' if no other match
-        }
-    }, [location, loggedIn]);
-
-    // Check if the user is logged in and automatically fetch groups after login
-    useEffect(() => {
-        const token = localStorage.getItem('token');
-        setLoggedIn(!!token);
-
-        if (token) {
-            axios
-                .get('http://127.0.0.1:8000/api/groups/', { headers: { Authorization: `Bearer ${token}` } })
-                .then((response) => {
-                    if (Array.isArray(response.data)) {
-
-                        const unlistedGroup = getItem('Unlisted', 'group-X');
-
-                        const fetchedGroups = [
-                            unlistedGroup,
-                            ...response.data.map((group) => getItem(group.groupName, `group-${group.groupId}`))
-                        ];
-
-                        setGroupItems(fetchedGroups);
-                    } else {
-                        console.error('API response is not an array', response.data);
-                        setGroupItems([]);
-                    }
-                })
-                .catch((error) => {
-                    console.error('Error fetching groups:', error);
-                    setGroupItems([]);
-                });
-        }
-    }, [loggedIn]);
-
-    const fetchData = () => {
-        if (selectedGroupId === -1) {
-            fetchAllPasswordItems(setPasswordItems);
-        } else if (selectedGroupId) {
-            dataFetching(selectedGroupId, setPasswordItems);
-        } else {
-            fetchUnlistedPasswordItems(setPasswordItems);
-        }
-    };
-
-
-
-    useEffect(() => {
-        fetchData();
-    }, [selectedGroupId]);
-
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (searchRef.current && !searchRef.current.contains(event.target)) {
-                setIsSearching(false);
-                setFilteredItems([]);
-            }
-        };
-
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
-
-
-
-    const handleMenuClick = (key) => {
-        setSelectedKey(key);
-        setIsSearching(false);
-
-        if (key === 'logout') {
-            showLogoutConfirmation();
-        }
-        else {
-
-            if (key === '2') {
-                setSelectedGroupId(-1);
-                setBreadcrumbItems([
-                    {title: 'Group'},
-                    {title: 'All'},
-                ]);
-                fetchDataForAllGroups();
-            } else if (key.startsWith('group-')) {
-                const groupId = key.split('-')[1];
-                setSelectedGroupId(groupId);
-
-                if (groupId === 'X') {
-                    setSelectedGroupId(null);
-                    setBreadcrumbItems([
-                        {title: 'Group'},
-                        {title: 'Unlisted'},
-                    ]);
-                    fetchDataForUnlistedGroups();
-                } else {
-                    setSelectedGroupId(groupId);
-                    const clickedGroup = groupItems.find(item => item.key === key);
-
-                    if (clickedGroup) {
-                        const groupName = clickedGroup.label;
-                        setBreadcrumbItems([
-                            {title: 'Group'},
-                            {title: groupName},
-                        ]);
-                    }
-
-
-                }
-            }
-        }
-    };
-
-    const fetchDataForAllGroups = () => {
-        axios
-            .get('http://127.0.0.1:8000/api/password-items/', config)
-            .then((response) => {
-                setPasswordItems(response.data.passwords);
-            })
-            .catch((error) => {
-                console.error('Error fetching all password items:', error);
-            });
-    };
-
-    const fetchDataForUnlistedGroups = () => {
-        axios
-            .get('http://127.0.0.1:8000/api/password-items/unlisted/', config)
-            .then((response) => {
-                setPasswordItems(response.data.passwords);
-            })
-            .catch((error) => {
-                console.error('Error fetching unlisted password items:', error);
-            });
-    };
-
-    const onOpenChange = (keys) => {
-        setOpenKeys(keys);
-    };
-
-    const groupMenuItems = [
-        {
-            label: 'About us',
-            key: '1',
-            icon: <DesktopOutlined />,
-            onClick: () => navigate('/about'),
-        },
-        ...(loggedIn ? [
-            {
-                label: 'Passwords',
-                key: '2',
-                icon: <PieChartOutlined />,
-                onClick: () => navigate('/passwords'),
-            },
-            {
-                label: 'Groups',
-                key: 'sub1',
-                icon: <UserOutlined />,
-                children: groupItems.length > 0 ? groupItems : [{ label: 'Loading...', key: 'loading' }],
-            }
-        ] : []),
-        {
-        label: loggedIn ? 'Logout' : 'Login',
-        key: loggedIn ? 'logout' : 'login',
-        icon: loggedIn ? <LogoutOutlined /> : <LoginOutlined />,
-        onClick: () => loggedIn ? showLogoutConfirmation() : navigate('/login')  // Show confirmation modal for logout
-    }
-];
-
-
-    const [breadcrumbItems, setBreadcrumbItems] = useState([
-        { title: 'Group' },
-        { title: 'All' },
-    ]);
-
-    const onMenuSelect = ({ key }) => {
-        handleMenuClick(key);
-    };
-
-    const handleLogin = () => {
-        navigate('/login');
-        setShowAuthModal(false);
-    };
-
-    const handleRegister = () => {
-        navigate('/register');
-        setShowAuthModal(false);
-    };
-    // User menu items for the bottom of the sidebar
-    const userItem = [getItem('User', '3', <DesktopOutlined />)];
-
-    const onPasswordAdd = (newItem) => {
-        setPasswordItems((prevItems) => [...prevItems, newItem]);  // Add the new password to the current state
-    };
-
-    useEffect(() => {
-        if (selectedKey === '2') {
-            fetchDataForAllGroups(); // Fetch all password items for the default "Passwords" selection
-        }
-    }, [selectedKey]);
-
-const showLogoutConfirmation = () => {
-    setShowLogoutConfirm(true); // Show the logout confirmation modal
-};
-
-const handleLogout = () => {
-    localStorage.removeItem('token'); // Remove the token
-    setLoggedIn(false); // Update the login state
-    message.success('You have successfully logged out. See you soon..');
-    setShowLogoutConfirm(false); // Close the logout confirmation modal
-    setSelectedKey('login'); // Reset selected key to 'login'
-    navigate('/login'); // Redirect to the login page
-};
-
-    // Handle blur (unfocus) from the search input
-    const onSearchBlur = () => {
-        fetchData();  // Fetch normal group data when the search bar loses focus
-    };
-
-    const onSearch = (value) => {
-        const trimmedQuery = value.trim();
-        if (!trimmedQuery) {
-            fetchData();  // Clear if the query is empty
-            return;
-        }
-
-        // Set up the correct endpoint based on selected group
-        let endpoint;
-        if (selectedGroupId === -1) {
-
-            endpoint = `http://127.0.0.1:8000/api/password-items/?search=${encodeURIComponent(trimmedQuery)}`;
-        } else if (selectedGroupId === null) {
-            // Unlisted passwords
-            endpoint = `http://127.0.0.1:8000/api/groups/null/password-items/?search=${encodeURIComponent(trimmedQuery)}`;
-        } else {
-            // Specific group
-            endpoint = `http://127.0.0.1:8000/api/groups/${selectedGroupId}/password-items/?search=${encodeURIComponent(trimmedQuery)}`;
-        }
-
-        // Fetch data from the selected endpoint
-        axios.get(endpoint, config)
-            .then((response) => {
-                if (response.data && Array.isArray(response.data.passwords)) {
-                    setPasswordItems(response.data.passwords);  // Display fetched passwords
-                } else {
-                    setPasswordItems([]);  // Handle unexpected response structure
-                }
-            })
-            .catch((error) => {
-                console.error('Error during search:', error);
-            });
-    };
-
-
-const handleCancelLogout = () => {
-    setShowLogoutConfirm(false); // Close the confirmation modal without logging out
-    setSelectedKey('2');
-};
-
-    const showModal = (item) => {
-    setSelectedPasswordItem(item); // Set the selected password item
-    setIsModalVisible(true); // Show the modal
-    };
-
-    const handleCancel = () => {
-    setIsModalVisible(false); // Hide the modal
-    };
-
-    return (
-        <PasswordProvider>
-        <Layout style={{ minHeight: '100vh' }}>
-            <Sider collapsible
-                   collapsed={collapsed}
-                   onCollapse={(value) => setCollapsed(value)}>
-
-                <Menu
-                    theme="dark"
-                    mode="inline"
-                    selectedKeys={[selectedKey]}
-                    openKeys={openKeys}
-                    onClick={onMenuSelect}
-                    onOpenChange={onOpenChange}
-                    items={groupMenuItems}
-                />
-            </Sider>
-
+    return <>
+        <Layout style={{minHeight: '100vh'}}>
+            <SidebarMenu/>
             <Layout>
-                {/* Conditionally render search bar and add password button */}
-
-                {!isLoginPage && !isRegisterPage && !isAboutUsPage && loggedIn &&  (
-                <div ref={searchRef}>
-                    <Search
-                        placeholder="What are you looking for?"
-                        onSearch={onSearch}
-                        className = "custom-search-bar"
-                        onBlur={onSearchBlur}
-
-                        ref={searchInputRef}
-                    />
-                </div>
-
-                )}
-                {/* <Header style={{ padding: 0, background: colorBgContainer }} />*/}
-
-                <Content style={{ margin: '0 16px' }}>
-                    <Routes>
-                        <Route path="/login" element={<Login />} />
-                        <Route path="/register" element={<Register />} />
-                        <Route path="/about" element={<AboutUs />} />
-
-                        <Route path="/" element={<Navigate to="/about" />} />
-
-                        <Route path="/passwords" element={
-                            <PrivateRoute>
-                                <Breadcrumb style={{ margin: '16px 0' }} items={breadcrumbItems} />
-                                <MainPage
-                                    groupId={selectedGroupId}
-                                    userId={userId}
-                                    setGroupItems={setGroupItems}
-                                    passwordItems={passwordItems} // Pass down the password items
-                                    setPasswordItems={setPasswordItems}
-                                />
-                            </PrivateRoute>
-                        }
-                               exact
-                        />
-                    </Routes>
-
-
-                </Content>
-                <Footer style={{ textAlign: 'center' }}>© 2024 LockR</Footer>
+                <Routes>
+                    <Route path="/" element={<Navigate to="/about"/>}/>
+                    <Route path="/login" element={<LoginPage/>}/>
+                    <Route path="/register" element={<RegistrationPage/>}/>
+                    <Route path="/about" element={<AboutUsPage/>}/>
+                    <Route path="/passwords" element={
+                        <PrivateRoute>
+                            <PasswordItemsPage/>
+                        </PrivateRoute>
+                    } exact />
+                </Routes>
             </Layout>
-
-            {/* Plus Button at the bottom-right corner under the table */}
-            {/* Conditionally render the "Add New Password" button */}
-
-            {!isLoginPage && !isRegisterPage && !isAboutUsPage && loggedIn && (
-                <div style={{
-                    position: 'fixed',
-                    bottom: 24,
-                    right: 24,
-                    zIndex: 9999,
-                }}
-                >
-                    <SaveNewPassword
-                        groupId={selectedGroupId}
-                        userId={userId}
-                        comment={comment}
-                        url={url}
-                        onPasswordAdd={(newItem) => {
-                            setPasswordItems((prevItems) => [...prevItems, newItem]);  // Add new password to the table
-                        }}
-                        setGroupItems={setGroupItems}
-                    />
-                </div>
-
-            )}
-            <Modal
-                title="Authentication"
-                open={showAuthModal}
-                onCancel={() => setShowAuthModal(false)}
-                footer={null}
-            >
-                {loggedIn ? (
-                    <p>You are logged in.</p>
-                ) : (
-                    <div>
-                        <p>Please log in to continue.</p>
-                        <Button type="primary" onClick={handleLogin} style={{ marginRight: 8 }}>
-                            Login
-                        </Button>
-                        <Button type="default" onClick={handleRegister}>
-                            Create Account
-                        </Button>
-                    </div>
-                )}
-            </Modal>
-            <Modal
-                title="Confirm Logout"
-                visible={showLogoutConfirm}
-                onOk={handleLogout}
-                onCancel={handleCancelLogout}
-                okText="Yes"
-                cancelText="No"
-            >
-                <p>Are you sure you want to log out?</p>
-            </Modal>
-            <Modal
-                title="Password Details"
-                open={isModalVisible}
-                onCancel={handleCancel}
-                footer={null} // You can add footer actions if needed
-            >
-                {selectedPasswordItem ? (
-                    <div>
-                        <p><strong>Item Name:</strong> {selectedPasswordItem.itemName}</p>
-                        <p><strong>Username:</strong> {selectedPasswordItem.userName}</p>
-                        <p><strong>Password:</strong> {selectedPasswordItem.password}</p>
-                        <p><strong>URL:</strong> {selectedPasswordItem.url}</p>
-                        <p><strong>Comment:</strong> {selectedPasswordItem.comment}</p>
-                    </div>
-                ) : (
-                    <p>No details available</p>
-                )}
-            </Modal>
-
         </Layout>
-        </PasswordProvider>
-    );
-};
+    </>
+}
+
+//     const [collapsed, setCollapsed] = useState(false);
+//     const [passwordItems, setPasswordItems] = useState([]);
+//     const [groupItems, setGroupItems] = useState([]);
+//     const [selectedGroupId, setSelectedGroupId] = useState(-1);
+//     const [userId, setUserId] = useState(1);
+//     const [comment, setCommentId] = useState(null);
+//     const [url, setUrlId] = useState(null);
+//     const [openKeys, setOpenKeys] = useState([]);
+//     const [filteredItems, setFilteredItems] = useState([]);
+//     const [isSearching, setIsSearching] = useState(false);
+//     const searchRef = useRef(null);
+//     const searchInputRef = useRef(null);
+//     const initialLoggedInState = !!localStorage.getItem('token');
+//
+//     const [loggedIn, setLoggedIn] = useState(initialLoggedInState); // Initialize loggedIn state correctly    const [showAuthModal, setShowAuthModal] = useState(false);
+//     const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+//     const navigate = useNavigate();
+//     const [isModalVisible, setIsModalVisible] = useState(false);
+//     const [selectedPasswordItem, setSelectedPasswordItem] = useState(null);
+//     const location = useLocation();
+//     const [selectedKey, setSelectedKey] = useState(initialLoggedInState ? '2' : 'login'); // Based on loggedIn, decide selected key
+//     const isLoginPage = location.pathname === '/login';
+//     const isRegisterPage = location.pathname === '/register';
+//     const isAboutUsPage = location.pathname === '/about';
+//     const [showAuthModal, setShowAuthModal] = useState(false); // Add state for auth modal
+//
+//
+//
+//
+//     // Update login status when location changes (e.g., after login/logout)
+//     useEffect(() => {
+//         const token = localStorage.getItem('token');
+//         setLoggedIn(!!token); // Update loggedIn state based on token presence
+//         if (!token) {
+//             setSelectedKey('login'); // Set the selected key to 'login' when logged out
+//         }
+//     }, [location]);
+//
+//     // Focus on the input when the component mounts
+//
+//     useEffect(() => {
+//         if (searchInputRef.current || (loggedIn && !isLoginPage && !isRegisterPage && !isAboutUsPage && searchInputRef.current)) {
+//             searchInputRef.current.focus();
+//         }
+//     }, [selectedGroupId,loggedIn, isLoginPage, isRegisterPage, isAboutUsPage]);
+//
+//
+//
+//     const {
+//         token: { colorBgContainer },
+//     } = theme.useToken();
+//
+//     // This effect will set the selected key based on the current path
+//     useEffect(() => {
+//         const path = location.pathname;
+//
+//         if (path === '/about') {
+//             setSelectedKey('1'); // '1' for "About Us"
+//         } else if (path === '/passwords' && loggedIn) {
+//             setSelectedKey('2'); // '2' for "Passwords"
+//         } else if (path === '/login') {
+//             setSelectedKey('login'); // 'login' for Login page
+//         } else {
+//             setSelectedKey('login'); // Default to 'login' if no other match
+//         }
+//     }, [location, loggedIn]);
+//
+//     // Check if the user is logged in and automatically fetch groups after login
+//     useEffect(() => {
+//         const token = localStorage.getItem('token');
+//         setLoggedIn(!!token);
+//
+//         if (token) {
+//             axios
+//                 .get('http://127.0.0.1:8000/api/groups/', { headers: { Authorization: `Bearer ${token}` } })
+//                 .then((response) => {
+//                     if (Array.isArray(response.data)) {
+//
+//                         const unlistedGroup = getItem('Unlisted', 'group-X');
+//
+//                         const fetchedGroups = [
+//                             unlistedGroup,
+//                             ...response.data.map((group) => getItem(group.groupName, `group-${group.groupId}`))
+//                         ];
+//
+//                         setGroupItems(fetchedGroups);
+//                     } else {
+//                         console.error('API response is not an array', response.data);
+//                         setGroupItems([]);
+//                     }
+//                 })
+//                 .catch((error) => {
+//                     console.error('Error fetching groups:', error);
+//                     setGroupItems([]);
+//                 });
+//         }
+//     }, [loggedIn]);
+//
+//     const fetchData = () => {
+//         if (selectedGroupId === -1) {
+//             fetchAllPasswordItems(setPasswordItems);
+//         } else if (selectedGroupId) {
+//             dataFetching(selectedGroupId, setPasswordItems);
+//         } else {
+//             fetchUnlistedPasswordItems(setPasswordItems);
+//         }
+//     };
+//
+//
+//
+//     useEffect(() => {
+//         fetchData();
+//     }, [selectedGroupId]);
+//
+//     useEffect(() => {
+//         const handleClickOutside = (event) => {
+//             if (searchRef.current && !searchRef.current.contains(event.target)) {
+//                 setIsSearching(false);
+//                 setFilteredItems([]);
+//             }
+//         };
+//
+//         document.addEventListener('mousedown', handleClickOutside);
+//         return () => document.removeEventListener('mousedown', handleClickOutside);
+//     }, []);
+//
+//
+//
+//     const handleMenuClick = (key) => {
+//         setSelectedKey(key);
+//         setIsSearching(false);
+//
+//         if (key === 'logout') {
+//             showLogoutConfirmation();
+//         }
+//         else {
+//
+//             if (key === '2') {
+//                 setSelectedGroupId(-1);
+//                 setBreadcrumbItems([
+//                     {title: 'Group'},
+//                     {title: 'All'},
+//                 ]);
+//                 fetchDataForAllGroups();
+//             } else if (key.startsWith('group-')) {
+//                 const groupId = key.split('-')[1];
+//                 setSelectedGroupId(groupId);
+//
+//                 if (groupId === 'X') {
+//                     setSelectedGroupId(null);
+//                     setBreadcrumbItems([
+//                         {title: 'Group'},
+//                         {title: 'Unlisted'},
+//                     ]);
+//                     fetchDataForUnlistedGroups();
+//                 } else {
+//                     setSelectedGroupId(groupId);
+//                     const clickedGroup = groupItems.find(item => item.key === key);
+//
+//                     if (clickedGroup) {
+//                         const groupName = clickedGroup.label;
+//                         setBreadcrumbItems([
+//                             {title: 'Group'},
+//                             {title: groupName},
+//                         ]);
+//                     }
+//
+//
+//                 }
+//             }
+//         }
+//     };
+//
+//     const fetchDataForAllGroups = () => {
+//         axios
+//             .get('http://127.0.0.1:8000/api/password-items/', config)
+//             .then((response) => {
+//                 setPasswordItems(response.data.passwords);
+//             })
+//             .catch((error) => {
+//                 console.error('Error fetching all password items:', error);
+//             });
+//     };
+//
+//     const fetchDataForUnlistedGroups = () => {
+//         axios
+//             .get('http://127.0.0.1:8000/api/password-items/unlisted/', config)
+//             .then((response) => {
+//                 setPasswordItems(response.data.passwords);
+//             })
+//             .catch((error) => {
+//                 console.error('Error fetching unlisted password items:', error);
+//             });
+//     };
+//
+//     const onOpenChange = (keys) => {
+//         setOpenKeys(keys);
+//     };
+//
+//     const groupMenuItems = [
+//         {
+//             label: 'About us',
+//             key: '1',
+//             icon: <DesktopOutlined />,
+//             onClick: () => navigate('/about'),
+//         },
+//         ...(loggedIn ? [
+//             {
+//                 label: 'Passwords',
+//                 key: '2',
+//                 icon: <PieChartOutlined />,
+//                 onClick: () => navigate('/passwords'),
+//             },
+//             {
+//                 label: 'Groups',
+//                 key: 'sub1',
+//                 icon: <UserOutlined />,
+//                 children: groupItems.length > 0 ? groupItems : [{ label: 'Loading...', key: 'loading' }],
+//             }
+//         ] : []),
+//         {
+//         label: loggedIn ? 'Logout' : 'Login',
+//         key: loggedIn ? 'logout' : 'login',
+//         icon: loggedIn ? <LogoutOutlined /> : <LoginOutlined />,
+//         onClick: () => loggedIn ? showLogoutConfirmation() : navigate('/login')  // Show confirmation modal for logout
+//     }
+// ];
+//
+//
+//     const [breadcrumbItems, setBreadcrumbItems] = useState([
+//         { title: 'Group' },
+//         { title: 'All' },
+//     ]);
+//
+//     const onMenuSelect = ({ key }) => {
+//         handleMenuClick(key);
+//     };
+//
+//     const handleLogin = () => {
+//         navigate('/login');
+//         setShowAuthModal(false);
+//     };
+//
+//     const handleRegister = () => {
+//         navigate('/register');
+//         setShowAuthModal(false);
+//     };
+//     // User menu items for the bottom of the sidebar
+//     const userItem = [getItem('User', '3', <DesktopOutlined />)];
+//
+//     const onPasswordAdd = (newItem) => {
+//         setPasswordItems((prevItems) => [...prevItems, newItem]);  // Add the new password to the current state
+//     };
+//
+//     useEffect(() => {
+//         if (selectedKey === '2') {
+//             fetchDataForAllGroups(); // Fetch all password items for the default "Passwords" selection
+//         }
+//     }, [selectedKey]);
+//
+// const showLogoutConfirmation = () => {
+//     setShowLogoutConfirm(true); // Show the logout confirmation modal
+// };
+//
+// const handleLogout = () => {
+//     localStorage.removeItem('token'); // Remove the token
+//     setLoggedIn(false); // Update the login state
+//     message.success('You have successfully logged out. See you soon..');
+//     setShowLogoutConfirm(false); // Close the logout confirmation modal
+//     setSelectedKey('login'); // Reset selected key to 'login'
+//     navigate('/login'); // Redirect to the login page
+// };
+//
+//     // Handle blur (unfocus) from the search input
+//     const onSearchBlur = () => {
+//         fetchData();  // Fetch normal group data when the search bar loses focus
+//     };
+//
+//     const onSearch = (value) => {
+//         const trimmedQuery = value.trim();
+//         if (!trimmedQuery) {
+//             fetchData();  // Clear if the query is empty
+//             return;
+//         }
+//
+//         // Set up the correct endpoint based on selected group
+//         let endpoint;
+//         if (selectedGroupId === -1) {
+//
+//             endpoint = `http://127.0.0.1:8000/api/password-items/?search=${encodeURIComponent(trimmedQuery)}`;
+//         } else if (selectedGroupId === null) {
+//             // Unlisted passwords
+//             endpoint = `http://127.0.0.1:8000/api/groups/null/password-items/?search=${encodeURIComponent(trimmedQuery)}`;
+//         } else {
+//             // Specific group
+//             endpoint = `http://127.0.0.1:8000/api/groups/${selectedGroupId}/password-items/?search=${encodeURIComponent(trimmedQuery)}`;
+//         }
+//
+//         // Fetch data from the selected endpoint
+//         axios.get(endpoint, config)
+//             .then((response) => {
+//                 if (response.data && Array.isArray(response.data.passwords)) {
+//                     setPasswordItems(response.data.passwords);  // Display fetched passwords
+//                 } else {
+//                     setPasswordItems([]);  // Handle unexpected response structure
+//                 }
+//             })
+//             .catch((error) => {
+//                 console.error('Error during search:', error);
+//             });
+//     };
+//
+//
+// const handleCancelLogout = () => {
+//     setShowLogoutConfirm(false); // Close the confirmation modal without logging out
+//     setSelectedKey('2');
+// };
+//
+//     const showModal = (item) => {
+//     setSelectedPasswordItem(item); // Set the selected password item
+//     setIsModalVisible(true); // Show the modal
+//     };
+//
+//     const handleCancel = () => {
+//     setIsModalVisible(false); // Hide the modal
+//     };
+//
+//     return (
+//         <PasswordProvider>
+//         <Layout style={{ minHeight: '100vh' }}>
+//             <Sider collapsible
+//                    collapsed={collapsed}
+//                    onCollapse={(value) => setCollapsed(value)}>
+//
+//                 <Menu
+//                     theme="dark"
+//                     mode="inline"
+//                     selectedKeys={[selectedKey]}
+//                     openKeys={openKeys}
+//                     onClick={onMenuSelect}
+//                     onOpenChange={onOpenChange}
+//                     items={groupMenuItems}
+//                 />
+//             </Sider>
+//
+//             <Layout>
+//                 {/* Conditionally render search bar and add password button */}
+//
+//                 {!isLoginPage && !isRegisterPage && !isAboutUsPage && loggedIn &&  (
+//                 <div ref={searchRef}>
+//                     <Search
+//                         placeholder="What are you looking for?"
+//                         onSearch={onSearch}
+//                         className = "custom-search-bar"
+//                         onBlur={onSearchBlur}
+//
+//                         ref={searchInputRef}
+//                     />
+//                 </div>
+//
+//                 )}
+//                 {/* <Header style={{ padding: 0, background: colorBgContainer }} />*/}
+//
+//                 <Content style={{ margin: '0 16px' }}>
+//                     <Routes>
+//                         <Route path="/login" element={<Login />} />
+//                         <Route path="/register" element={<Register />} />
+//                         <Route path="/about" element={<AboutUs />} />
+//
+//                         <Route path="/" element={<Navigate to="/about" />} />
+//
+//                         <Route path="/passwords" element={
+//                             <PrivateRoute>
+//                                 <Breadcrumb style={{ margin: '16px 0' }} items={breadcrumbItems} />
+//                                 <MainPage
+//                                     groupId={selectedGroupId}
+//                                     userId={userId}
+//                                     setGroupItems={setGroupItems}
+//                                     passwordItems={passwordItems} // Pass down the password items
+//                                     setPasswordItems={setPasswordItems}
+//                                 />
+//                             </PrivateRoute>
+//                         }
+//                                exact
+//                         />
+//                     </Routes>
+//
+//
+//                 </Content>
+//                 <Footer style={{ textAlign: 'center' }}>© 2024 LockR</Footer>
+//             </Layout>
+//
+//             {/* Plus Button at the bottom-right corner under the table */}
+//             {/* Conditionally render the "Add New Password" button */}
+//
+//             {!isLoginPage && !isRegisterPage && !isAboutUsPage && loggedIn && (
+//                 <div style={{
+//                     position: 'fixed',
+//                     bottom: 24,
+//                     right: 24,
+//                     zIndex: 9999,
+//                 }}
+//                 >
+//                     <SaveNewPassword
+//                         groupId={selectedGroupId}
+//                         userId={userId}
+//                         comment={comment}
+//                         url={url}
+//                         onPasswordAdd={(newItem) => {
+//                             setPasswordItems((prevItems) => [...prevItems, newItem]);  // Add new password to the table
+//                         }}
+//                         setGroupItems={setGroupItems}
+//                     />
+//                 </div>
+//
+//             )}
+//             <Modal
+//                 title="Authentication"
+//                 open={showAuthModal}
+//                 onCancel={() => setShowAuthModal(false)}
+//                 footer={null}
+//             >
+//                 {loggedIn ? (
+//                     <p>You are logged in.</p>
+//                 ) : (
+//                     <div>
+//                         <p>Please log in to continue.</p>
+//                         <Button type="primary" onClick={handleLogin} style={{ marginRight: 8 }}>
+//                             Login
+//                         </Button>
+//                         <Button type="default" onClick={handleRegister}>
+//                             Create Account
+//                         </Button>
+//                     </div>
+//                 )}
+//             </Modal>
+//             <Modal
+//                 title="Confirm Logout"
+//                 visible={showLogoutConfirm}
+//                 onOk={handleLogout}
+//                 onCancel={handleCancelLogout}
+//                 okText="Yes"
+//                 cancelText="No"
+//             >
+//                 <p>Are you sure you want to log out?</p>
+//             </Modal>
+//             <Modal
+//                 title="Password Details"
+//                 open={isModalVisible}
+//                 onCancel={handleCancel}
+//                 footer={null} // You can add footer actions if needed
+//             >
+//                 {selectedPasswordItem ? (
+//                     <div>
+//                         <p><strong>Item Name:</strong> {selectedPasswordItem.itemName}</p>
+//                         <p><strong>Username:</strong> {selectedPasswordItem.userName}</p>
+//                         <p><strong>Password:</strong> {selectedPasswordItem.password}</p>
+//                         <p><strong>URL:</strong> {selectedPasswordItem.url}</p>
+//                         <p><strong>Comment:</strong> {selectedPasswordItem.comment}</p>
+//                     </div>
+//                 ) : (
+//                     <p>No details available</p>
+//                 )}
+//             </Modal>
+//
+//         </Layout>
+//         </PasswordProvider>
+//     );
+// };
 
 export default App;

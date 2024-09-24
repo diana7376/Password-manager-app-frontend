@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { PlusOutlined, UserOutlined, EyeInvisibleOutlined, EyeTwoTone,RollbackOutlined  } from '@ant-design/icons';
-import { Button, Tooltip, Modal, Input, Select, message, Space } from 'antd';
+import { Button, Tooltip, Modal, Input, Select, message, } from 'antd';
 import { addPasswordItem } from './crud_operation';
 import axios from './axiosConfg';
 import { usePasswordContext } from './PasswordContext';
 import './styles.css';
 const { Option } = Select;
 
-const SaveNewPassword = ({ groupId, userId, comment, url, onPasswordAdd, setGroupItems }) => {
+const SaveNewPassword = ({ userId = 1, onPasswordAdd, setGroupItems }) => {
     const [open, setOpen] = useState(false);
     const [fieldName, setFieldName] = useState('');
     const [username, setUsername] = useState('');

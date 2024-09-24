@@ -1,10 +1,11 @@
 import axios from 'axios';
 import { message } from 'antd';
 import { useNavigate } from 'react-router-dom';
+import {BASE_URL} from "./constants";
 
 // Create an Axios instance
 const axiosInstance = axios.create({
-    baseURL: 'http://127.0.0.1:8000/api/', // Your backend URL
+    baseURL: BASE_URL, // Your backend URL
 });
 
 // Interceptor to add token to headers
