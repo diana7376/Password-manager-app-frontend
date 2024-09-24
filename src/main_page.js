@@ -208,7 +208,7 @@ const MainPage = ({ groupId, userId, setGroupItems,passwordItems,setPasswordItem
     return (
         <div>
             <Table
-                dataSource={passwordItems}  // Use 'data' instead of 'passwordItems' from context
+                dataSource={passwordItems}
                 columns={columns}
                 rowKey={(record) => record.passId}
             />

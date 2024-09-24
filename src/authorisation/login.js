@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from '../axiosConfg';
+import axios from 'axios';
 import { EyeInvisibleOutlined, EyeOutlined } from '@ant-design/icons';
 import { message } from 'antd';
 import './login.css';
+import {URLS} from "../apiConstants";
 
 const Login = ({ onLogout }) => {
     const [username, setUsername] = useState('');
@@ -16,7 +17,7 @@ const Login = ({ onLogout }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        axios.post('/token/', { username, password })
+        axios.post(URLS.LOGIN, { username, password })
             .then((response) => {
                 localStorage.setItem('token', response.data.access);
                 message.success('Login successful! Welcome...');

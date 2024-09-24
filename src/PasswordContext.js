@@ -1,7 +1,7 @@
 import React, { createContext, useState, useContext } from 'react';
-import axios from './axiosConfg';
+import axios from 'axios';
 import { config } from './crud_operation';
-import { message } from 'antd';
+import {URLS} from "./apiConstants";
 
 const PasswordContext = createContext();
 
@@ -10,7 +10,7 @@ export const PasswordProvider = ({ children }) => {
 
     // Fetch passwords from the API
     const fetchPasswords = () => {
-        axios.get('http://127.0.0.1:8000/api/password-items/', config)
+        axios.get(URLS.ALL_PASSWORDS, config)
             .then(response => {
                 if (Array.isArray(response.data.passwords)) {
                     setPasswordItems(response.data.passwords);  // Update context state with fresh data

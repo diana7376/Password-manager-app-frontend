@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { PlusOutlined, UserOutlined, EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
 import { Button, Tooltip, Modal, Input, Select, message } from 'antd';
 import { addPasswordItem } from './crud_operation';
-import axios from './axiosConfg';
+import axios from 'axios';
 import { usePasswordContext } from './PasswordContext';
+import {URLS} from "./apiConstants";
 
 const { Option } = Select;
 
@@ -19,7 +20,7 @@ const SaveNewPassword = ({ groupId, userId, comment, url, onPasswordAdd,  setGro
     const { addPassword } = usePasswordContext();
 
     useEffect(() => {
-        axios.get('http://127.0.0.1:8000/api/groups/')
+        axios.get(URLS.GROUP)
             .then(response => {
                 setGroupOptions(response.data);
             })
@@ -36,7 +37,7 @@ const SaveNewPassword = ({ groupId, userId, comment, url, onPasswordAdd,  setGro
         let groupIdToUse = selectedGroup;
 
         if (newGroupName) {
-            axios.post('http://127.0.0.1:8000/api/groups/', { groupName: newGroupName, userId: userId })
+            axios.post(URLS.GROUP, { groupName: newGroupName, userId: userId })
                 .then(response => {
                     groupIdToUse = response.data.groupId;
                     setGroupItems(prev => [...prev, { key: `group-${groupIdToUse}`, label: newGroupName }]);  // Update the sidebar with the new group
@@ -79,7 +80,7 @@ const SaveNewPassword = ({ groupId, userId, comment, url, onPasswordAdd,  setGro
     };
 
     const generatePassword = () => {
-        axios.post('http://127.0.0.1:8000/api/password-items/generate/', { /* any necessary payload */ })
+        axios.post(URLS.GENERATE_PASSWORD)
             .then(response => {
                 // Log the entire response to check its structure
                 console.log('Generated password response:', response);

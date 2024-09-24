@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from '../axiosConfg';
+import axios from 'axios';
 import { message } from 'antd';
 import { EyeInvisibleOutlined, EyeOutlined } from '@ant-design/icons'; // Import icons
 
 import './login.css';
+import {URLS} from "../apiConstants";
 
 const Register = ({ onLogout }) => {
     const [username, setUsername] = useState('');
@@ -26,7 +27,7 @@ const Register = ({ onLogout }) => {
         }
 
         // Registration request
-        axios.post('/register/', {
+        axios.post(URLS.REGISTER, {
             username,
             email,
             password,

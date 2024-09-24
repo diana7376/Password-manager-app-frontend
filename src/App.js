@@ -9,7 +9,7 @@ import {
     LogoutOutlined,
     LoginOutlined
 } from '@ant-design/icons';
-import axios from './axiosConfg';
+import axios from 'axios';
 import fuzzysort from 'fuzzysort';
 import MainPage from './main_page';
 import SaveNewPassword from './save_new_password';
@@ -22,6 +22,7 @@ import PrivateRoute from './authorisation/PrivateRoute';
 import AboutUs from "./aboutUs";
 import { useLocation } from 'react-router-dom';
 import { PasswordProvider } from './PasswordContext';
+import {URLS} from "./apiConstants";
 
 const { Search } = Input;
 const { Header, Content, Footer, Sider } = Layout;
@@ -88,7 +89,7 @@ const App = () => {
 
         if (token) {
             axios
-                .get('http://127.0.0.1:8000/api/groups/', { headers: { Authorization: `Bearer ${token}` } })
+                .get(URLS.GROUP, { headers: { Authorization: `Bearer ${token}` } })
                 .then((response) => {
                     if (Array.isArray(response.data)) {
                         const allGroup = getItem('All', 'group-0');
@@ -216,7 +217,7 @@ const App = () => {
                     ]);
                 }
 
-                axios.get(`http://127.0.0.1:8000/api/groups/${groupId}/password-items/`, config)
+                axios.get(URLS.PASSWORD_FROM_GROUP(groupId), config)
                     .then(response => {
                         const groupName = response.data.groupName;
                         setBreadcrumbItems([
@@ -235,7 +236,7 @@ const App = () => {
 
     const fetchDataForAllGroups = () => {
         axios
-            .get('http://127.0.0.1:8000/api/password-items/', config)
+            .get(URLS.ALL_PASSWORDS, config)
             .then((response) => {
                 setPasswordItems(response.data.passwords);
             })
@@ -246,7 +247,7 @@ const App = () => {
 
     const fetchDataForUnlistedGroups = () => {
         axios
-            .get('http://127.0.0.1:8000/api/password-items/unlisted/', config)
+            .get(URLS.PASSWORD_GROUP_UNLISTED, config)
             .then((response) => {
                 setPasswordItems(response.data.passwords);
             })

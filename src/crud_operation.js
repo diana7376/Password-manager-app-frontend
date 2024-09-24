@@ -1,4 +1,6 @@
-import axios, {token} from './axiosConfg';
+import axiosInstance, { token } from './axiosConfg';
+import {URLS} from "./apiConstants";
+import axios from "axios";
 
 export const config = {
     headers: { Authorization: `Bearer ${token}` }  // Correct usage of token for authorization
@@ -15,8 +17,8 @@ export function addPasswordItem(newItem, groupId) {
     }
 
     const url = groupId === null || groupId === 'null'
-        ? 'http://127.0.0.1:8000/api/password-items/'
-        : `http://127.0.0.1:8000/api/groups/${groupId}/password-items/`;
+        ? URLS.ALL_PASSWORDS
+        : URLS.PASSWORD_FROM_GROUP(groupId);
 
     return axios.post(url, payload, config)
         .then(response => {
@@ -30,23 +32,21 @@ export function addPasswordItem(newItem, groupId) {
 }
 
 // Helper function to fetch a password item by its ID
-export const fetchPasswordById = (passId,groupId) => {
-    return axios.get(`http://127.0.0.1:8000/api/groups/${groupId}/password-items/${passId}/`, config)
-        .then(response => {
-            // Return the decrypted password item
-            return response.data;
-        })
+export function fetchPasswordById(passId, groupId) {
+    const url = URLS.PASSWORD_BY_ID(groupId, passId); // Dynamically build the URL
+    return axiosInstance.get(url)
+        .then(response => response.data)
         .catch(error => {
             console.error('Error fetching password by ID:', error);
             throw error;
         });
-};
+}
 
 export const updatePasswordItem = (passId, groupId, updatedData, setData) => {
     // Adjust URL for unlisted items
     const url = (groupId === null || groupId === 'null' || groupId === 0)
-        ? `http://127.0.0.1:8000/api/password-items/${passId}/`  // Use a different endpoint for unlisted items
-        : `http://127.0.0.1:8000/api/groups/${groupId}/password-items/${passId}/`;
+        ? URLS.PASSWORD_NO_GROUP(passId)
+        : URLS.PASSWORD_BY_ID(passId,groupId);
 
     // Remove the groupId from the data if it's for unlisted items
     const dataToSend = { ...updatedData };
@@ -93,7 +93,7 @@ export const updatePasswordItem = (passId, groupId, updatedData, setData) => {
 };
 
 function deleteGroup(groupId, setGroupItems) {
-    axios.delete(`http://127.0.0.1:8000/api/groups/${groupId}/`, config)
+    axios.delete(URLS.GROUP_BY_ID(groupId), config)
         .then((response) => {
             if (response.status === 204) {
                 console.log(`Group ${groupId} deleted successfully`);
@@ -114,7 +114,7 @@ function deleteGroup(groupId, setGroupItems) {
 
 function checkAndDeleteGroup(groupId, setData, setGroupItems) {
     // Fetch all password items for this group to see if any are left
-    axios.get(`http://127.0.0.1:8000/api/groups/${groupId}/password-items/`, config)
+    axios.get(URLS.PASSWORD_FROM_GROUP(groupId), config)
         .then(response => {
             const remainingItems = response.data.passwords || [];
 
@@ -134,7 +134,7 @@ function checkAndDeleteGroup(groupId, setData, setGroupItems) {
 
 export function deleteData(passId, groupId, setData, onSuccess, setGroupItems) {
     // Delete password item
-    return axios.delete(`http://127.0.0.1:8000/api/groups/${groupId}/password-items/${passId}/`, config)
+    return axios.delete(URLS.GROUP_BY_ID(passId,groupId), config)
         .then((response) => {
             if (response.status === 204) {
                 console.log('Password item deleted successfully');
@@ -161,7 +161,7 @@ export function deleteData(passId, groupId, setData, onSuccess, setGroupItems) {
 
 
 export function fetchAllPasswordItems(setData) {
-    axios.get('http://127.0.0.1:8000/api/password-items/', config) // Adjust the endpoint if needed
+    axios.get(URLS.ALL_PASSWORDS, config) // Adjust the endpoint if needed
         .then(response => {
             // Check if response.data is an array
             if (Array.isArray(response.data.passwords)) {
@@ -186,7 +186,7 @@ export function fetchAllPasswordItems(setData) {
 }
 
 export function fetchUnlistedPasswordItems(setData) {
-    axios.get('http://127.0.0.1:8000/api/password-items/unlisted/', config) // Adjust the endpoint if needed
+    axios.get(URLS.PASSWORD_GROUP_UNLISTED, config) // Adjust the endpoint if needed
         .then(response => {
             if (response.data && Array.isArray(response.data.passwords)) {
                 const mappedData = response.data.passwords.map(item => ({
@@ -210,7 +210,7 @@ export function fetchUnlistedPasswordItems(setData) {
 }
 
 export function dataFetching(groupId, setData) {
-    axios.get(`http://127.0.0.1:8000/api/groups/${groupId}/password-items/`, config)
+    axios.get(URLS.PASSWORD_FROM_GROUP(groupId), config)
         .then(response => {
             const passwordItemsWithGroupNames = response.data.passwords.map(item => ({
                 passId: item.passId,
@@ -236,7 +236,7 @@ export function dataFetching(groupId, setData) {
 
 export const fetchHistory = async (passwordId) => {
     try {
-        const response = await fetch(`/api/password-history/${passwordId}`); // Include passwordId in the URL
+        const response = await fetch(URLS.HISTORY(passwordId)); // Include passwordId in the URL
         if (!response.ok) {
             throw new Error('Failed to fetch history');
         }
