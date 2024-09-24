@@ -63,9 +63,15 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
         setClickedRow(record);
         try {
             const history = await fetchHistory(record.passId);
-            setHistoryData(history);
+            // Ensure that if no history exists, historyData is set to an empty array
+            if (history && history.length > 0) {
+                setHistoryData(history);
+            } else {
+                setHistoryData([]); // Set to an empty array if no history is found
+            }
         } catch (error) {
-            message.error('Failed to fetch history');
+            //message.error('Failed to fetch history');
+            setHistoryData([]); // Ensure we set an empty array in case of an error
         }
 
         // Set current values in the form
