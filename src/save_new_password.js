@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { PlusOutlined, UserOutlined, EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
-import { Button, Tooltip, Modal, Input, Select, message } from 'antd';
+import { PlusOutlined, UserOutlined, EyeInvisibleOutlined, EyeTwoTone,RollbackOutlined  } from '@ant-design/icons';
+import { Button, Tooltip, Modal, Input, Select, message, Space } from 'antd';
 import { addPasswordItem } from './crud_operation';
 import axios from './axiosConfg';
 import { usePasswordContext } from './PasswordContext';
-
+import './styles.css';
 const { Option } = Select;
 
 const SaveNewPassword = ({ groupId, userId, comment, url, onPasswordAdd, setGroupItems }) => {
@@ -23,14 +23,33 @@ const SaveNewPassword = ({ groupId, userId, comment, url, onPasswordAdd, setGrou
     useEffect(() => {
         axios.get('http://127.0.0.1:8000/api/groups/')
             .then(response => {
-                setGroupOptions(response.data);
+                const groupsWithUnlisted = [
+                    { groupId: 'null', groupName: 'Unlisted' },  // Add Unlisted group
+                    ...response.data,
+                ];
+                setGroupOptions(groupsWithUnlisted);
             })
             .catch(error => {
                 console.error('Error fetching groups:', error);
             });
     }, []);
 
+
+    // Function to show the modal and clear all input fields
     const showModal = () => {
+        // Clear all input data when the modal is opened
+        setFieldName('');
+        setUsername('');
+        setPassword('');
+        setSelectedGroup(null);
+        setNewGroupName('');
+        setComments('');
+        setUrlField('');
+
+        // Reset password strength meter
+        setStrengthMessage('');
+        setStrengthScore(0);
+
         setOpen(true);
     };
 
@@ -40,7 +59,7 @@ const SaveNewPassword = ({ groupId, userId, comment, url, onPasswordAdd, setGrou
             return;
         }
 
-        let groupIdToUse = selectedGroup;
+        let groupIdToUse = selectedGroup === 'null' ? null : selectedGroup;
 
         // URL validation check
         if (urlField && !isValidUrl(urlField)) {
@@ -166,6 +185,11 @@ const SaveNewPassword = ({ groupId, userId, comment, url, onPasswordAdd, setGrou
         }
     };
 
+    // Clear selected group
+    const clearSelectedGroup = () => {
+        setSelectedGroup(null);
+    };
+
     return (
         <>
             <Tooltip title="Add new password">
@@ -234,18 +258,28 @@ const SaveNewPassword = ({ groupId, userId, comment, url, onPasswordAdd, setGrou
                         onClick={generatePassword}>
                     Generate password
                 </Button>
+                    <div style ={{display: 'flex', justifyContent: 'space-between'}}>
 
-                <Select
-                    style={{width: '100%', marginBottom: '10px'}}
-                    placeholder="Select an existing group"
-                    onChange={(value) => setSelectedGroup(value)}
-                >
-                    {groupOptions.map((group) => (
-                        <Option key={group.groupId} value={group.groupId}>
-                            {group.groupName}
-                        </Option>
-                    ))}
-                </Select>
+                    <Select
+                        style={{ width: '90%', marginBottom: '10px' }}  // Make the Select dropdown smaller
+                        placeholder="Select an existing group"
+                        value={selectedGroup || undefined}
+                        onChange={(value) => setSelectedGroup(value)}
+                    >
+                        {groupOptions.map((group) => (
+                            <Option key={group.groupId} value={group.groupId}>
+                                {group.groupName}
+                            </Option>
+                        ))}
+                    </Select>
+
+                    <Button
+                        icon={<RollbackOutlined />}
+                        onClick={clearSelectedGroup}
+                        style={{ backgroundColor: '#fff', color: '#BFBFBF', marginBottom: '10px' }}
+                        className={'button-reset'}// Whitish background
+                    />
+                    </div>
 
                 <Input
                     placeholder="Or enter new group name"

@@ -359,6 +359,12 @@ body {
 }
 
 
+.button-reset{
+    border-color: #D9D9D9;
+}
 
+.button-reset:hover{
+    border-color: #2F72ED;
+}
 
 
