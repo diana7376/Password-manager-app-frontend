@@ -30,7 +30,8 @@ const suffix = (
     <AudioOutlined style={{ fontSize: 16, color: '#1677ff' }} />
 );
 
-const onSearch = (value, _e, info) => console.log(info?.source, value);
+
+
 
 function getItem(label, key, icon, children) {
     return {
@@ -68,6 +69,26 @@ const App = () => {
     const isAboutUsPage = location.pathname === '/about';
     const [showAuthModal, setShowAuthModal] = useState(false); // Add state for auth modal
 
+    const fetchDataSearch = () => {
+        let endpoint;
+        if (selectedGroupId === -1) {
+            endpoint = 'http://127.0.0.1:8000/api/password-items/';  // Fetch all passwords
+        } else if (selectedGroupId === null) {
+            endpoint = 'http://127.0.0.1:8000/api/groups/null/password-items/';  // Fetch unlisted passwords
+        } else {
+            endpoint = `http://127.0.0.1:8000/api/groups/${selectedGroupId}/password-items/`;  // Fetch group-specific passwords
+        }
+
+        axios.get(endpoint)
+            .then(response => {
+                setPasswordItems(response.data.passwords || []);
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
+    };
+
+
     // Update login status when location changes (e.g., after login/logout)
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -83,7 +104,7 @@ const App = () => {
         if (searchInputRef.current) {
             searchInputRef.current.focus();
         }
-    }, []);
+    }, [selectedGroupId]);
 
     const {
         token: { colorBgContainer },
@@ -161,41 +182,7 @@ const App = () => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    const onSearch = (value) => {
-        setIsSearching(true);
 
-        if (value.trim() === '') {
-            setIsSearching(false);
-            setFilteredItems([]);
-            return;
-        }
-
-        const resultsItemName = fuzzysort.go(value, passwordItems, { key: 'itemName', threshold: -10000 });
-        const resultsUserName = fuzzysort.go(value, passwordItems, { key: 'userName', threshold: -10000 });
-        const resultsComment = fuzzysort.go(value, passwordItems, { key: 'comment', threshold: -10000 });
-        const resultsUrl = fuzzysort.go(value, passwordItems, { key: 'url', threshold: -10000 });
-
-        const combinedResults = [
-            ...resultsItemName,
-            ...resultsUserName,
-            ...resultsComment,
-            ...resultsUrl
-        ];
-
-        const uniqueResults = new Map();
-        combinedResults.forEach(result => {
-            if (!uniqueResults.has(result.obj.id)) {
-                uniqueResults.set(result.obj.id, result);
-            }
-        });
-
-        const filtered = Array.from(uniqueResults.values()).map(result => ({
-            ...result.obj,
-            similarityScore: result.score
-        }));
-
-        setFilteredItems(filtered);
-    };
 
     const handleMenuClick = (key) => {
         setSelectedKey(key);
@@ -342,6 +329,46 @@ const handleLogout = () => {
     navigate('/login'); // Redirect to the login page
 };
 
+    // Handle blur (unfocus) from the search input
+    const onSearchBlur = () => {
+        fetchDataSearch();  // Fetch normal group data when the search bar loses focus
+    };
+
+    const onSearch = (value) => {
+        const trimmedQuery = value.trim();
+        if (!trimmedQuery) {
+            fetchDataSearch();  // Clear if the query is empty
+            return;
+        }
+
+        // Set up the correct endpoint based on selected group
+        let endpoint;
+        if (selectedGroupId === -1) {
+
+            endpoint = `http://127.0.0.1:8000/api/password-items/?search=${encodeURIComponent(trimmedQuery)}`;
+        } else if (selectedGroupId === null) {
+            // Unlisted passwords
+            endpoint = `http://127.0.0.1:8000/api/groups/null/password-items/?search=${encodeURIComponent(trimmedQuery)}`;
+        } else {
+            // Specific group
+            endpoint = `http://127.0.0.1:8000/api/groups/${selectedGroupId}/password-items/?search=${encodeURIComponent(trimmedQuery)}`;
+        }
+
+        // Fetch data from the selected endpoint
+        axios.get(endpoint, config)
+            .then((response) => {
+                if (response.data && Array.isArray(response.data.passwords)) {
+                    setPasswordItems(response.data.passwords);  // Display fetched passwords
+                } else {
+                    setPasswordItems([]);  // Handle unexpected response structure
+                }
+            })
+            .catch((error) => {
+                console.error('Error during search:', error);
+            });
+    };
+
+
 const handleCancelLogout = () => {
     setShowLogoutConfirm(false); // Close the confirmation modal without logging out
     setSelectedKey('2');
@@ -383,13 +410,9 @@ const handleCancelLogout = () => {
                         placeholder="What are you looking for?"
                         onSearch={onSearch}
                         className = "custom-search-bar"
+                        onBlur={onSearchBlur}
 
-                        ref={(input) => {
-                            // Attach the ref to the input DOM element inside the Search component
-                            if (input) {
-                                searchInputRef.current = input.input;
-                            }
-                        }}
+                        ref={searchInputRef}
                     />
                 </div>
 

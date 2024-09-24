@@ -286,7 +286,7 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
                                 <div style={{ marginBottom: '10px' }}>
                                     <label style={{ fontWeight: 'bold' }}>User Name</label>
                                     <Input
-                                        placeholder="User Name"
+                                        placeholder="Username"
                                         value={editedUserName}
                                         onChange={(e) => setEditedUserName(e.target.value)}
                                     />

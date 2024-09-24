@@ -237,11 +237,7 @@ export const fetchHistory = async (passwordId) => {
         return response.data.passwords;
     } catch (error) {
         console.error('Error fetching history:', error.response || error); // Log the entire error object
-        // if (error.response && error.response.data) {
-        //     message.error(`Error: ${error.response.data.message || 'Failed to fetch history'}`);
-        // } else {
-        //     message.error('Failed to fetch history');
-        // }
+
         throw error;
     }
 };

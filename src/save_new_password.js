@@ -101,7 +101,7 @@ const SaveNewPassword = ({ groupId, userId, comment, url, onPasswordAdd, setGrou
                 setOpen(false);
             })
             .catch((error) => {
-                console.error('Error adding password:', error);
+                console.error('Error adding password: ', error);
                 message.error('Failed to add password');
             });
     };
