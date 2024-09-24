@@ -9,6 +9,7 @@ import {
     fetchUnlistedPasswordItems,
     updatePasswordItem
 } from './crud_operation';
+import axios from './axiosConfg';
 import './styles.css';
 
 const { TabPane } = Tabs;
@@ -35,16 +36,53 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
 
     const [isSaveButtonDisabled, setIsSaveButtonDisabled] = useState(true);
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+    const [nextPage, setNextPage] = useState(null);
+    const [prevPage, setPrevPage] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);  // State to track the current page number
 
-    // Fetch password items based on groupId
-    useEffect(() => {
-        if (groupId === -1) {
-            fetchAllPasswordItems(setData);
-        } else if (groupId) {
-            dataFetching(groupId, setData);
+
+
+    // Function to fetch data based on the group
+    const fetchData = (url = null, page = 1) => {
+        setLoading(true);
+
+        // Determine the appropriate endpoint based on the groupId
+        let endpoint;
+        if (url) {
+            // If a URL is provided, use it for pagination (next/previous page)
+            endpoint = url;
+        } else if (groupId === -1) {
+            // Case 1: Fetch all passwords (default "Passwords" option)
+            endpoint = 'http://127.0.0.1:8000/api/password-items/';
+        } else if (groupId === null) {
+            // Case 2: Fetch unlisted passwords (groupId is 'null')
+            endpoint = 'http://127.0.0.1:8000/api/groups/null/password-items/';
         } else {
-            fetchUnlistedPasswordItems(setData);
+            // Case 3: Fetch passwords for a specific group
+            endpoint = `http://127.0.0.1:8000/api/groups/${groupId}/password-items/`;
         }
+
+        // Use Axios to fetch the data from the determined endpoint
+        axios.get(endpoint)
+            .then((response) => {
+                const data = response.data;
+                setPasswordItems(data.passwords);  // Set the table data
+                setNextPage(data.next_page);       // Set the next page URL
+                setPrevPage(data.previous_page);   // Set the previous page URL
+                setCurrentPage(page);
+            })
+            .catch((error) => {
+                console.error('Error fetching data:', error);
+            })
+            .finally(() => {
+                setLoading(false);
+            });
+    };
+
+    // Fetch data when the component mounts or the groupId changes
+    useEffect(() => {
+        fetchData();
     }, [groupId]);
 
     useEffect(() => {
@@ -231,8 +269,36 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
                 dataSource={passwordItems}
                 columns={columns}
                 rowKey={(record) => record.passId}
+                loading={loading}
+                pagination={false}
             />
-
+            <div style={{display: 'flex', justifyContent: 'center', marginTop: 16}}>
+                <Button
+                    onClick={() => fetchData(prevPage, currentPage - 1)}
+                    disabled={!prevPage}
+                    style={{marginRight: 8}}
+                >
+                    Previous Page
+                </Button>
+                <div style={{
+                    width: '40px',
+                    height: '40px',
+                    lineHeight: '40px',
+                    textAlign: 'center',
+                    border: '1px solid #d9d9d9',
+                    borderRadius: '4px',
+                    margin: '0 12px',
+                    fontSize: '16px',
+                }}>
+                    {currentPage}
+                </div>
+                <Button
+                    onClick={() => fetchData(nextPage, currentPage + 1)}
+                    disabled={!nextPage}
+                >
+                    Next Page
+                </Button>
+            </div>
             <Modal
                 title="Password Item Details"
                 open={isModalOpen}
@@ -241,7 +307,7 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
             >
                 <Tabs defaultActiveKey="1">
                     <TabPane tab="Details" key="1">
-                        {clickedRow && (
+                    {clickedRow && (
                             <div>
                                 <p><strong>Name:</strong> {clickedRow.itemName}</p>
                                 <p><strong>User Name:</strong> {clickedRow.userName}</p>
@@ -257,7 +323,9 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
                                 </p>
                                 <p><strong>Group:</strong> {clickedRow.groupName}</p>
                                 <p><strong>Comment:</strong> {clickedRow.comment}</p>
-                                <p><strong>URL:</strong> {clickedRow.url ? <a href={clickedRow.url} target="_blank" rel="noopener noreferrer">{clickedRow.url}</a> : 'No URL provided'}</p>
+                                <p><strong>URL:</strong> {clickedRow.url ? <a href={clickedRow.url} target="_blank"
+                                                                              rel="noopener noreferrer">{clickedRow.url}</a> : 'No URL provided'}
+                                </p>
                             </div>
                         )}
                     </TabPane>
@@ -275,49 +343,49 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
                     <TabPane tab="Edit" key="3">
                         {clickedRow && (
                             <div>
-                                <div style={{ marginBottom: '10px' }}>
-                                    <label style={{ fontWeight: 'bold' }}>Item Name</label>
+                                <div style={{marginBottom: '10px'}}>
+                                    <label style={{fontWeight: 'bold'}}>Item Name</label>
                                     <Input
                                         placeholder="Item Name"
                                         value={editedItemName}
                                         onChange={(e) => setEditedItemName(e.target.value)}
                                     />
                                 </div>
-                                <div style={{ marginBottom: '10px' }}>
-                                    <label style={{ fontWeight: 'bold' }}>User Name</label>
+                                <div style={{marginBottom: '10px'}}>
+                                    <label style={{fontWeight: 'bold'}}>User Name</label>
                                     <Input
                                         placeholder="Username"
                                         value={editedUserName}
                                         onChange={(e) => setEditedUserName(e.target.value)}
                                     />
                                 </div>
-                                <div style={{ marginBottom: '10px' }}>
-                                    <label style={{ fontWeight: 'bold' }}>Password</label>
+                                <div style={{marginBottom: '10px'}}>
+                                    <label style={{fontWeight: 'bold'}}>Password</label>
                                     <Input.Password
                                         placeholder="Password"
                                         value={editedPassword}
                                         onChange={(e) => setEditedPassword(e.target.value)}
-                                        iconRender={(visible) => (visible ? <EyeOutlined /> : <EyeInvisibleOutlined />)}
+                                        iconRender={(visible) => (visible ? <EyeOutlined/> : <EyeInvisibleOutlined/>)}
                                     />
                                 </div>
-                                <div style={{ marginBottom: '10px' }}>
-                                    <label style={{ fontWeight: 'bold' }}>Group</label>
+                                <div style={{marginBottom: '10px'}}>
+                                    <label style={{fontWeight: 'bold'}}>Group</label>
                                     <Input
                                         placeholder="Group"
                                         value={editedGroup}
                                         onChange={(e) => setEditedGroup(e.target.value)}
                                     />
                                 </div>
-                                <div style={{ marginBottom: '10px' }}>
-                                    <label style={{ fontWeight: 'bold' }}>Comment</label>
+                                <div style={{marginBottom: '10px'}}>
+                                    <label style={{fontWeight: 'bold'}}>Comment</label>
                                     <Input
                                         placeholder="Comment"
                                         value={editedComment}
                                         onChange={(e) => setEditedComment(e.target.value)}
                                     />
                                 </div>
-                                <div style={{ marginBottom: '10px' }}>
-                                    <label style={{ fontWeight: 'bold' }}>URL</label>
+                                <div style={{marginBottom: '10px'}}>
+                                    <label style={{fontWeight: 'bold'}}>URL</label>
                                     <Input
                                         placeholder="URL"
                                         value={editedUrl}
@@ -331,7 +399,7 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
                                 >
                                     Save
                                 </Button>
-                                <Button danger onClick={handleDelete} style={{ marginLeft: 8 }}>
+                                <Button danger onClick={handleDelete} style={{marginLeft: 8}}>
                                     Delete
                                 </Button>
                             </div>
