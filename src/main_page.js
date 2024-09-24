@@ -192,6 +192,33 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
         },
     ];
 
+    const history_columns = [
+        {
+            title: 'Date',
+            dataIndex: 'updatedAt',
+            key: 'date',
+            render: (updatedAt) => {
+                const [date] = updatedAt.split(' ');  // Extract date (before space)
+                return <span>{date}</span>;
+            },
+        },
+        {
+            title: 'Time',
+            dataIndex: 'updatedAt',
+            key: 'time',
+            render: (updatedAt) => {
+                const [, time] = updatedAt.split(' ');  // Extract time (after space)
+                return <span>{time}</span>;
+            },
+        },
+        {
+            title: 'Password',
+            dataIndex: 'oldPassword',
+            key: 'password',
+            render: (password) => <span>{password}</span>,
+        },
+    ];
+
     return (
         <div>
             <Table
@@ -230,13 +257,11 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
                     </TabPane>
                     <TabPane tab="History" key="2">
                         {historyData.length > 0 ? (
-                            <ul>
-                                {historyData.map((entry, index) => (
-                                    <li key={index}>
-                                        {entry.updatedAt} : {entry.oldPassword}
-                                    </li>
-                                ))}
-                            </ul>
+                            <Table
+                                columns={history_columns}
+                                dataSource={historyData}
+                                rowKey={(record) => record.updatedAt}
+                            />
                         ) : (
                             <p>No history available.</p>
                         )}
