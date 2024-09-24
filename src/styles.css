@@ -138,7 +138,7 @@ ul {
 /* Custom styles for the sidebar menu */
 .ant-menu {
     position: sticky;
-    top: 0;
+    top: 30px;
     margin-top: 1.875rem;
     background-color: #001529;
     border-right: none;
