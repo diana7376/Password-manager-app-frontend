@@ -1,11 +1,12 @@
+
 import axiosInstance, { token } from './axiosConfg';
 import {URLS} from "./apiConstants";
 import axios from "axios";
 
 export const config = {
-    headers: { Authorization: `Bearer ${token}` }  // Correct usage of token for authorization
+    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }  // Correct usage of token for authorization
 };
-console.log("used token:", token);
+console.log(`used token: ${localStorage.getItem('token')}`);
 
 export function addPasswordItem(newItem, groupId) {
     // Create a copy of newItem to avoid directly modifying the original object
@@ -230,20 +231,23 @@ export function dataFetching(groupId, setData) {
         });
 }
 
-
-
-
-
 export const fetchHistory = async (passwordId) => {
     try {
+
         const response = await fetch(URLS.HISTORY(passwordId)); // Include passwordId in the URL
         if (!response.ok) {
             throw new Error('Failed to fetch history');
         }
         return await response.json();
+        //return response.data.passwords;
+
     } catch (error) {
-        console.error('Error fetching history:', error);
+        console.error('Error fetching history:', error.response || error); // Log the entire error object
+        if (error.response && error.response.data) {
+            message.error(`Error: ${error.response.data.message || 'Failed to fetch history'}`);
+        } else {
+            message.error('Failed to fetch history');
+        }
         throw error;
     }
 };
-

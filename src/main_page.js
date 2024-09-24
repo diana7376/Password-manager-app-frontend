@@ -14,8 +14,8 @@ import './styles.css';
 const { TabPane } = Tabs;
 const { Text } = Typography;
 
-const MainPage = ({ groupId, userId, setGroupItems,passwordItems,setPasswordItems }) => {
-    const [data, setData] = useState([]);  // Use 'data' to hold password items
+const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordItems }) => {
+    const [data, setData] = useState([]);
     const [clickedRow, setClickedRow] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [historyData, setHistoryData] = useState([]);
@@ -23,13 +23,15 @@ const MainPage = ({ groupId, userId, setGroupItems,passwordItems,setPasswordItem
     const [editedUserName, setEditedUserName] = useState('');
     const [editedPassword, setEditedPassword] = useState('');
     const [editedGroup, setEditedGroup] = useState('');
-    const [editedComment, setEditedComment] = useState(''); // Added for comments
+    const [editedComment, setEditedComment] = useState('');
+    const [editedUrl, setEditedUrl] = useState(''); // Added for URL field
 
     const [originalItemName, setOriginalItemName] = useState('');
     const [originalUserName, setOriginalUserName] = useState('');
     const [originalPassword, setOriginalPassword] = useState('');
     const [originalGroup, setOriginalGroup] = useState('');
-    const [originalComment, setOriginalComment] = useState(''); // Added for original comments
+    const [originalComment, setOriginalComment] = useState('');
+    const [originalUrl, setOriginalUrl] = useState(''); // Added for original URL
 
     const [isSaveButtonDisabled, setIsSaveButtonDisabled] = useState(true);
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -51,14 +53,14 @@ const MainPage = ({ groupId, userId, setGroupItems,passwordItems,setPasswordItem
             editedUserName === originalUserName &&
             editedPassword === originalPassword &&
             editedGroup === originalGroup &&
-            editedComment === originalComment; // Include comments in the check
+            editedComment === originalComment &&
+            editedUrl === originalUrl; // Include URL in the check
 
         setIsSaveButtonDisabled(isUnchanged);
-    }, [editedItemName, editedUserName, editedPassword, editedGroup, editedComment, originalItemName, originalUserName, originalPassword, originalGroup]);
+    }, [editedItemName, editedUserName, editedPassword, editedGroup, editedComment, editedUrl, originalItemName, originalUserName, originalPassword, originalGroup, originalComment, originalUrl]);
 
     const handleMenuClick = async (record) => {
         setClickedRow(record);
-        console.log()
         try {
             const history = await fetchHistory(record.passId);
             setHistoryData(history);
@@ -66,19 +68,21 @@ const MainPage = ({ groupId, userId, setGroupItems,passwordItems,setPasswordItem
             message.error('Failed to fetch history');
         }
 
+        // Set current values in the form
         setEditedItemName(record.itemName);
         setEditedUserName(record.userName);
         setEditedPassword(record.password);
         setEditedGroup(record.groupName);
-        setEditedComment(record.comment); // Set the comment from the record
+        setEditedComment(record.comment);
+        setEditedUrl(record.url); // Set URL from the record
 
-
+        // Set original values for comparison
         setOriginalItemName(record.itemName);
         setOriginalUserName(record.userName);
         setOriginalPassword(record.password);
         setOriginalGroup(record.groupName);
-        setOriginalComment(record.comment); // Set original comment
-
+        setOriginalComment(record.comment);
+        setOriginalUrl(record.url); // Set original URL
 
         setIsModalOpen(true);
     };
@@ -92,19 +96,18 @@ const MainPage = ({ groupId, userId, setGroupItems,passwordItems,setPasswordItem
         const effectiveGroupId = groupId === -1 ? clickedRow.groupId : groupId;
 
         const updatedData = {
-            passId: clickedRow.passId,  // Keep the original passId
+            passId: clickedRow.passId,
             itemName: editedItemName,
             userName: editedUserName,
             password: editedPassword,
             groupId: effectiveGroupId,
             userId: userId,
-            comment: editedComment, // Include the comment in the updated data
-
+            comment: editedComment,
+            url: editedUrl // Include the URL in the updated data
         };
-        console.log('Updating password with data:', updatedData);
+
         updatePasswordItem(clickedRow.passId, effectiveGroupId, updatedData, setData)
             .then((response) => {
-                console.log('Update successful:', response);
                 setPasswordItems(prevData =>
                     prevData.map(item =>
                         item.passId === clickedRow.passId ? { ...updatedData, passId: clickedRow.passId } : item
@@ -114,13 +117,9 @@ const MainPage = ({ groupId, userId, setGroupItems,passwordItems,setPasswordItem
                 setIsModalOpen(false);
             })
             .catch((error) => {
-                console.error('Update failed:', error);
                 message.error('Failed to update item');
             });
     };
-
-
-
 
     const handleDelete = () => {
         Modal.confirm({
@@ -129,15 +128,10 @@ const MainPage = ({ groupId, userId, setGroupItems,passwordItems,setPasswordItem
             onOk() {
                 if (clickedRow && clickedRow.passId) {
                     deleteData(clickedRow.passId, clickedRow.groupId, setPasswordItems, () => {
-                        // Success callback: Close the modal on successful deletion
                         message.success('Password item deleted successfully');
-                        setIsModalOpen(false);  // Close the modal
-                    }, setGroupItems)  // Pass setGroupItems to handle group deletion
-                        .then(() => {
-                            // message.success('Password item and group (if empty) deleted successfully');
-                        })
+                        setIsModalOpen(false);
+                    }, setGroupItems)
                         .catch(error => {
-                            console.error('Error during deletion:', error);
                             message.error('Failed to delete password item or group');
                         });
                 } else {
@@ -146,10 +140,6 @@ const MainPage = ({ groupId, userId, setGroupItems,passwordItems,setPasswordItem
             },
         });
     };
-
-
-
-
 
     const handleModalClose = () => {
         setIsModalOpen(false);
@@ -172,8 +162,7 @@ const MainPage = ({ groupId, userId, setGroupItems,passwordItems,setPasswordItem
             dataIndex: 'password',
             key: 'password',
             render: (text, record) => {
-                const passwordMasked = record.password ? '*'.repeat(record.password.length) : '';  // Check if password is defined
-
+                const passwordMasked = record.password ? '*'.repeat(record.password.length) : '';
                 return (
                     <span>
                         {record.isPasswordVisible ? record.password : passwordMasked}
@@ -181,9 +170,7 @@ const MainPage = ({ groupId, userId, setGroupItems,passwordItems,setPasswordItem
                             style={{ marginLeft: 8, cursor: 'pointer' }}
                             onClick={() => {
                                 record.isPasswordVisible = !record.isPasswordVisible;
-                                // setData([...data]);
                                 setPasswordItems([...passwordItems]);  // Update the table with visibility toggled
-
                             }}
                         >
                             {record.isPasswordVisible ? <EyeInvisibleOutlined /> : <EyeOutlined />}
@@ -202,6 +189,33 @@ const MainPage = ({ groupId, userId, setGroupItems,passwordItems,setPasswordItem
                     onClick={() => handleMenuClick(record)}
                 />
             ),
+        },
+    ];
+
+    const history_columns = [
+        {
+            title: 'Date',
+            dataIndex: 'updatedAt',
+            key: 'date',
+            render: (updatedAt) => {
+                const [date] = updatedAt.split(' ');  // Extract date (before space)
+                return <span>{date}</span>;
+            },
+        },
+        {
+            title: 'Time',
+            dataIndex: 'updatedAt',
+            key: 'time',
+            render: (updatedAt) => {
+                const [, time] = updatedAt.split(' ');  // Extract time (after space)
+                return <span>{time}</span>;
+            },
+        },
+        {
+            title: 'Password',
+            dataIndex: 'oldPassword',
+            key: 'password',
+            render: (password) => <span>{password}</span>,
         },
     ];
 
@@ -236,20 +250,18 @@ const MainPage = ({ groupId, userId, setGroupItems,passwordItems,setPasswordItem
                                     </Button>
                                 </p>
                                 <p><strong>Group:</strong> {clickedRow.groupName}</p>
-                                <p><strong>Comment:</strong> {clickedRow.comment}</p> {/* Display comment */}
-
+                                <p><strong>Comment:</strong> {clickedRow.comment}</p>
+                                <p><strong>URL:</strong> {clickedRow.url ? <a href={clickedRow.url} target="_blank" rel="noopener noreferrer">{clickedRow.url}</a> : 'No URL provided'}</p>
                             </div>
                         )}
                     </TabPane>
                     <TabPane tab="History" key="2">
                         {historyData.length > 0 ? (
-                            <ul>
-                                {historyData.map((entry, index) => (
-                                    <li key={index}>
-                                        {entry.timestamp}: {entry.oldPassword}
-                                    </li>
-                                ))}
-                            </ul>
+                            <Table
+                                columns={history_columns}
+                                dataSource={historyData}
+                                rowKey={(record) => record.updatedAt}
+                            />
                         ) : (
                             <p>No history available.</p>
                         )}
@@ -279,6 +291,7 @@ const MainPage = ({ groupId, userId, setGroupItems,passwordItems,setPasswordItem
                                         placeholder="Password"
                                         value={editedPassword}
                                         onChange={(e) => setEditedPassword(e.target.value)}
+                                        iconRender={(visible) => (visible ? <EyeOutlined /> : <EyeInvisibleOutlined />)}
                                     />
                                 </div>
                                 <div style={{ marginBottom: '10px' }}>
@@ -297,24 +310,26 @@ const MainPage = ({ groupId, userId, setGroupItems,passwordItems,setPasswordItem
                                         onChange={(e) => setEditedComment(e.target.value)}
                                     />
                                 </div>
+                                <div style={{ marginBottom: '10px' }}>
+                                    <label style={{ fontWeight: 'bold' }}>URL</label>
+                                    <Input
+                                        placeholder="URL"
+                                        value={editedUrl}
+                                        onChange={(e) => setEditedUrl(e.target.value)}
+                                    />
+                                </div>
                                 <Button
                                     type="primary"
                                     onClick={handleSaveChanges}
                                     disabled={isSaveButtonDisabled}
                                 >
-                                    Save Changes
+                                    Save
+                                </Button>
+                                <Button danger onClick={handleDelete} style={{ marginLeft: 8 }}>
+                                    Delete
                                 </Button>
                             </div>
                         )}
-                    </TabPane>
-                    <TabPane tab="Delete" key="4">
-                        <Button
-                            type="primary"
-                            danger
-                            onClick={handleDelete}
-                        >
-                            Delete Password Item
-                        </Button>
                     </TabPane>
                 </Tabs>
             </Modal>
