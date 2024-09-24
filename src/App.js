@@ -69,24 +69,7 @@ const App = () => {
     const isAboutUsPage = location.pathname === '/about';
     const [showAuthModal, setShowAuthModal] = useState(false); // Add state for auth modal
 
-    const fetchDataSearch = () => {
-        let endpoint;
-        if (selectedGroupId === -1) {
-            endpoint = 'http://127.0.0.1:8000/api/password-items/';  // Fetch all passwords
-        } else if (selectedGroupId === null) {
-            endpoint = 'http://127.0.0.1:8000/api/groups/null/password-items/';  // Fetch unlisted passwords
-        } else {
-            endpoint = `http://127.0.0.1:8000/api/groups/${selectedGroupId}/password-items/`;  // Fetch group-specific passwords
-        }
 
-        axios.get(endpoint)
-            .then(response => {
-                setPasswordItems(response.data.passwords || []);
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-            });
-    };
 
 
     // Update login status when location changes (e.g., after login/logout)
@@ -101,10 +84,12 @@ const App = () => {
     // Focus on the input when the component mounts
 
     useEffect(() => {
-        if (searchInputRef.current) {
+        if (searchInputRef.current || (loggedIn && !isLoginPage && !isRegisterPage && !isAboutUsPage && searchInputRef.current)) {
             searchInputRef.current.focus();
         }
-    }, [selectedGroupId]);
+    }, [selectedGroupId,loggedIn, isLoginPage, isRegisterPage, isAboutUsPage]);
+
+
 
     const {
         token: { colorBgContainer },
@@ -165,6 +150,8 @@ const App = () => {
             fetchUnlistedPasswordItems(setPasswordItems);
         }
     };
+
+
 
     useEffect(() => {
         fetchData();
@@ -331,13 +318,13 @@ const handleLogout = () => {
 
     // Handle blur (unfocus) from the search input
     const onSearchBlur = () => {
-        fetchDataSearch();  // Fetch normal group data when the search bar loses focus
+        fetchData();  // Fetch normal group data when the search bar loses focus
     };
 
     const onSearch = (value) => {
         const trimmedQuery = value.trim();
         if (!trimmedQuery) {
-            fetchDataSearch();  // Clear if the query is empty
+            fetchData();  // Clear if the query is empty
             return;
         }
 
