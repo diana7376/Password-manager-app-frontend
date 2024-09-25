@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Table, Modal, Tabs, Input, Typography, Button, message } from 'antd';
 import { MoreOutlined, EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 import {
+    config,
     dataFetching,
     deleteData,
     fetchAllPasswordItems,
@@ -11,6 +12,8 @@ import {
 } from './crud_operation';
 import axios from './axiosConfg';
 import './styles.css';
+
+const { Search } = Input;
 
 const { TabPane } = Tabs;
 const { Text } = Typography;
@@ -90,6 +93,41 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
     useEffect(() => {
         fetchData();
     }, [groupId]);
+
+    const onSearch = (value) => {
+        const trimmedQuery = value.trim();
+        if (!trimmedQuery) {
+            fetchData();  // Clear if the query is empty
+            return;
+        }
+
+        // Set up the correct endpoint based on selected group
+        let endpoint;
+        if (groupId === -1) {
+
+            endpoint = `http://127.0.0.1:8000/api/password-items/?search=${encodeURIComponent(trimmedQuery)}`;
+        } else if (groupId === null) {
+            // Unlisted passwords
+            endpoint = `http://127.0.0.1:8000/api/groups/null/password-items/?search=${encodeURIComponent(trimmedQuery)}`;
+        } else {
+            // Specific group
+            endpoint = `http://127.0.0.1:8000/api/groups/${groupId}/password-items/?search=${encodeURIComponent(trimmedQuery)}`;
+        }
+
+
+        // Fetch data from the selected endpoint
+        axios.get(endpoint, config)
+            .then((response) => {
+                if (response.data && Array.isArray(response.data.passwords)) {
+                    setPasswordItems(response.data.passwords);  // Display fetched passwords
+                } else {
+                    setPasswordItems([]);  // Handle unexpected response structure
+                }
+            })
+            .catch((error) => {
+                console.error('Error during search:', error);
+            });
+    };
 
     useEffect(() => {
         const isUnchanged =
@@ -293,6 +331,17 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
 
     return (
         <div>
+
+                <Search
+                    placeholder="What are you looking for?"
+                    onSearch={onSearch}
+                    className="custom-search-bar"
+                    //onBlur={onSearchBlur}
+
+                   // ref={searchInputRef}
+                />
+
+
             <Table
                 dataSource={passwordItems}
                 columns={columns}
@@ -335,7 +384,7 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
             >
                 <Tabs defaultActiveKey="1">
                     <TabPane tab="Details" key="1">
-                    {clickedRow && (
+                        {clickedRow && (
                             <div>
                                 <p><strong>Name:</strong> {clickedRow.itemName}</p>
                                 <p><strong>User Name:</strong> {clickedRow.userName}</p>
@@ -367,11 +416,11 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
                                     loading={historyLoading}
                                     pagination={false}
                                 />
-                                <div style={{ display: 'flex', justifyContent: 'center', marginTop: 16 }}>
+                                <div style={{display: 'flex', justifyContent: 'center', marginTop: 16}}>
                                     <Button
                                         onClick={() => fetchHistoryData(clickedRow.passId, historyPrevPage, historyCurrentPage - 1)}
                                         disabled={!historyPrevPage}
-                                        style={{ marginRight: 8 }}
+                                        style={{marginRight: 8}}
                                     >
                                         Previous Page
                                     </Button>
