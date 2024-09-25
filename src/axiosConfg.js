@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { message } from 'antd';
-import { useNavigate } from 'react-router-dom';
 
 // Create an Axios instance
 const axiosInstance = axios.create({
@@ -13,6 +12,7 @@ axiosInstance.interceptors.request.use(
         const token = localStorage.getItem('token'); // Retrieve token inside the interceptor
         if (token) {
             config.headers['Authorization'] = `Bearer ${token}`;
+            config.isAuthenticated = true; // Custom flag to track if the request is authenticated
         }
         return config;
     },
@@ -23,12 +23,16 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
     (response) => response,
     (error) => {
-        if (error.response && error.response.status === 401) {
-            // Unauthorized error (401) - Trigger automatic logout
-            localStorage.removeItem('token'); // Remove the token
+        const token = localStorage.getItem('token');
+
+        // Only show the "session expired" message if the user was previously logged in
+        if (error.response && error.response.status === 401 && token) {
+            localStorage.removeItem('token'); // Remove the token if it's expired
             message.error('Session expired, please log in again.');
-            const navigate = useNavigate();
-            navigate('/login'); // Redirect to login
+
+            if (typeof error.config?.onUnauthorized === 'function') {
+                error.config.onUnauthorized(); // Trigger the onUnauthorized callback
+            }
         }
         return Promise.reject(error);
     }

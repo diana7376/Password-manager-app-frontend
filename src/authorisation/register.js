@@ -11,54 +11,75 @@ const Register = ({ onLogout }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    const [error, setError] = useState('');
+    const [errors, setErrors] = useState({});
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const navigate = useNavigate();
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault(); // Prevent the default form submission
+
+        // Clear previous errors
+        setErrors({});
 
         // Check if passwords match
         if (password !== confirmPassword) {
-            setError('Passwords do not match');
+            setErrors((prevErrors) => ({ ...prevErrors, confirmPassword: 'Passwords do not match' }));
             return;
         }
 
-        // Registration request
-        axios.post('/register/', {
-            username,
-            email,
-            password,
-            password2: confirmPassword // Include password2 in the request
-        })
-            .then((response) => {
-                localStorage.setItem('token', response.data.access); // Store access token
-                // Success notification
-                message.success('Registration successful! Redirecting to login...');
-                setError(''); // Clear any previous error
-                // Redirect to the login page
-                navigate('/login');
-            })
-            .catch((error) => {
-                if (error.response) {
-                    console.log('Response error:', error.response.data);
-                    message.error('Registration failed: ' + (error.response?.data?.detail || 'Unknown error')); // Error notification
-                } else if (error.request) {
-                    console.log('No response received:', error.request);
-                    message.error('No response from the server'); // Error notification
-                } else {
-                    console.log('Error setting up request:', error.message);
-                    message.error('Error setting up request'); // Error notification
-                }
+        try {
+            // Registration request
+            const response = await axios.post('/register/', {
+                username,
+                email,
+                password,
+                password2: confirmPassword // Include password2 in the request
+            }, {
+                onUnauthorized: () => navigate('/login') // Handle unauthorized errors (401)
             });
+
+            localStorage.setItem('token', response.data.access); // Store access token
+            message.success('Registration successful! Redirecting to login...');
+            navigate('/login'); // Redirect to the login page
+        } catch (error) {
+            if (error.response) {
+                console.log('Response error:', error.response.data);
+
+                // Handle validation errors from the response (e.g., email, password)
+                const validationErrors = error.response.data;
+                const formattedErrors = {};
+
+                for (const field in validationErrors) {
+                    formattedErrors[field] = validationErrors[field].join(' ');
+                }
+
+                setErrors(formattedErrors); // Set the field-specific errors
+                // message.error('Registration failed. Please check the form for errors.');
+            } else if (error.request) {
+                console.log('No response received:', error.request);
+                message.error('No response from the server'); // Error notification
+            } else {
+                console.log('Error setting up request:', error.message);
+                message.error('Error setting up request'); // Error notification
+            }
+        }
     };
 
     return (
         <div className="auth-container">
             <div className="form-wrapper">
                 <h2>Register</h2>
-                {error && <p className="error">{error}</p>}
+
+                {/* Display general form error messages */}
+                {/*{Object.keys(errors).length > 0 && (*/}
+                {/*    <div className="error-container">*/}
+                {/*        {Object.entries(errors).map(([field, errorMessage]) => (*/}
+                {/*            <p className="error" key={field}>{field}: {errorMessage}</p>*/}
+                {/*        ))}*/}
+                {/*    </div>*/}
+                {/*)}*/}
+
                 <form onSubmit={handleSubmit}>
                     <div className="input-group">
                         <label>Username:</label>
@@ -68,6 +89,7 @@ const Register = ({ onLogout }) => {
                             onChange={(e) => setUsername(e.target.value)}
                             required
                         />
+                        {errors.username && <p className="error">{errors.username}</p>}
                     </div>
                     <div className="input-group">
                         <label>Email:</label>
@@ -77,6 +99,7 @@ const Register = ({ onLogout }) => {
                             onChange={(e) => setEmail(e.target.value)}
                             required
                         />
+                        {errors.email && <p className="error">{errors.email}</p>}
                     </div>
                     <div className="input-group">
                         <label>Password:</label>
@@ -95,6 +118,7 @@ const Register = ({ onLogout }) => {
                                 {showPassword ? <EyeOutlined /> : <EyeInvisibleOutlined />}
                             </span>
                         </div>
+                        {errors.password && <p className="error">{errors.password}</p>}
                     </div>
                     <div className="input-group">
                         <label>Confirm Password:</label>
@@ -113,6 +137,7 @@ const Register = ({ onLogout }) => {
                                 {showConfirmPassword ? <EyeOutlined /> : <EyeInvisibleOutlined />}
                             </span>
                         </div>
+                        {errors.confirmPassword && <p className="error">{errors.confirmPassword}</p>}
                     </div>
                     <button type="submit" className="submit-btn">Register</button>
                     <div className="old-user">
