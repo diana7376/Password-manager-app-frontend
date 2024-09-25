@@ -58,9 +58,14 @@ const AboutUs = () => {
 
             <footer className="footer">
                 <div className="footer-content">
-                    <div className="footer-logo">LockR</div>
+                    <div className="footer-logo"><img
+                        src="https://i.imgur.com/WR8JhwQ.png"
+                        alt="Expanded Logo"
+                        style={{width: '100%', maxHeight: '60px', objectFit: 'contain',}}
+                    /></div>
                     <div className="footer-social">
-                        <a href="#" className="social-icon"><img src="https://img.icons8.com/ios/50/000000/facebook.png" alt="Facebook" /></a>
+                        <a href="#" className="social-icon"><img src="https://img.icons8.com/ios/50/000000/facebook.png"
+                                                                 alt="Facebook"/></a>
                         <a href="#" className="social-icon"><img src="https://img.icons8.com/ios/50/000000/twitter.png" alt="Twitter" /></a>
                         <a href="#" className="social-icon"><img src="https://img.icons8.com/ios/50/000000/linkedin.png" alt="LinkedIn" /></a>
                         <a href="#" className="social-icon"><img src="https://img.icons8.com/ios/50/000000/instagram.png" alt="Instagram" /></a>

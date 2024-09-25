@@ -22,6 +22,7 @@ const SaveNewPassword = ({ userId, onPasswordAdd }) => {
     const [strengthMessage, setStrengthMessage] = useState('');
     const [strengthScore, setStrengthScore] = useState(0);
 
+
     useEffect(() => {
         const fetchGroups = async () => {
             try {
@@ -184,6 +185,7 @@ const SaveNewPassword = ({ userId, onPasswordAdd }) => {
                 onOk={handleOk}
                 onCancel={handleCancel}
                 width={600}
+                className="modal-common"
             >
                 <p>Enter the new password details here...</p>
 
