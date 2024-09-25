@@ -11,6 +11,8 @@ import {
 } from './crud_operation';
 import axios from './axiosConfg';
 import './styles.css';
+import { usePasswordContext } from './PasswordContext';
+
 
 const { TabPane } = Tabs;
 const { Text } = Typography;
@@ -39,7 +41,8 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
     const [nextPage, setNextPage] = useState(null);
     const [prevPage, setPrevPage] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [currentPage, setCurrentPage] = useState(1);  // State to track the current page number
+
+    const { currentPage, updatePage } = usePasswordContext();
 
     // Pagination state for the history table
     const [historyCurrentPage, setHistoryCurrentPage] = useState(1);
@@ -50,11 +53,12 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
 
 
     // Function to fetch data based on the group
-    const fetchData = (url = null, page = 1) => {
+    const fetchData = (url = null, page = currentPage) => {
         setLoading(true);
 
         // Determine the appropriate endpoint based on the groupId
-        let endpoint;
+        let endpoint = url ? url : `http://127.0.0.1:8000/api/password-items/?page=${page}`;
+
         if (url) {
             // If a URL is provided, use it for pagination (next/previous page)
             endpoint = url;
@@ -76,7 +80,7 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
                 setPasswordItems(data.passwords);  // Set the table data
                 setNextPage(data.next_page);       // Set the next page URL
                 setPrevPage(data.previous_page);   // Set the previous page URL
-                setCurrentPage(page);
+                updatePage(page);
             })
             .catch((error) => {
                 console.error('Error fetching data:', error);

@@ -22,6 +22,7 @@ import PrivateRoute from './authorisation/PrivateRoute';
 import AboutUs from "./aboutUs";
 import { useLocation } from 'react-router-dom';
 import { PasswordProvider } from './PasswordContext';
+import { usePasswordContext } from './PasswordContext';  // Import the context
 
 const { Search } = Input;
 const { Header, Content, Footer, Sider } = Layout;
@@ -68,6 +69,7 @@ const App = () => {
     const isRegisterPage = location.pathname === '/register';
     const isAboutUsPage = location.pathname === '/about';
     const [showAuthModal, setShowAuthModal] = useState(false); // Add state for auth modal
+    const { currentPage } = usePasswordContext();  // Retrieve currentPage from context
 
 
 
@@ -323,23 +325,15 @@ const handleLogout = () => {
 
     const onSearch = (value) => {
         const trimmedQuery = value.trim();
+
         if (!trimmedQuery) {
-            fetchData();  // Clear if the query is empty
+            fetchData(null, currentPage);  // Clear if the query is empty
             return;
         }
 
         // Set up the correct endpoint based on selected group
-        let endpoint;
-        if (selectedGroupId === -1) {
+        let endpoint = `http://127.0.0.1:8000/api/password-items/?search=${encodeURIComponent(trimmedQuery)}&page=${currentPage}`;
 
-            endpoint = `http://127.0.0.1:8000/api/password-items/?search=${encodeURIComponent(trimmedQuery)}`;
-        } else if (selectedGroupId === null) {
-            // Unlisted passwords
-            endpoint = `http://127.0.0.1:8000/api/groups/null/password-items/?search=${encodeURIComponent(trimmedQuery)}`;
-        } else {
-            // Specific group
-            endpoint = `http://127.0.0.1:8000/api/groups/${selectedGroupId}/password-items/?search=${encodeURIComponent(trimmedQuery)}`;
-        }
 
         // Fetch data from the selected endpoint
         axios.get(endpoint, config)
