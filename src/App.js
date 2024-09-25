@@ -321,39 +321,7 @@ const handleLogout = () => {
         fetchData();  // Fetch normal group data when the search bar loses focus
     };
 
-    const onSearch = (value) => {
-        const trimmedQuery = value.trim();
-        if (!trimmedQuery) {
-            fetchData();  // Clear if the query is empty
-            return;
-        }
 
-        // Set up the correct endpoint based on selected group
-        let endpoint;
-        if (selectedGroupId === -1) {
-
-            endpoint = `http://127.0.0.1:8000/api/password-items/?search=${encodeURIComponent(trimmedQuery)}`;
-        } else if (selectedGroupId === null) {
-            // Unlisted passwords
-            endpoint = `http://127.0.0.1:8000/api/groups/null/password-items/?search=${encodeURIComponent(trimmedQuery)}`;
-        } else {
-            // Specific group
-            endpoint = `http://127.0.0.1:8000/api/groups/${selectedGroupId}/password-items/?search=${encodeURIComponent(trimmedQuery)}`;
-        }
-
-        // Fetch data from the selected endpoint
-        axios.get(endpoint, config)
-            .then((response) => {
-                if (response.data && Array.isArray(response.data.passwords)) {
-                    setPasswordItems(response.data.passwords);  // Display fetched passwords
-                } else {
-                    setPasswordItems([]);  // Handle unexpected response structure
-                }
-            })
-            .catch((error) => {
-                console.error('Error during search:', error);
-            });
-    };
 
 
 const handleCancelLogout = () => {
@@ -389,22 +357,7 @@ const handleCancelLogout = () => {
             </Sider>
 
             <Layout>
-                {/* Conditionally render search bar and add password button */}
 
-                {!isLoginPage && !isRegisterPage && !isAboutUsPage && loggedIn &&  (
-                <div ref={searchRef}>
-                    <Search
-                        placeholder="What are you looking for?"
-                        onSearch={onSearch}
-                        className = "custom-search-bar"
-                        onBlur={onSearchBlur}
-
-                        ref={searchInputRef}
-                    />
-                </div>
-
-                )}
-                {/* <Header style={{ padding: 0, background: colorBgContainer }} />*/}
 
                 <Content style={{ margin: '0 16px' }}>
                     <Routes>
@@ -416,13 +369,15 @@ const handleCancelLogout = () => {
 
                         <Route path="/passwords" element={
                             <PrivateRoute>
-                                <Breadcrumb style={{ margin: '16px 0' }} items={breadcrumbItems} />
+                                {/*<Breadcrumb style={{ margin: '16px 0' }} items={breadcrumbItems} />*/}
                                 <MainPage
                                     groupId={selectedGroupId}
                                     userId={userId}
                                     setGroupItems={setGroupItems}
                                     passwordItems={passwordItems} // Pass down the password items
                                     setPasswordItems={setPasswordItems}
+                                    breadcrumbItems={breadcrumbItems}  // Pass breadcrumb items as props
+
                                 />
                             </PrivateRoute>
                         }

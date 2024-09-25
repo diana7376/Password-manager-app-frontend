@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Modal, Tabs, Input, Typography, Button, message } from 'antd';
+import { Table, Modal, Tabs, Input, Typography, Button, message,Breadcrumb  } from 'antd';
 import { MoreOutlined, EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 import {
+    config,
     dataFetching,
     deleteData,
     fetchAllPasswordItems,
@@ -12,10 +13,12 @@ import {
 import axios from './axiosConfg';
 import './styles.css';
 
+const { Search } = Input;
+
 const { TabPane } = Tabs;
 const { Text } = Typography;
 
-const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordItems }) => {
+const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordItems,breadcrumbItems  }) => {
     const [data, setData] = useState([]);
     const [clickedRow, setClickedRow] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -40,12 +43,19 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
     const [prevPage, setPrevPage] = useState(null);
     const [loading, setLoading] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);  // State to track the current page number
+    const [searchMode, setSearchMode] = useState(false); // To track if we are in search mode
+
+    // Pagination state for search results
+    const [currentPageSearch, setCurrentPageSearch] = useState(1);
+    const [nextPageSearch, setNextPageSearch] = useState(null);
+    const [prevPageSearch, setPrevPageSearch] = useState(null);
 
     // Pagination state for the history table
     const [historyCurrentPage, setHistoryCurrentPage] = useState(1);
     const [historyNextPage, setHistoryNextPage] = useState(null);
     const [historyPrevPage, setHistoryPrevPage] = useState(null);
     const [historyLoading, setHistoryLoading] = useState(false);  // History loading state
+
 
 
 
@@ -60,14 +70,15 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
             endpoint = url;
         } else if (groupId === -1) {
             // Case 1: Fetch all passwords (default "Passwords" option)
-            endpoint = 'http://127.0.0.1:8000/api/password-items/';
+            endpoint = 'http://127.0.0.1:8000/api/password-items/?page=' + page;
         } else if (groupId === null) {
             // Case 2: Fetch unlisted passwords (groupId is 'null')
-            endpoint = 'http://127.0.0.1:8000/api/groups/null/password-items/';
+            endpoint = 'http://127.0.0.1:8000/api/groups/null/password-items/?page=' + page;
         } else {
             // Case 3: Fetch passwords for a specific group
-            endpoint = `http://127.0.0.1:8000/api/groups/${groupId}/password-items/`;
+            endpoint = `http://127.0.0.1:8000/api/groups/${groupId}/password-items/?page=` + page;
         }
+
 
         // Use Axios to fetch the data from the determined endpoint
         axios.get(endpoint)
@@ -77,6 +88,7 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
                 setNextPage(data.next_page);       // Set the next page URL
                 setPrevPage(data.previous_page);   // Set the previous page URL
                 setCurrentPage(page);
+                setSearchMode(false);  // Not in search mode
             })
             .catch((error) => {
                 console.error('Error fetching data:', error);
@@ -90,6 +102,60 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
     useEffect(() => {
         fetchData();
     }, [groupId]);
+
+    const onSearch = (value) => {
+        const trimmedQuery = value.trim();
+        setSearchMode(Boolean(trimmedQuery)); // Enter search mode only if a query is provided
+
+        if (!trimmedQuery) {
+            fetchData(null, currentPage);  // Clear the search and go back to normal data
+            return;
+        }
+
+        // Reset search pagination
+        setCurrentPageSearch(1);
+
+        let endpoint;
+        if (groupId === -1) {
+            endpoint = `http://127.0.0.1:8000/api/password-items/?page=1&search=${encodeURIComponent(trimmedQuery)}`;
+        } else if (groupId === null) {
+            endpoint = `http://127.0.0.1:8000/api/groups/null/password-items/?page=1&search=${encodeURIComponent(trimmedQuery)}`;
+        } else {
+            endpoint = `http://127.0.0.1:8000/api/groups/${groupId}/password-items/?page=1&search=${encodeURIComponent(trimmedQuery)}`;
+        }
+
+        axios.get(endpoint)
+            .then((response) => {
+                const data = response.data;
+                setPasswordItems(data.passwords);
+                setNextPageSearch(data.next_page);
+                setPrevPageSearch(data.previous_page);
+            })
+            .catch((error) => {
+                console.error('Error during search:', error);
+            });
+    };
+
+
+    // Change page in search results
+    const fetchSearchResults = (url, page) => {
+        setLoading(true);
+        axios.get(url)
+            .then((response) => {
+                const data = response.data;
+                setPasswordItems(data.passwords);
+                setNextPageSearch(data.next_page);
+                setPrevPageSearch(data.previous_page);
+                setCurrentPageSearch(page);
+            })
+            .catch((error) => {
+                console.error('Error fetching search results:', error);
+            })
+            .finally(() => {
+                setLoading(false);
+            });
+    };
+
 
     useEffect(() => {
         const isUnchanged =
@@ -307,6 +373,18 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
     return (
         <div>
 
+
+                <Search
+                    placeholder="What are you looking for?"
+                    onSearch={onSearch}
+                    className="custom-search-bar"
+                    //onBlur={onSearchBlur}
+
+                   // ref={searchInputRef}
+                />
+
+            <Breadcrumb style={{ margin: '16px 0' }} items={breadcrumbItems} />
+
             <Table
                 dataSource={passwordItems}
                 columns={columns}
@@ -317,9 +395,9 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
             />
             <div style={{display: 'flex', justifyContent: 'center', marginTop: 16}}>
                 <Button
-                    onClick={() => fetchData(prevPage, currentPage - 1)}
-                    disabled={!prevPage}
-                    style={{marginRight: 8}}
+                    onClick={() => searchMode ? fetchSearchResults(prevPageSearch, currentPageSearch - 1) : fetchData(prevPage, currentPage - 1)}
+                    disabled={searchMode ? !prevPageSearch : !prevPage}  // Fix: !prevPage (instead of searchMode ? !prevPageSearch : prevPage)
+                    style={{ marginRight: 8 }}
                 >
                     Previous Page
                 </Button>
@@ -334,11 +412,14 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
                     margin: '0 12px',
                     fontSize: '16px',
                 }}>
-                    {currentPage}
+                    {searchMode ? currentPageSearch : currentPage} {/* Show currentPageSearch in search mode */}
                 </div>
+
                 <Button
-                    onClick={() => fetchData(nextPage, currentPage + 1)}
-                    disabled={!nextPage}
+
+                    onClick={() => searchMode ? fetchSearchResults(nextPageSearch, currentPageSearch + 1) : fetchData(nextPage, currentPage + 1)}
+                    disabled={searchMode ? !nextPageSearch : !nextPage}  // Fix: !nextPage (instead of searchMode ? !prevPageSearch : prevPage)
+                    style={{ marginRight: 8 }}
                 >
                     Next Page
                 </Button>
@@ -357,7 +438,7 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
             >
                 <Tabs defaultActiveKey="1">
                     <TabPane tab="Details" key="1">
-                    {clickedRow && (
+                        {clickedRow && (
                             <div>
                                 <p><strong>Name:</strong> {clickedRow.itemName}</p>
                                 <p><strong>User Name:</strong> {clickedRow.userName}</p>
@@ -389,11 +470,11 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
                                     loading={historyLoading}
                                     pagination={false}
                                 />
-                                <div style={{ display: 'flex', justifyContent: 'center', marginTop: 16 }}>
+                                <div style={{display: 'flex', justifyContent: 'center', marginTop: 16}}>
                                     <Button
                                         onClick={() => fetchHistoryData(clickedRow.passId, historyPrevPage, historyCurrentPage - 1)}
                                         disabled={!historyPrevPage}
-                                        style={{ marginRight: 8 }}
+                                        style={{marginRight: 8}}
                                     >
                                         Previous Page
                                     </Button>
