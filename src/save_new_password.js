@@ -21,7 +21,7 @@ const SaveNewPassword = ({ userId, onPasswordAdd }) => {
     const [urlError, setUrlError] = useState(null);
     const [strengthMessage, setStrengthMessage] = useState('');
     const [strengthScore, setStrengthScore] = useState(0);
-
+    const [loading, setLoading] = useState(false); // Loading state
 
     useEffect(() => {
         const fetchGroups = async () => {
@@ -54,6 +54,8 @@ const SaveNewPassword = ({ userId, onPasswordAdd }) => {
     };
 
     const handleOk = () => {
+        if (loading) return; // Prevent multiple clicks while loading
+
         if (selectedGroup === null && newGroupName.trim() === '') {
             message.error("Please select a group or enter a new group name.");
             return;
@@ -66,6 +68,7 @@ const SaveNewPassword = ({ userId, onPasswordAdd }) => {
             return;
         }
 
+        setLoading(true); // Set loading state to true
         savePassword(groupIdToUse);
     };
 
@@ -89,6 +92,9 @@ const SaveNewPassword = ({ userId, onPasswordAdd }) => {
             .catch((error) => {
                 console.error('Error adding password: ', error);
                 message.error('Failed to add password');
+            })
+            .finally(() => {
+                setLoading(false); // Reset loading state after completion
             });
     };
 
@@ -186,6 +192,7 @@ const SaveNewPassword = ({ userId, onPasswordAdd }) => {
                 onCancel={handleCancel}
                 width={600}
                 className="modal-common"
+                okButtonProps={{ loading }} // Add loading to the OK button
             >
                 <p>Enter the new password details here...</p>
 
@@ -249,12 +256,19 @@ const SaveNewPassword = ({ userId, onPasswordAdd }) => {
                 <Input
                     placeholder="Or enter new group name"
                     value={newGroupName}
-                    onChange={(e) => setNewGroupName(e.target.value)}
+                                        onChange={(e) => setNewGroupName(e.target.value)}
                     style={{ marginBottom: '10px' }}
                 />
 
                 <Input
-                    placeholder="Enter URL (optional)"
+                    placeholder="Comments (optional)"
+                    value={comments}
+                    onChange={(e) => setComments(e.target.value)}
+                    style={{ marginBottom: '10px' }}
+                />
+
+                <Input
+                    placeholder="URL (optional)"
                     value={urlField}
                     onChange={handleUrlChange}
                     style={{ marginBottom: '10px' }}
@@ -262,15 +276,11 @@ const SaveNewPassword = ({ userId, onPasswordAdd }) => {
                 />
                 {urlError && <span style={{ color: 'red' }}>{urlError}</span>}
 
-                <Input.TextArea
-                    placeholder="Comments (optional)"
-                    value={comments}
-                    onChange={(e) => setComments(e.target.value)}
-                    style={{ marginBottom: '10px' }}
-                />
+
             </Modal>
         </>
     );
 };
 
 export default SaveNewPassword;
+
