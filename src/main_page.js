@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Modal, Tabs, Input, Typography, Button, message } from 'antd';
+import { Table, Modal, Tabs, Input, Typography, Button, message,Breadcrumb  } from 'antd';
 import { MoreOutlined, EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 import {
     config,
@@ -18,7 +18,7 @@ const { Search } = Input;
 const { TabPane } = Tabs;
 const { Text } = Typography;
 
-const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordItems }) => {
+const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordItems,breadcrumbItems  }) => {
     const [data, setData] = useState([]);
     const [clickedRow, setClickedRow] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -369,6 +369,7 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
                    // ref={searchInputRef}
                 />
 
+            <Breadcrumb style={{ margin: '16px 0' }} items={breadcrumbItems} />
 
             <Table
                 dataSource={passwordItems}

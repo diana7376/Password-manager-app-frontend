@@ -369,13 +369,15 @@ const handleCancelLogout = () => {
 
                         <Route path="/passwords" element={
                             <PrivateRoute>
-                                <Breadcrumb style={{ margin: '16px 0' }} items={breadcrumbItems} />
+                                {/*<Breadcrumb style={{ margin: '16px 0' }} items={breadcrumbItems} />*/}
                                 <MainPage
                                     groupId={selectedGroupId}
                                     userId={userId}
                                     setGroupItems={setGroupItems}
                                     passwordItems={passwordItems} // Pass down the password items
                                     setPasswordItems={setPasswordItems}
+                                    breadcrumbItems={breadcrumbItems}  // Pass breadcrumb items as props
+
                                 />
                             </PrivateRoute>
                         }
