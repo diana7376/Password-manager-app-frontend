@@ -344,6 +344,21 @@ const handleCancelLogout = () => {
             <Sider collapsible
                    collapsed={collapsed}
                    onCollapse={(value) => setCollapsed(value)}>
+                <div style={{padding: '20px', textAlign: 'center', marginTop: '10px', position:'sticky', top: '2%'}}>
+                    {!collapsed ? (
+                        <img
+                            src="https://i.imgur.com/WR8JhwQ.png"
+                            alt="Expanded Logo"
+                            style={{width: '100%', maxHeight: '64px', objectFit: 'contain', }}
+                        />
+                    ) : (
+                        <img
+                            src="https://i.imgur.com/5rgYyOW.png"
+                            alt="Collapsed Logo"
+                            style={{width: '100%', maxHeight: '60px', objectFit: 'contain'}}
+                        />
+                    )}
+                </div>
 
                 <Menu
                     theme="dark"
@@ -354,22 +369,23 @@ const handleCancelLogout = () => {
                     onOpenChange={onOpenChange}
                     items={groupMenuItems}
                 />
+
             </Sider>
 
             <Layout>
 
 
-                <Content style={{ margin: '0 16px' }}>
+                <Content style={{margin: '0 16px'}}>
                     <Routes>
-                        <Route path="/login" element={<Login />} />
-                        <Route path="/register" element={<Register />} />
-                        <Route path="/about" element={<AboutUs />} />
+                        <Route path="/login" element={<Login/>}/>
+                        <Route path="/register" element={<Register/>}/>
+                        <Route path="/about" element={<AboutUs/>}/>
 
-                        <Route path="/" element={<Navigate to="/about" />} />
+                        <Route path="/" element={<Navigate to="/about"/>}/>
 
                         <Route path="/passwords" element={
                             <PrivateRoute>
-                                {/*<Breadcrumb style={{ margin: '16px 0' }} items={breadcrumbItems} />*/}
+                            {/*<Breadcrumb style={{ margin: '16px 0' }} items={breadcrumbItems} />*/}
                                 <MainPage
                                     groupId={selectedGroupId}
                                     userId={userId}

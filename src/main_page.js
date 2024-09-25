@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Modal, Tabs, Input, Typography, Button, message,Breadcrumb  } from 'antd';
-import { MoreOutlined, EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
+import { MoreOutlined, EyeOutlined, EyeInvisibleOutlined, LeftOutlined, RightOutlined } from '@ant-design/icons';
 import {
     config,
     dataFetching,
@@ -192,6 +192,7 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
 
     const handleMenuClick = async (record) => {
         setClickedRow(record);
+        setIsModalOpen(true);
         fetchHistoryData(record.passId);  // Fetch first page of history when opening the modal
         try {
             const history = await fetchHistory(record.passId);
@@ -222,7 +223,7 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
         setOriginalComment(record.comment);
         setOriginalUrl(record.url); // Set original URL
 
-        setIsModalOpen(true);
+
     };
 
     const handleSaveChanges = () => {
@@ -303,33 +304,47 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
             dataIndex: 'itemName',
             key: 'itemName',
         },
+
         {
             title: 'User Name',
             dataIndex: 'userName',
             key: 'userName',
         },
-        {
-            title: 'Password',
-            dataIndex: 'password',
-            key: 'password',
-            render: (text, record) => {
-                const passwordMasked = record.password ? '*'.repeat(record.password.length) : '';
-                return (
-                    <span>
-                        {record.isPasswordVisible ? record.password : passwordMasked}
-                        <span
-                            style={{ marginLeft: 8, cursor: 'pointer' }}
-                            onClick={() => {
-                                record.isPasswordVisible = !record.isPasswordVisible;
-                                setPasswordItems([...passwordItems]);  // Update the table with visibility toggled
-                            }}
-                        >
-                            {record.isPasswordVisible ? <EyeInvisibleOutlined /> : <EyeOutlined />}
-                        </span>
+
+         {
+        title: (
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span>Password</span>
+                <Button
+                    type="link"  // Low-key, link-styled button
+                    onClick={toggleAllPasswordsVisibility}
+                    style={{ fontSize: '14px', color: '#4b6584' }}  // Adjust style to blend in
+                >
+                    {isPasswordVisible ? 'Hide All' : 'Show All'}
+                </Button>
+            </div>
+        ),
+        dataIndex: 'password',
+        key: 'password',
+        render: (text, record) => {
+            const passwordMasked = record.password ? '*'.repeat(record.password.length) : '';
+            return (
+                <span>
+                    {record.isPasswordVisible ? record.password : passwordMasked}
+                    <span
+                        style={{ marginLeft: 8, cursor: 'pointer' }}
+                        onClick={() => {
+                            record.isPasswordVisible = !record.isPasswordVisible;
+                            setPasswordItems([...passwordItems]);  // Update the table with visibility toggled
+                        }}
+                    >
+                        {record.isPasswordVisible ? <EyeInvisibleOutlined /> : <EyeOutlined />}
                     </span>
-                );
-            },
+                </span>
+            );
         },
+    },
+
         {
             title: '',
             key: 'actions',
@@ -399,7 +414,7 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
                     disabled={searchMode ? !prevPageSearch : !prevPage}  // Fix: !prevPage (instead of searchMode ? !prevPageSearch : prevPage)
                     style={{ marginRight: 8 }}
                 >
-                    Previous Page
+                     <LeftOutlined /> {/* Icon for Previous Page */}
                 </Button>
 
                 <div style={{
@@ -407,10 +422,12 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
                     height: '40px',
                     lineHeight: '40px',
                     textAlign: 'center',
-                    border: '1px solid #d9d9d9',
+                    border: '1px solid #2F72EDFF',
                     borderRadius: '4px',
                     margin: '0 12px',
                     fontSize: '16px',
+                    background: 'white',
+
                 }}>
                     {searchMode ? currentPageSearch : currentPage} {/* Show currentPageSearch in search mode */}
                 </div>
@@ -419,23 +436,21 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
 
                     onClick={() => searchMode ? fetchSearchResults(nextPageSearch, currentPageSearch + 1) : fetchData(nextPage, currentPage + 1)}
                     disabled={searchMode ? !nextPageSearch : !nextPage}  // Fix: !nextPage (instead of searchMode ? !prevPageSearch : prevPage)
-                    style={{ marginRight: 8 }}
+                    style={{ marginLeft: 8,  }}
                 >
-                    Next Page
+                    <RightOutlined /> {/* Icon for Next Page */}
                 </Button>
-                <Button
-                onClick={toggleAllPasswordsVisibility}
-                style={{ marginBottom: 16, marginLeft: 45 }}
-            >
-                {isPasswordVisible ? 'Hide All Passwords' : 'Show All Passwords'}
-            </Button>
+
             </div>
             <Modal
                 title="Password Item Details"
                 open={isModalOpen}
                 onCancel={handleModalClose}
                 footer={null}
+                className="password-details-modal"
+
             >
+
                 <Tabs defaultActiveKey="1">
                     <TabPane tab="Details" key="1">
                         {clickedRow && (
@@ -443,19 +458,30 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
                                 <p><strong>Name:</strong> {clickedRow.itemName}</p>
                                 <p><strong>User Name:</strong> {clickedRow.userName}</p>
                                 <p>
-                                    <strong style={{marginRight:'10px'}}>Password:</strong>
+                                    <strong style={{marginRight: '10px'}}>Password:</strong>
                                     {isPasswordVisible ? clickedRow.password : '*'.repeat(clickedRow.password.length)}
                                     <Button
                                         type="link"
                                         onClick={() => setIsPasswordVisible(!isPasswordVisible)}
-                                    >
-                                        {isPasswordVisible ? 'Hide' : 'Show'}
-                                    </Button>
+                                        icon={isPasswordVisible ? <EyeInvisibleOutlined/> : <EyeOutlined/>}
+                                    />
                                 </p>
-                                <p><strong>Group:</strong> {clickedRow.groupName}</p>
-                                <p><strong>Comment:</strong> {clickedRow.comment}</p>
-                                <p><strong>URL:</strong> {clickedRow.url ? <a href={clickedRow.url} target="_blank"
-                                                                              rel="noopener noreferrer">{clickedRow.url}</a> : 'No URL provided'}
+                                <p>
+                                    <strong>Group:</strong> {clickedRow.groupName ? clickedRow.groupName : 'Unlisted'}
+                                </p>
+                                {clickedRow.comment && (
+                                    <p>
+                                        <strong>Comment:</strong> {clickedRow.comment}
+                                    </p>
+                                )}
+                                <p>
+                                    <strong>URL:</strong> {clickedRow.url ? (
+                                    <a href={clickedRow.url} target="_blank" rel="noopener noreferrer">
+                                        {clickedRow.url}
+                                    </a>
+                                ) : (
+                                    'No URL provided'
+                                )}
                                 </p>
                             </div>
                         )}
