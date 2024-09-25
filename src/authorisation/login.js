@@ -5,7 +5,9 @@ import { EyeInvisibleOutlined, EyeOutlined } from '@ant-design/icons';
 import { message } from 'antd';
 import './login.css';
 
-const Login = ({ onLogout }) => {
+
+
+const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -16,16 +18,23 @@ const Login = ({ onLogout }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        axios.post('/token/', { username, password })
-            .then((response) => {
-                localStorage.setItem('token', response.data.access);
-                message.success('Login successful! Welcome...');
-                setError('');
-                navigate('/passwords');
-            })
-            .catch((error) => {
-                setError('Invalid credentials: ' + (error.response?.data?.detail || 'Unknown error'));
-            });
+        try {
+            const response = await axios.post('/token/',
+                { username, password },
+                {
+                    onUnauthorized: () => navigate('/login') // Handle 401 Unauthorized here
+                }
+            );
+            localStorage.setItem('token', response.data.access);
+            message.success('Login successful! Welcome...');
+            setError('');
+            navigate('/passwords'); // Redirect after login success
+        } catch (err) {
+            console.log('Full error:', err);  // Log the entire error object
+            const errorMessage = err.response?.data?.detail || 'Unknown error occurred.';
+            setError(errorMessage);  // Display the error
+            // message.error(`Login failed: ${errorMessage}`);
+        }
     };
 
     return (

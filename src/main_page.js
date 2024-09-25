@@ -218,7 +218,20 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
         setClickedRow(null);
     };
 
-    const columns = [
+      const toggleAllPasswordsVisibility = () => {
+        const newVisibility = !isPasswordVisible;
+        setIsPasswordVisible(newVisibility);
+
+        // Update each password item's visibility state
+        setPasswordItems(prevData =>
+            prevData.map(item => ({
+                ...item,
+                isPasswordVisible: newVisibility,
+            }))
+        );
+    };
+
+     const columns = [
         {
             title: 'Name',
             dataIndex: 'itemName',
@@ -293,12 +306,14 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
 
     return (
         <div>
+
             <Table
                 dataSource={passwordItems}
                 columns={columns}
                 rowKey={(record) => record.passId}
                 loading={loading}
                 pagination={false}
+
             />
             <div style={{display: 'flex', justifyContent: 'center', marginTop: 16}}>
                 <Button
@@ -308,6 +323,7 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
                 >
                     Previous Page
                 </Button>
+
                 <div style={{
                     width: '40px',
                     height: '40px',
@@ -326,6 +342,12 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
                 >
                     Next Page
                 </Button>
+                <Button
+                onClick={toggleAllPasswordsVisibility}
+                style={{ marginBottom: 16, marginLeft: 45 }}
+            >
+                {isPasswordVisible ? 'Hide All Passwords' : 'Show All Passwords'}
+            </Button>
             </div>
             <Modal
                 title="Password Item Details"
@@ -340,7 +362,7 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
                                 <p><strong>Name:</strong> {clickedRow.itemName}</p>
                                 <p><strong>User Name:</strong> {clickedRow.userName}</p>
                                 <p>
-                                    <strong>Password:</strong>
+                                    <strong style={{marginRight:'10px'}}>Password:</strong>
                                     {isPasswordVisible ? clickedRow.password : '*'.repeat(clickedRow.password.length)}
                                     <Button
                                         type="link"
