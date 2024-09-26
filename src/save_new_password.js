@@ -53,24 +53,57 @@ const SaveNewPassword = ({ userId, onPasswordAdd }) => {
         setOpen(true);
     };
 
-    const handleOk = () => {
-        if (loading) return; // Prevent multiple clicks while loading
+   const handleOk = () => {
+    if (loading) return; // Prevent multiple clicks while loading
 
-        if (selectedGroup === null && newGroupName.trim() === '') {
-            message.error("Please select a group or enter a new group name.");
-            return;
-        }
+    // Ensure at least a group is selected or a new group is being created
+    if (selectedGroup === null && newGroupName.trim() === '') {
+        message.error("Please select a group or enter a new group name.");
+        return;
+    }
 
+    if (urlField && !isValidUrl(urlField)) {
+        setUrlError('Invalid URL');
+        return;
+    }
+
+    setLoading(true); // Set loading state to true
+
+    // If a new group name is entered, create the group first
+    if (newGroupName.trim() !== '') {
+        createNewGroup(newGroupName).then((newGroupId) => {
+            savePassword(newGroupId); // Use the new groupId to save the password
+        }).catch((error) => {
+            console.error('Error creating group:', error);
+            message.error('Failed to create new group');
+            setLoading(false); // Reset loading in case of error
+        });
+    } else {
         const groupIdToUse = selectedGroup === 'null' ? null : selectedGroup;
+        savePassword(groupIdToUse); // Save password with selected group
+    }
+};
 
-        if (urlField && !isValidUrl(urlField)) {
-            setUrlError('Invalid URL');
-            return;
-        }
+// Function to create a new group and update the dropdown list automatically
+const createNewGroup = async (groupName) => {
+    try {
+        const response = await axios.post('http://127.0.0.1:8000/api/groups/', { groupName });
+        const newGroup = {
+            groupId: response.data.groupId, // Assuming API returns the new group's ID
+            groupName: groupName,
+        };
 
-        setLoading(true); // Set loading state to true
-        savePassword(groupIdToUse);
-    };
+        // Update the group options with the new group and select it automatically
+        setGroupOptions((prevOptions) => [...prevOptions, newGroup]);
+        setSelectedGroup(newGroup.groupId); // Automatically select the new group
+        message.success('New group created successfully');
+
+        return newGroup.groupId; // Return the new group's ID
+    } catch (error) {
+        throw new Error('Error creating group');
+    }
+};
+
 
     const savePassword = (groupIdToUse) => {
         const newPasswordItem = {
