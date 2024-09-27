@@ -13,6 +13,8 @@ import {
 import axios from './axiosConfg';
 import './styles.css';
 
+import { usePasswordContext } from './PasswordContext';  // Import the context
+
 const { Search } = Input;
 
 const { TabPane } = Tabs;
@@ -30,6 +32,7 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
     const [editedComment, setEditedComment] = useState('');
     const [editedUrl, setEditedUrl] = useState(''); // Added for URL field
 
+    const { currentPage, setCurrentPage } = usePasswordContext();
     const [originalItemName, setOriginalItemName] = useState('');
     const [originalUserName, setOriginalUserName] = useState('');
     const [originalPassword, setOriginalPassword] = useState('');
@@ -42,7 +45,6 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
     const [nextPage, setNextPage] = useState(null);
     const [prevPage, setPrevPage] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [currentPage, setCurrentPage] = useState(1);  // State to track the current page number
     const [searchMode, setSearchMode] = useState(false); // To track if we are in search mode
 
     // Pagination state for search results

@@ -7,6 +7,8 @@ const PasswordContext = createContext();
 
 export const PasswordProvider = ({ children }) => {
     const [passwordItems, setPasswordItems] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1); // Add currentPage here
+
 
     // Fetch passwords from the API
     const fetchPasswords = () => {
@@ -52,7 +54,9 @@ export const PasswordProvider = ({ children }) => {
             fetchPasswords,
             addPassword,
             updatePassword,
-            deletePassword
+            deletePassword,
+            currentPage,
+            setCurrentPage,
         }}>
             {children}
         </PasswordContext.Provider>
