@@ -19,7 +19,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: url('https://i.imgur.com/GCvLquU.png') repeat; /* Add a subtle pattern or texture */
+  background: url('../../public/img.png') repeat; /* Add a subtle pattern or texture */
   opacity: 0.1; /* Light opacity for subtle effect */
   z-index: 0; /* Send it to the back */
 }

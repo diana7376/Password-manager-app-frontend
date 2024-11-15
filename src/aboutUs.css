@@ -23,9 +23,8 @@ body {
 /*}*/
 
 .ant-layout{
-    background: url('https://i.imgur.com/GCvLquU.png') repeat;
+    background: url('../public/img.png') repeat;
     background-size: 40%;
-
 }
 
 .ant-layout-footer{
@@ -441,7 +440,7 @@ body {
 /* Mobile styles (up to 40vw or 60vh) */
 @media (max-width: 40vw), (max-height: 60vh) {
     .ant-layout {
-        background-image: url('https://i.imgur.com/GCvLquU.png'); /* Replace with your image */
+        background-image: url('../public/img.png'); /* Replace with your image */
         background-repeat: no-repeat; /* Prevent background from repeating */
         background-size: auto; /* Use the image's natural size */
         background-position: center; /* Center the image */
@@ -451,7 +450,7 @@ body {
 /* Tablet styles (between 41vw and 75vw or 61vh and 90vh) */
 @media (min-width: 41vw) and (max-width: 75vw), (min-height: 61vh) and (max-height: 90vh) {
     .ant-layout {
-        background-image: url('https://i.imgur.com/GCvLquU.png'); /* Replace with your image */
+        background-image: url('../public/img.png'); /* Replace with your image */
         background-repeat: no-repeat; /* Prevent repeating */
         background-size: auto; /* Use the image's natural size */
         background-position: center; /* Center the image */
@@ -461,7 +460,7 @@ body {
 /* Desktop styles (above 76vw or 91vh) */
 @media (min-width: 76vw), (min-height: 91vh) {
     .ant-layout {
-        background-image: url('https://i.imgur.com/GCvLquU.png'); /* Replace with your image */
+        background-image: url('../public/img.png'); /* Replace with your image */
         background-repeat: repeat; /* Allow repeating */
         background-size: auto; /* Keep the image at its natural size */
         background-position: center; /* Center the image */

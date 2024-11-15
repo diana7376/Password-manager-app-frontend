@@ -26,7 +26,7 @@ const SaveNewPassword = ({ userId, onPasswordAdd }) => {
     useEffect(() => {
         const fetchGroups = async () => {
             try {
-                const response = await axios.get('http://127.0.0.1:8000/api/groups/');
+                const response = await axios.get('groups/');
                 const groupsWithUnlisted = [
                     { groupId: 'null', groupName: 'Unlisted' },
                     ...response.data,
@@ -87,7 +87,7 @@ const SaveNewPassword = ({ userId, onPasswordAdd }) => {
 // Function to create a new group and update the dropdown list automatically
 const createNewGroup = async (groupName) => {
     try {
-        const response = await axios.post('http://127.0.0.1:8000/api/groups/', { groupName });
+        const response = await axios.post('groups/', { groupName });
         const newGroup = {
             groupId: response.data.groupId, // Assuming API returns the new group's ID
             groupName: groupName,
@@ -137,7 +137,7 @@ const createNewGroup = async (groupName) => {
     };
 
     const generatePassword = () => {
-        axios.post('http://127.0.0.1:8000/api/password-items/generate/', {})
+        axios.post('password-items/generate/', {})
             .then(response => {
                 if (response.data && response.data.generated_password) {
                     setPassword(response.data.generated_password);

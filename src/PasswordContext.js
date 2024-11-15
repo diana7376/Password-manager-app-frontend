@@ -12,7 +12,7 @@ export const PasswordProvider = ({ children }) => {
 
     // Fetch passwords from the API
     const fetchPasswords = () => {
-        axios.get('http://127.0.0.1:8000/api/password-items/', config)
+        axios.get('password-items/', config)
             .then(response => {
                 if (Array.isArray(response.data.passwords)) {
                     setPasswordItems(response.data.passwords);  // Update context state with fresh data

@@ -72,13 +72,18 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
             endpoint = url;
         } else if (groupId === -1) {
             // Case 1: Fetch all passwords (default "Passwords" option)
-            endpoint = 'http://127.0.0.1:8000/api/password-items/?page=' + page;
+            endpoint = '/password-items/?page=' + page;
         } else if (groupId === null) {
             // Case 2: Fetch unlisted passwords (groupId is 'null')
-            endpoint = 'http://127.0.0.1:8000/api/groups/null/password-items/?page=' + page;
+            endpoint = '/groups/null/password-items/?page=' + page;
         } else {
             // Case 3: Fetch passwords for a specific group
-            endpoint = `http://127.0.0.1:8000/api/groups/${groupId}/password-items/?page=` + page;
+            endpoint = `/groups/${groupId}/password-items/?page=` + page;
+        }
+
+        // Ensure the endpoint starts with the full base URL
+        if (!endpoint.startsWith('http')) {
+            endpoint = `${process.env.REACT_APP_API_BASE_URL}${endpoint}`;
         }
 
 
@@ -119,11 +124,11 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
 
         let endpoint;
         if (groupId === -1) {
-            endpoint = `http://127.0.0.1:8000/api/password-items/?page=1&search=${encodeURIComponent(trimmedQuery)}`;
+            endpoint = `password-items/?page=1&search=${encodeURIComponent(trimmedQuery)}`;
         } else if (groupId === null) {
-            endpoint = `http://127.0.0.1:8000/api/groups/null/password-items/?page=1&search=${encodeURIComponent(trimmedQuery)}`;
+            endpoint = `groups/null/password-items/?page=1&search=${encodeURIComponent(trimmedQuery)}`;
         } else {
-            endpoint = `http://127.0.0.1:8000/api/groups/${groupId}/password-items/?page=1&search=${encodeURIComponent(trimmedQuery)}`;
+            endpoint = `groups/${groupId}/password-items/?page=1&search=${encodeURIComponent(trimmedQuery)}`;
         }
 
         axios.get(endpoint)
@@ -174,7 +179,7 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
     // Fetch history data for a specific password item with pagination
     const fetchHistoryData = (passId, url = null, page = 1) => {
         setHistoryLoading(true);
-        let endpoint = url || `http://127.0.0.1:8000/api/password-history/${passId}/?page=${page}`;
+        let endpoint = url || `password-history/${passId}/?page=${page}`;
 
         axios.get(endpoint)
             .then((response) => {
@@ -389,8 +394,6 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
 
     return (
         <div>
-
-
                 <Search
                     placeholder="What are you looking for?"
                     onSearch={onSearch}

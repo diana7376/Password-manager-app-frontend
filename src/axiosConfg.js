@@ -1,9 +1,12 @@
+
+
 import axios from 'axios';
 import { message } from 'antd';
 
 // Create an Axios instance
 const axiosInstance = axios.create({
-    baseURL: 'http://127.0.0.1:8000/api/', // Your backend URL
+    // Use the environment variable for the base URL
+    baseURL: process.env.REACT_APP_API_BASE_URL || 'http://127.0.0.1:8000/api/', // Default to localhost in development
 });
 
 // Interceptor to add token to headers
@@ -14,6 +17,7 @@ axiosInstance.interceptors.request.use(
             config.headers['Authorization'] = `Bearer ${token}`;
             config.isAuthenticated = true; // Custom flag to track if the request is authenticated
         }
+        config.headers['X-Requested-By'] = 'frontend'; // Add the custom header
         return config;
     },
     (error) => Promise.reject(error)

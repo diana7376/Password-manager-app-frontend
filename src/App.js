@@ -117,7 +117,7 @@ const App = () => {
 
         if (token) {
             axios
-                .get('http://127.0.0.1:8000/api/groups/', { headers: { Authorization: `Bearer ${token}` } })
+                .get('groups/', { headers: { Authorization: `Bearer ${token}` } })
                 .then((response) => {
                     if (Array.isArray(response.data)) {
 
@@ -218,7 +218,7 @@ const App = () => {
 
     const fetchDataForAllGroups = () => {
         axios
-            .get('http://127.0.0.1:8000/api/password-items/', config)
+            .get('password-items/', config)
             .then((response) => {
                 setPasswordItems(response.data.passwords);
             })
@@ -229,7 +229,7 @@ const App = () => {
 
     const fetchDataForUnlistedGroups = () => {
         axios
-            .get('http://127.0.0.1:8000/api/password-items/unlisted/', config)
+            .get('password-items/unlisted/', config)
             .then((response) => {
                 setPasswordItems(response.data.passwords);
             })
