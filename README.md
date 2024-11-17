@@ -45,30 +45,35 @@ Ensure you have the following prerequisites installed before setting up LockR's 
 
 - **npm**  
   Installed automatically with Node.js. To confirm, run:
-``` sh
-npm -v
-```
+  
+  ``` sh
+  npm -v
+  ```
 
 ### ⚙️ Installation
 
 _Follow these steps to install and configure LockR's frontend:_
 
 1. Clone the Repository
-``` sh
-git clone https://github.com/diana7376/Password-manager-app-frontend
-```
+    ``` sh
+    git clone https://github.com/diana7376/Password-manager-app-frontend
+    ```
 2. Install the required packages
-``` sh
-npm install
-```
+    ``` sh
+    npm install
+    ```
 3. Start the development server
-``` sh
-npm start
-```
+    ``` sh
+    npm start
+    ```
 4.  Access the localhost address
-```
-http://localhost:8000/
-```
+    ```
+    http://localhost:3000/
+    ```
+5. If needed build the app and transfer the `build` folder according to the steps, from the Backend repo, into the right place
+    ```
+    npm run build
+    ```
 
 ****
 
@@ -80,6 +85,7 @@ http://localhost:8000/
 - [x] Implement the log in page
 - [x] Implement pagination
 - [x] Set up search functionality
+- [x] Deploy the app on the Web
 - [ ] Passwords Sharing Page
 
 See the [project view](https://github.com/users/diana7376/projects/2) for a full list of tasks in progress, proposed features (and known issues).
