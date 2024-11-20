@@ -1,38 +1,83 @@
-/* Body Background and Text */
+/* Dark Mode for Entire App */
 body.dark-mode {
-    background-color: #112a45; /* Dark blue background */
-    color: #f0f0f0; /* Light text */
+    background: #1C2C3E !important; /* Solid dark background */
+    color: #E5E6E8 !important; /* Light text for readability */
+    position: relative; /* Position for the pattern overlay */
+    transition: background 0.3s ease, color 0.3s ease; /* Smooth transition */
 }
 
-/* Table Styles */
-body.dark-mode table {
-    background-color: #15395b;
-    color: #f0f0f0;
+/* Pattern Overlay */
+body.dark-mode::before {
+    content: '';
+    position: fixed; /* Fixed position for the pattern across the viewport */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('/Users/daria/Desktop/Uni/practica_tefnologica/Password-manager-app-frontend/public/img.png') repeat, #1C2C3E; /* Pattern with fallback to solid background */
+    opacity: 0.1; /* Light opacity for subtle effect */
+    z-index: -1; /* Ensure it stays behind all content */
 }
 
-body.dark-mode th, body.dark-mode td {
-    border: 1px solid #177ddc;
+/* Layout Specifics */
+body.dark-mode .ant-layout {
+    background: transparent !important; /* Transparent to let the body background show through */
 }
 
-body.dark-mode tr:hover {
-    background-color: #177ddc;
+body.dark-mode .ant-layout-header {
+    background: rgba(28, 44, 62, 0.9) !important; /* Semi-transparent for consistency */
+    color: #E5E6E8 !important;
 }
 
-/* Search Bar */
-body.dark-mode .custom-search-bar {
-    background: #15395b;
-    color: #f0f0f0;
+body.dark-mode .ant-layout-footer {
+    background: rgba(28, 44, 62, 0.9) !important;
+    color: #E5E6E8 !important;
 }
 
-/* Sidebar */
-body.dark-mode .ant-menu {
-    background-color: #15395b;
-    color: #f0f0f0;
+/* Forms and Inputs */
+body.dark-mode .form-wrapper {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #E5E6E8 !important;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5); /* Stronger shadow for dark mode */
 }
 
 /* Buttons */
-body.dark-mode .ant-btn-primary {
-    background-color: #177ddc;
-    border-color: #177ddc;
-    color: #f0f0f0;
+body.dark-mode .submit-btn {
+    background: #2F72ED !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .submit-btn:hover {
+    background: #7A91E5 !important;
+}
+
+/* Links */
+body.dark-mode a {
+    color: #2F72ED !important;
+}
+
+body.dark-mode a:hover {
+    color: #7A91E5 !important;
+}
+
+/* Footer and Header */
+body.dark-mode .footer {
+    background: rgba(28, 44, 62, 0.9) !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .header {
+    background: rgba(28, 44, 62, 0.9) !important;
+    color: #E5E6E8 !important;
+}
+
+/* Modal Styling */
+body.dark-mode .ant-modal {
+    background: rgba(28, 44, 62, 0.9) !important;
+    color: #E5E6E8 !important;
+}
+
+/* Transitions for Smooth Experience */
+body.dark-mode, body.dark-mode * {
+    transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
