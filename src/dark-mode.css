@@ -1,0 +1,38 @@
+/* Body Background and Text */
+body.dark-mode {
+    background-color: #112a45; /* Dark blue background */
+    color: #f0f0f0; /* Light text */
+}
+
+/* Table Styles */
+body.dark-mode table {
+    background-color: #15395b;
+    color: #f0f0f0;
+}
+
+body.dark-mode th, body.dark-mode td {
+    border: 1px solid #177ddc;
+}
+
+body.dark-mode tr:hover {
+    background-color: #177ddc;
+}
+
+/* Search Bar */
+body.dark-mode .custom-search-bar {
+    background: #15395b;
+    color: #f0f0f0;
+}
+
+/* Sidebar */
+body.dark-mode .ant-menu {
+    background-color: #15395b;
+    color: #f0f0f0;
+}
+
+/* Buttons */
+body.dark-mode .ant-btn-primary {
+    background-color: #177ddc;
+    border-color: #177ddc;
+    color: #f0f0f0;
+}

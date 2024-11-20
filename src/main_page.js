@@ -12,6 +12,7 @@ import {
 } from './crud_operation';
 import axios from './axiosConfg';
 import './styles.css';
+import './dark-mode.css'
 
 import { usePasswordContext } from './PasswordContext';  // Import the context
 
@@ -61,6 +62,32 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
     const [historyNextPage, setHistoryNextPage] = useState(null);
     const [historyPrevPage, setHistoryPrevPage] = useState(null);
     const [historyLoading, setHistoryLoading] = useState(false);  // History loading state
+
+    const [isDarkMode, setIsDarkMode] = useState(false);
+
+
+
+    const toggleDarkMode = (checked) => {
+        console.log(`Switch toggled: ${checked ? "Dark Mode ON" : "Light Mode ON"}`);
+        if (checked) {
+            document.body.classList.add("dark-mode");
+            console.log("Dark mode enabled.");
+        } else {
+            document.body.classList.remove("dark-mode");
+            console.log("Dark mode disabled.");
+        }
+        localStorage.setItem("darkMode", checked);
+        setIsDarkMode(checked);
+    };
+
+    useEffect(() => {
+        const savedPreference = localStorage.getItem("darkMode") === "true";
+        console.log(`Restoring dark mode preference: ${savedPreference ? "ON" : "OFF"}`);
+        if (savedPreference) {
+            document.body.classList.add("dark-mode");
+            setIsDarkMode(true);
+        }
+    }, []);
 
 
 
@@ -408,7 +435,7 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
             />
             {/* Switch on the right side */}
             <div className="right-section">
-                <Switch defaultChecked onChange={onChange}/>
+                <Switch checked={isDarkMode} onChange={toggleDarkMode} />
             </div>
 
             <Breadcrumb style={{margin: '16px 0'}} items={breadcrumbItems}>
