@@ -613,3 +613,11 @@ ul {
     padding: 4px 8px;
     font-size: 14px;
 }
+
+
+.right-section {
+    display: flex;
+    align-items: center;
+    margin-right: 5%;
+    justify-content: flex-end; /* Push the switch to the far right */
+}

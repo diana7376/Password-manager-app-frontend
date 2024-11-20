@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Modal, Tabs, Input, Typography, Button, message,Breadcrumb  } from 'antd';
+import { Table, Modal, Tabs, Input, Typography, Button, message, Breadcrumb, Switch  } from 'antd';
 import { MoreOutlined, EyeOutlined, EyeInvisibleOutlined, LeftOutlined, RightOutlined } from '@ant-design/icons';
 import {
     config,
@@ -19,6 +19,10 @@ const { Search } = Input;
 
 const { TabPane } = Tabs;
 const { Text } = Typography;
+
+const onChange = (checked) => {
+    console.log(`switch to ${checked}`); // Logs the state of the switch
+};
 
 const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordItems,breadcrumbItems  }) => {
     const [data, setData] = useState([]);
@@ -394,16 +398,22 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
 
     return (
         <div>
-                <Search
-                    placeholder="What are you looking for?"
-                    onSearch={onSearch}
-                    className="custom-search-bar"
-                    //onBlur={onSearchBlur}
+            <Search
+                placeholder="What are you looking for?"
+                onSearch={onSearch}
+                className="custom-search-bar"
+                //onBlur={onSearchBlur}
 
-                   // ref={searchInputRef}
-                />
+                // ref={searchInputRef}
+            />
+            {/* Switch on the right side */}
+            <div className="right-section">
+                <Switch defaultChecked onChange={onChange}/>
+            </div>
 
-            <Breadcrumb style={{ margin: '16px 0' }} items={breadcrumbItems} />
+            <Breadcrumb style={{margin: '16px 0'}} items={breadcrumbItems}>
+
+            </Breadcrumb>
 
             <Table
                 dataSource={passwordItems}
@@ -417,9 +427,9 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
                 <Button
                     onClick={() => searchMode ? fetchSearchResults(prevPageSearch, currentPageSearch - 1) : fetchData(prevPage, currentPage - 1)}
                     disabled={searchMode ? !prevPageSearch : !prevPage}  // Fix: !prevPage (instead of searchMode ? !prevPageSearch : prevPage)
-                    style={{ marginRight: 8 }}
+                    style={{marginRight: 8}}
                 >
-                     <LeftOutlined /> {/* Icon for Previous Page */}
+                    <LeftOutlined/> {/* Icon for Previous Page */}
                 </Button>
 
                 <div style={{
@@ -441,9 +451,9 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
 
                     onClick={() => searchMode ? fetchSearchResults(nextPageSearch, currentPageSearch + 1) : fetchData(nextPage, currentPage + 1)}
                     disabled={searchMode ? !nextPageSearch : !nextPage}  // Fix: !nextPage (instead of searchMode ? !prevPageSearch : prevPage)
-                    style={{ marginLeft: 8,  }}
+                    style={{marginLeft: 8,}}
                 >
-                    <RightOutlined /> {/* Icon for Next Page */}
+                    <RightOutlined/> {/* Icon for Next Page */}
                 </Button>
 
             </div>
