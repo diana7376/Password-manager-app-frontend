@@ -14,7 +14,7 @@ body.dark-mode::before {
     left: 0;
     width: 100%;
     height: 100%;
-    background: url('/Users/daria/Desktop/Uni/practica_tefnologica/Password-manager-app-frontend/public/img.png') repeat, #1C2C3E; /* Pattern with fallback to solid background */
+    background: url('../public/img.png') repeat, #1C2C3E; /* Pattern with fallback to solid background */
     opacity: 0.1; /* Light opacity for subtle effect */
     z-index: -1; /* Ensure it stays behind all content */
 }
@@ -75,6 +75,86 @@ body.dark-mode .header {
 body.dark-mode .ant-modal {
     background: rgba(28, 44, 62, 0.9) !important;
     color: #E5E6E8 !important;
+}
+
+/* Password Table Parent Container */
+body.dark-mode .ant-table-wrapper {
+    margin: 0 !important; /* Remove outer margins */
+    padding: 0 !important; /* Remove inner padding */
+    border: none !important; /* Ensure no border around the wrapper */
+    background: transparent !important; /* Transparent to blend with the parent */
+    box-shadow: none !important; /* Remove shadow */
+}
+
+/* Fix for Problematic White Area (ant-spin-container) */
+body.dark-mode .ant-spin-container {
+    background: #001529 !important; /* Match the table background */
+    margin: 0 !important; /* Remove any margin */
+    padding: 0 !important; /* Remove any padding */
+    border: none !important; /* Remove any border */
+    box-shadow: none !important; /* Remove any shadow */
+}
+
+/* Direct Parent Wrapper */
+body.dark-mode .ant-card,
+body.dark-mode .ant-card-body,
+body.dark-mode .container,
+body.dark-mode .content-wrapper {
+    margin: 0 !important; /* Remove margins */
+    padding: 0 !important; /* Remove padding */
+    border: none !important; /* Remove border */
+    background: transparent !important; /* Transparent background */
+    box-shadow: none !important; /* Remove shadow */
+}
+
+/* Password Table Styles */
+body.dark-mode .ant-table {
+    background: #001529 !important; /* Dark blue background */
+    color: #ffffff !important; /* White text for readability */
+    border: none !important; /* Remove table border */
+    border-radius: 8px; /* Rounded corners for a polished look */
+    box-shadow: none !important; /* Remove outer shadow */
+}
+
+/* Table Header Styles */
+body.dark-mode .ant-table th {
+    background: #00263E !important; /* Slightly darker blue for contrast */
+    color: #ffffff !important; /* White text */
+    font-weight: 600; /* Emphasize header text */
+    text-align: center; /* Center-align header text */
+    border: none !important; /* Remove header border */
+}
+
+/* Table Cell Styles */
+body.dark-mode .ant-table td {
+    background: #001529 !important; /* Match table background */
+    color: #ffffff !important; /* White text */
+    text-align: left; /* Align text to the left */
+    padding: 12px; /* Add padding for spacing */
+    border: none !important; /* Remove cell borders */
+}
+
+/* Row Hover Effect */
+body.dark-mode .ant-table tr:hover td {
+    background: #00314D !important; /* Slightly lighter blue on hover */
+    color: #ffffff !important; /* Ensure text remains white */
+}
+
+/* Pagination Styles */
+body.dark-mode .ant-pagination-item {
+    background: #001529 !important; /* Match table background */
+    color: #ffffff !important;
+    border-color: transparent !important; /* Remove borders */
+}
+
+body.dark-mode .ant-pagination-item-active {
+    background: #00314D !important; /* Highlight active page */
+    color: #ffffff !important;
+}
+
+body.dark-mode .ant-pagination-item:hover {
+    background: #00314D !important; /* Lighter blue on hover */
+    color: #ffffff !important;
 }
 
 /* Transitions for Smooth Experience */
