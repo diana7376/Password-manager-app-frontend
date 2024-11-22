@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Table, Modal, Tabs, Input, Typography, Button, message, Breadcrumb, Switch  } from 'antd';
+import React, { useState, useEffect,useRef  } from 'react';
+import { Table, Modal, Tabs, Input, Typography, Button, message,Breadcrumb, Switch } from 'antd';
 import { MoreOutlined, EyeOutlined, EyeInvisibleOutlined, LeftOutlined, RightOutlined } from '@ant-design/icons';
 import {
     config,
@@ -63,6 +63,40 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
     const [historyPrevPage, setHistoryPrevPage] = useState(null);
     const [historyLoading, setHistoryLoading] = useState(false);  // History loading state
 
+    // OTP related
+    const [secretKey, setSecretKey] = useState('');
+    const [otp, setOtp] = useState('000000');
+    const pollingRef = useRef(null); // To manage the polling interval
+    const [initialRequestFailed, setInitialRequestFailed] = useState(false); // Track initial request failure
+
+    // Start polling the OTP endpoint when the modal opens
+    useEffect(() => {
+        if (isModalOpen) {
+            fetchOtp(); // Try fetching OTP immediately
+            if (!initialRequestFailed) {
+                pollingRef.current = setInterval(fetchOtp, 5000); // Start polling only if the initial request is successful
+            }
+        } else {
+            clearInterval(pollingRef.current); // Stop polling when modal closes
+        }
+
+        return () => clearInterval(pollingRef.current); // Cleanup on unmount or modal closure
+    }, [isModalOpen, initialRequestFailed]);
+
+    // Save secret key
+    const handleSaveKey = async () => {
+        try {
+            const response = await axios.post(`/password-items-otp/${clickedRow.passId}/update-otp/`, {
+                otpKey: secretKey,
+            });
+            message.success(response.data.responseKey);
+            setInitialRequestFailed(false); // Reset failure state
+            fetchOtp(); // Fetch OTP immediately
+            pollingRef.current = setInterval(fetchOtp, 5000); // Restart polling
+        } catch (error) {
+            message.error('Failed to save the OTP key');
+        }
+    };
     const [isDarkMode, setIsDarkMode] = useState(false);
 
 
@@ -90,7 +124,44 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
     }, []);
 
 
+    // Delete secret key
+    const handleDeleteKey = async () => {
+        try {
+            await axios.delete(`/password-items-otp/${clickedRow.passId}/delete-otp/`);
+            setSecretKey('');
+            message.success('OTP key deleted successfully');
+        } catch (error) {
+            message.error('Failed to delete the OTP key');
+        }
+    };
 
+    // Function to fetch OTP from the endpoint
+    const fetchOtp = async () => {
+        try {
+            const response = await axios.get(`/password-items-otp/${clickedRow.passId}/generate-otp/`);
+            const responseKey = response.data.responseKey;
+
+            if (responseKey === "No OTP key found for this item") {
+                setOtp('000000'); // Fallback OTP
+                setInitialRequestFailed(false); // No error in this case
+            } else {
+                setOtp(responseKey.toString().padStart(6, '0')); // Format OTP as 6 digits
+                setInitialRequestFailed(false); // Mark as successful
+            }
+        } catch (error) {
+            setInitialRequestFailed(true); // Mark failure
+            setOtp('000000'); // Fallback in case of an error
+
+            clearInterval(pollingRef.current); // Stop polling if the request fails
+        }
+    };
+
+
+    // Copy OTP to clipboard
+    const handleCopyOtp = () => {
+        navigator.clipboard.writeText(otp);
+        message.success('OTP copied to clipboard');
+    };
 
     // Function to fetch data based on the group
     const fetchData = (url = null, page = 1) => {
@@ -349,39 +420,39 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
             key: 'userName',
         },
 
-         {
-        title: (
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span>Password</span>
-                <Button
-                    type="link"  // Low-key, link-styled button
-                    onClick={toggleAllPasswordsVisibility}
-                    style={{ fontSize: '14px', color: '#4b6584' }}  // Adjust style to blend in
-                >
-                    {isPasswordVisible ? 'Hide All' : 'Show All'}
-                </Button>
-            </div>
-        ),
-        dataIndex: 'password',
-        key: 'password',
-        render: (text, record) => {
-            const passwordMasked = record.password ? '*'.repeat(record.password.length) : '';
-            return (
-                <span>
-                    {record.isPasswordVisible ? record.password : passwordMasked}
-                    <span
-                        style={{ marginLeft: 8, cursor: 'pointer' }}
-                        onClick={() => {
-                            record.isPasswordVisible = !record.isPasswordVisible;
-                            setPasswordItems([...passwordItems]);  // Update the table with visibility toggled
-                        }}
+        {
+            title: (
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span>Password</span>
+                    <Button
+                        type="link"  // Low-key, link-styled button
+                        onClick={toggleAllPasswordsVisibility}
+                        style={{ fontSize: '14px', color: '#4b6584' }}  // Adjust style to blend in
                     >
+                        {isPasswordVisible ? 'Hide All' : 'Show All'}
+                    </Button>
+                </div>
+            ),
+            dataIndex: 'password',
+            key: 'password',
+            render: (text, record) => {
+                const passwordMasked = record.password ? '*'.repeat(record.password.length) : '';
+                return (
+                    <span>
+                    {record.isPasswordVisible ? record.password : passwordMasked}
+                        <span
+                            style={{ marginLeft: 8, cursor: 'pointer' }}
+                            onClick={() => {
+                                record.isPasswordVisible = !record.isPasswordVisible;
+                                setPasswordItems([...passwordItems]);  // Update the table with visibility toggled
+                            }}
+                        >
                         {record.isPasswordVisible ? <EyeInvisibleOutlined /> : <EyeOutlined />}
                     </span>
                 </span>
-            );
+                );
+            },
         },
-    },
 
         {
             title: '',
@@ -456,7 +527,7 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
                     disabled={searchMode ? !prevPageSearch : !prevPage}  // Fix: !prevPage (instead of searchMode ? !prevPageSearch : prevPage)
                     style={{marginRight: 8}}
                 >
-                    <LeftOutlined/> {/* Icon for Previous Page */}
+                    <LeftOutlined /> {/* Icon for Previous Page */}
                 </Button>
 
                 <div style={{
@@ -544,7 +615,7 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
                                         disabled={!historyPrevPage}
                                         style={{marginRight: 8}}
                                     >
-                                        Previous Page
+                                        <LeftOutlined />
                                     </Button>
                                     <div
                                         className="pagination-number-box"
@@ -564,7 +635,7 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
                                         onClick={() => fetchHistoryData(clickedRow.passId, historyNextPage, historyCurrentPage + 1)}
                                         disabled={!historyNextPage}
                                     >
-                                        Next Page
+                                        <RightOutlined />
                                     </Button>
                                 </div>
                             </div>
@@ -637,6 +708,29 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
                             </div>
                         )}
                     </TabPane>
+                    <TabPane tab="OTP" key="5">
+                        <div style={{marginBottom: '16px'}}>
+                            <Input
+                                placeholder="Enter Secret Key"
+                                value={secretKey}
+                                onChange={(e) => setSecretKey(e.target.value)}
+                                style={{width: '80%', marginRight: '8px'}}
+                            />
+                            <Button type="primary" onClick={handleSaveKey} disabled={!secretKey}>
+                                Save
+                            </Button>
+                            <Button danger onClick={handleDeleteKey} style={{marginLeft: '8px'}}>
+                                Delete
+                            </Button>
+                        </div>
+                        <div style={{textAlign: 'center', marginBottom: '16px'}}>
+                            <Typography.Title level={2} onClick={handleCopyOtp} style={{cursor: 'pointer'}}>
+                                {otp || '000000'}
+                            </Typography.Title>
+                            <Typography.Text type="secondary">Click to copy OTP</Typography.Text>
+                        </div>
+                    </TabPane>
+
                 </Tabs>
             </Modal>
         </div>
