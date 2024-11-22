@@ -23,6 +23,7 @@ const SaveNewPassword = ({ userId, onPasswordAdd }) => {
     const [strengthMessage, setStrengthMessage] = useState('');
     const [strengthScore, setStrengthScore] = useState(0);
     const [loading, setLoading] = useState(false); // Loading state
+    const [isSharingEnabled, setIsSharingEnabled] = useState(true);
 
     useEffect(() => {
         const fetchGroups = async () => {
@@ -244,15 +245,15 @@ const createNewGroup = async (groupName) => {
 
                 />
 
-                <div style={{marginBottom: '10px'}}>
+                <div >
                     <div style={{
                         height: '10px',
                         width: `${strengthScore * 24.75}%`,
                         backgroundColor: ['#D73F40', '#DC6551', '#F2B84F', '#BDE952', '#3ba62f'][strengthScore],
                         transition: 'width 0.3s',
                         borderRadius: '4px',
-                        marginBottom: '10px',
-                        marginTop: '10px',
+                        marginTop: '3px',
+                        marginBottom: '3px'
                     }}/>
                 </div>
 
@@ -268,8 +269,10 @@ const createNewGroup = async (groupName) => {
                     Generate password
                 </Button>
 
+            <div className={'shared-group'}>
+                <div className="group" style={{ width: '50%' }}>
                 <Select
-                    style={{width: '50%'}}
+                    style={{width: '100%', marginBottom: '10px'}}
                     placeholder="Select a group"
                     value={selectedGroup || undefined}
                     onChange={(value) => setSelectedGroup(value)}
@@ -286,37 +289,29 @@ const createNewGroup = async (groupName) => {
                         </Option>
                     ))}
                 </Select>
-
-                <div
-                    style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'flex-start',
-                        border: '1px solid #d9d9d9',
-                        padding: '15px',
-                        borderRadius: '10px',
-                        marginBottom: '15px',
-                        width: '100%',
-                        maxWidth: '600px',
-                        backgroundColor: '#f9f9f9'
-                    }}
-                >
-                    <div style={{display: 'flex', alignItems: 'center', marginBottom: '10px', width: '100%'}}>
-                        <span style={{fontWeight: '500', marginRight: 'auto'}}>Share Password</span>
-                        <Switch defaultChecked/>
-                    </div>
-                    <Input
-                        placeholder="Enter email to share"
-                        style={{width: '100%'}}
-                    />
-                </div>
                 <Input
                     placeholder="Or enter new group name"
                     value={newGroupName}
                     onChange={(e) => setNewGroupName(e.target.value)}
 
                 />
+                </div>
+                <div className={'share-box'} style={{borderRadius: '5px',height:'auto'}}>
+                    <div style={{display: 'flex', alignItems: 'center', marginBottom: '5px', width: '100%'}}>
+                        <span style={{fontWeight: '500', marginRight: 'auto'}}>Share Password</span>
+                        <Switch
+                            defaultChecked
+                            onChange={(checked) => setIsSharingEnabled(checked)}
+                            className="switch"/>
+                    </div>
+                    <Input
+                        placeholder="Enter email or username"
+                        style={{width: '100%', height:'31px'}}
+                        disabled={!isSharingEnabled}
+                    />
+                </div>
 
+            </div>
                 <Input
                     placeholder="Comments (optional)"
                     value={comments}
