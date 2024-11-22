@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Modal, Tabs, Input, Typography, Button, message,Breadcrumb  } from 'antd';
+import { Table, Modal, Tabs, Input, Typography, Button, message, Breadcrumb, Switch  } from 'antd';
 import { MoreOutlined, EyeOutlined, EyeInvisibleOutlined, LeftOutlined, RightOutlined } from '@ant-design/icons';
 import {
     config,
@@ -12,6 +12,7 @@ import {
 } from './crud_operation';
 import axios from './axiosConfg';
 import './styles.css';
+import './dark-mode.css'
 
 import { usePasswordContext } from './PasswordContext';  // Import the context
 
@@ -19,6 +20,10 @@ const { Search } = Input;
 
 const { TabPane } = Tabs;
 const { Text } = Typography;
+
+const onChange = (checked) => {
+    console.log(`switch to ${checked}`); // Logs the state of the switch
+};
 
 const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordItems,breadcrumbItems  }) => {
     const [data, setData] = useState([]);
@@ -57,6 +62,32 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
     const [historyNextPage, setHistoryNextPage] = useState(null);
     const [historyPrevPage, setHistoryPrevPage] = useState(null);
     const [historyLoading, setHistoryLoading] = useState(false);  // History loading state
+
+    const [isDarkMode, setIsDarkMode] = useState(false);
+
+
+
+    const toggleDarkMode = (checked) => {
+        console.log(`Switch toggled: ${checked ? "Dark Mode ON" : "Light Mode ON"}`);
+        if (checked) {
+            document.body.classList.add("dark-mode");
+            console.log("Dark mode enabled.");
+        } else {
+            document.body.classList.remove("dark-mode");
+            console.log("Dark mode disabled.");
+        }
+        localStorage.setItem("darkMode", checked);
+        setIsDarkMode(checked);
+    };
+
+    useEffect(() => {
+        const savedPreference = localStorage.getItem("darkMode") === "true";
+        console.log(`Restoring dark mode preference: ${savedPreference ? "ON" : "OFF"}`);
+        if (savedPreference) {
+            document.body.classList.add("dark-mode");
+            setIsDarkMode(true);
+        }
+    }, []);
 
 
 
@@ -394,16 +425,22 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
 
     return (
         <div>
-                <Search
-                    placeholder="What are you looking for?"
-                    onSearch={onSearch}
-                    className="custom-search-bar"
-                    //onBlur={onSearchBlur}
+            <Search
+                placeholder="What are you looking for?"
+                onSearch={onSearch}
+                className="custom-search-bar"
+                //onBlur={onSearchBlur}
 
-                   // ref={searchInputRef}
-                />
+                // ref={searchInputRef}
+            />
+            {/* Switch on the right side */}
+            <div className="right-section">
+                <Switch checked={isDarkMode} onChange={toggleDarkMode} />
+            </div>
 
-            <Breadcrumb style={{ margin: '16px 0' }} items={breadcrumbItems} />
+            <Breadcrumb style={{margin: '16px 0'}} items={breadcrumbItems}>
+
+            </Breadcrumb>
 
             <Table
                 dataSource={passwordItems}
@@ -417,9 +454,9 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
                 <Button
                     onClick={() => searchMode ? fetchSearchResults(prevPageSearch, currentPageSearch - 1) : fetchData(prevPage, currentPage - 1)}
                     disabled={searchMode ? !prevPageSearch : !prevPage}  // Fix: !prevPage (instead of searchMode ? !prevPageSearch : prevPage)
-                    style={{ marginRight: 8 }}
+                    style={{marginRight: 8}}
                 >
-                     <LeftOutlined /> {/* Icon for Previous Page */}
+                    <LeftOutlined/> {/* Icon for Previous Page */}
                 </Button>
 
                 <div style={{
@@ -441,9 +478,9 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
 
                     onClick={() => searchMode ? fetchSearchResults(nextPageSearch, currentPageSearch + 1) : fetchData(nextPage, currentPage + 1)}
                     disabled={searchMode ? !nextPageSearch : !nextPage}  // Fix: !nextPage (instead of searchMode ? !prevPageSearch : prevPage)
-                    style={{ marginLeft: 8,  }}
+                    style={{marginLeft: 8,}}
                 >
-                    <RightOutlined /> {/* Icon for Next Page */}
+                    <RightOutlined/> {/* Icon for Next Page */}
                 </Button>
 
             </div>
@@ -509,16 +546,18 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
                                     >
                                         Previous Page
                                     </Button>
-                                    <div style={{
-                                        width: '40px',
-                                        height: '40px',
-                                        lineHeight: '40px',
-                                        textAlign: 'center',
-                                        border: '1px solid #d9d9d9',
-                                        borderRadius: '4px',
-                                        margin: '0 12px',
-                                        fontSize: '16px',
-                                    }}>
+                                    <div
+                                        className="pagination-number-box"
+                                        style={{
+                                            width: '40px',
+                                            height: '40px',
+                                            lineHeight: '40px',
+                                            textAlign: 'center',
+                                            borderRadius: '4px',
+                                            margin: '0 12px',
+                                            fontSize: '16px',
+                                        }}
+                                    >
                                         {historyCurrentPage}
                                     </div>
                                     <Button

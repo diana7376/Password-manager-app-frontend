@@ -1,3 +1,19 @@
+:root {
+    /* Light Mode Colors */
+    --background-color: #ffffff;
+    --text-color: #333333;
+    --primary-color: #1890ff;
+    --secondary-color: #f0f0f0;
+
+    /* Dark Mode Colors */
+    --dark-background: #141414;
+    --dark-primary-color: #177ddc;
+    --dark-secondary-color: #112a45;
+    --dark-text-color: #f0f0f0;
+    --dark-accent-color: #15395b;
+}
+
+
 * {
     box-sizing: border-box;
 }
@@ -612,4 +628,29 @@ ul {
 .password-details-modal .password-field button {
     padding: 4px 8px;
     font-size: 14px;
+}
+
+
+.right-section {
+    display: flex;
+    align-items: center;
+    margin-right: 5%;
+    justify-content: flex-end; /* Push the switch to the far right */
+}
+
+/* Dark Mode Styles */
+body.dark-mode {
+    background-color: var(--dark-background);
+    color: var(--dark-text-color);
+}
+
+body.dark-mode .group-search-container {
+    background-color: var(--dark-secondary-color);
+    color: var(--dark-text-color);
+}
+
+body.dark-mode .passwords-table-container {
+    background-color: var(--dark-secondary-color);
+    color: var(--dark-text-color);
+    border: 1px solid var(--dark-accent-color);
 }
