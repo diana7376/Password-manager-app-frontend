@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { PlusOutlined, UserOutlined, EyeInvisibleOutlined, EyeTwoTone, RollbackOutlined } from '@ant-design/icons';
+import { PlusOutlined, UserOutlined, EyeInvisibleOutlined, EyeTwoTone, RollbackOutlined , ShareAltOutlined } from '@ant-design/icons';
 import { Button, Tooltip, Modal, Input, Select, message, Switch } from 'antd';
 import { addPasswordItem } from './crud_operation';
 import axios from './axiosConfg';
@@ -24,6 +24,7 @@ const SaveNewPassword = ({ userId, onPasswordAdd }) => {
     const [strengthScore, setStrengthScore] = useState(0);
     const [loading, setLoading] = useState(false); // Loading state
     const [isSharingEnabled, setIsSharingEnabled] = useState(true);
+    const [sharedGroups, setSharedGroups] = useState([]);
 
     useEffect(() => {
         const fetchGroups = async () => {
@@ -208,6 +209,26 @@ const createNewGroup = async (groupName) => {
         }
     };
 
+    const inviteUser = async (groupId, emailOrUsername) => {
+        if (!groupId || groupId === 'null') {
+            message.error("Please select a valid group before inviting users.");
+            return;
+        }
+
+        try {
+            const response = await axios.post(`http://127.0.0.1:8000/api/groups/${groupId}/invite/`, {
+                user: emailOrUsername,
+            });
+
+            if (response.status === 200) {
+                message.success('User invited successfully');
+            }
+        } catch (error) {
+            console.error('Error inviting user:', error);
+            message.error('Failed to invite user. Please try again.');
+        }
+    };
+
     return (
         <>
             <Tooltip title="Add new password">
@@ -271,44 +292,90 @@ const createNewGroup = async (groupName) => {
 
             <div className={'shared-group'}>
                 <div className="group" style={{ width: '50%' }}>
-                <Select
-                    style={{width: '100%', marginBottom: '10px'}}
-                    placeholder="Select a group"
-                    value={selectedGroup || undefined}
-                    onChange={(value) => setSelectedGroup(value)}
-                    allowClear
-                    showSearch
-                    notFoundContent="No groups found"
-                    filterOption={(input, option) =>
-                        option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                    }
-                >
-                    {groupOptions.map((group) => (
-                        <Option key={group.groupId} value={group.groupId}>
-                            {group.groupName}
-                        </Option>
-                    ))}
-                </Select>
+
+                    <Select
+                        style={{ width: '100%', marginBottom: '10px' }}
+                        placeholder="Select a group"
+                        value={selectedGroup || undefined}
+                        onChange={(value) => {
+                            setSelectedGroup(value);
+                            setIsSharingEnabled(sharedGroups.includes(value));
+                        }}
+                        allowClear
+                        showSearch
+                        notFoundContent="No groups found"
+                        filterOption={(input, option) =>
+                            option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                        }
+                    >
+                        {groupOptions.map((group) => (
+                            <Option key={group.groupId} value={group.groupId}>
+                                {group.groupName}
+                                {sharedGroups.includes(group.groupId) && (
+                                    <ShareAltOutlined style={{ marginLeft: '10px', color: '#1677ff' }} />
+                                )}
+                            </Option>
+                        ))}
+                    </Select>
+
+
+                    {
+
                 <Input
                     placeholder="Or enter new group name"
                     value={newGroupName}
                     onChange={(e) => setNewGroupName(e.target.value)}
 
                 />
+                        /* Conditional Rendering of Share Icon */}
+                    {selectedGroup && selectedGroup !== 'null' && isSharingEnabled && (
+                        <ShareAltOutlined
+                            style={{
+                                position: 'absolute',
+                                right: '-30px',
+                                top: '50%',
+                                transform: 'translateY(-50%)',
+                                fontSize: '18px',
+                                color: '#1677ff'
+                            }}
+                        />
+                    )}
+
                 </div>
                 <div className={'share-box'} style={{borderRadius: '5px',height:'auto'}}>
                     <div style={{display: 'flex', alignItems: 'center', marginBottom: '5px', width: '100%'}}>
                         <span style={{fontWeight: '500', marginRight: 'auto'}}>Share Password</span>
                         <Switch
-                            defaultChecked
-                            onChange={(checked) => setIsSharingEnabled(checked)}
-                            className="switch"/>
+                            defaultChecked={false}
+                            onChange={(checked) => {
+                                setIsSharingEnabled(checked);
+                                if (selectedGroup && selectedGroup !== 'null') {
+                                    if (checked) {
+                                        // Add the group to the sharedGroups list if not already present
+                                        setSharedGroups((prevSharedGroups) => {
+                                            if (!prevSharedGroups.includes(selectedGroup)) {
+                                                return [...prevSharedGroups, selectedGroup];
+                                            }
+                                            return prevSharedGroups;
+                                        });
+                                    } else {
+                                        // Remove the group from the sharedGroups list if unchecked
+                                        setSharedGroups((prevSharedGroups) =>
+                                            prevSharedGroups.filter((groupId) => groupId !== selectedGroup)
+                                        );
+                                    }
+                                }
+                            }}
+                            className="switch"
+                        />
+
                     </div>
                     <Input
                         placeholder="Enter email or username"
                         style={{width: '100%', height:'31px'}}
                         disabled={!isSharingEnabled}
                     />
+
                 </div>
 
             </div>
