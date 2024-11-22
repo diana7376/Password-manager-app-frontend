@@ -546,16 +546,18 @@ const MainPage = ({ groupId, userId, setGroupItems, passwordItems, setPasswordIt
                                     >
                                         Previous Page
                                     </Button>
-                                    <div style={{
-                                        width: '40px',
-                                        height: '40px',
-                                        lineHeight: '40px',
-                                        textAlign: 'center',
-                                        border: '1px solid #d9d9d9',
-                                        borderRadius: '4px',
-                                        margin: '0 12px',
-                                        fontSize: '16px',
-                                    }}>
+                                    <div
+                                        className="pagination-number-box"
+                                        style={{
+                                            width: '40px',
+                                            height: '40px',
+                                            lineHeight: '40px',
+                                            textAlign: 'center',
+                                            borderRadius: '4px',
+                                            margin: '0 12px',
+                                            fontSize: '16px',
+                                        }}
+                                    >
                                         {historyCurrentPage}
                                     </div>
                                     <Button
