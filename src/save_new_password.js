@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { PlusOutlined, UserOutlined, EyeInvisibleOutlined, EyeTwoTone, RollbackOutlined } from '@ant-design/icons';
-import { Button, Tooltip, Modal, Input, Select, message } from 'antd';
+import { Button, Tooltip, Modal, Input, Select, message, Switch } from 'antd';
 import { addPasswordItem } from './crud_operation';
 import axios from './axiosConfg';
 import { usePasswordContext } from './PasswordContext';
 import './styles.css';
+import './save_new_password.css'
 
 const { Option } = Select;
 
@@ -225,7 +226,7 @@ const createNewGroup = async (groupName) => {
                 onCancel={handleCancel}
                 width={600}
                 className="modal-common"
-                okButtonProps={{ loading }} // Add loading to the OK button
+                okButtonProps={{loading}} // Add loading to the OK button
             >
                 <p>Enter the new password details here...</p>
 
@@ -233,17 +234,17 @@ const createNewGroup = async (groupName) => {
                     placeholder="Field name"
                     value={fieldName}
                     onChange={(e) => setFieldName(e.target.value)}
-                    style={{ marginBottom: '10px' }}
+                    style={{marginBottom: '10px'}}
                 />
                 <Input
                     placeholder="User-name"
-                    prefix={<UserOutlined />}
+                    prefix={<UserOutlined/>}
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    style={{ marginBottom: '10px' }}
+
                 />
 
-                <div style={{ marginBottom: '10px' }}>
+                <div style={{marginBottom: '10px'}}>
                     <div style={{
                         height: '10px',
                         width: `${strengthScore * 24.75}%`,
@@ -252,23 +253,23 @@ const createNewGroup = async (groupName) => {
                         borderRadius: '4px',
                         marginBottom: '10px',
                         marginTop: '10px',
-                    }} />
+                    }}/>
                 </div>
 
                 <Input.Password
                     placeholder="Input password"
                     value={password}
                     onChange={handlePasswordChange}
-                    iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
-                    style={{ width: '45%', marginBottom: '10px' }}
+                    iconRender={(visible) => (visible ? <EyeTwoTone/> : <EyeInvisibleOutlined/>)}
+                    style={{width: '50%', marginBottom: '10px', height: '31px'}}
                 />
-                <Button type="primary" style={{ width: '45%', marginBottom: '10px', marginLeft: '9.5%' }}
-                    onClick={generatePassword}>
+                <Button type="primary" style={{width: '45%', marginBottom: '10px', marginLeft: '5%'}}
+                        onClick={generatePassword}>
                     Generate password
                 </Button>
 
                 <Select
-                    style={{ width: '100%', marginBottom: '10px' }}
+                    style={{width: '50%'}}
                     placeholder="Select a group"
                     value={selectedGroup || undefined}
                     onChange={(value) => setSelectedGroup(value)}
@@ -286,28 +287,51 @@ const createNewGroup = async (groupName) => {
                     ))}
                 </Select>
 
+                <div
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'flex-start',
+                        border: '1px solid #d9d9d9',
+                        padding: '15px',
+                        borderRadius: '10px',
+                        marginBottom: '15px',
+                        width: '100%',
+                        maxWidth: '600px',
+                        backgroundColor: '#f9f9f9'
+                    }}
+                >
+                    <div style={{display: 'flex', alignItems: 'center', marginBottom: '10px', width: '100%'}}>
+                        <span style={{fontWeight: '500', marginRight: 'auto'}}>Share Password</span>
+                        <Switch defaultChecked/>
+                    </div>
+                    <Input
+                        placeholder="Enter email to share"
+                        style={{width: '100%'}}
+                    />
+                </div>
                 <Input
                     placeholder="Or enter new group name"
                     value={newGroupName}
-                                        onChange={(e) => setNewGroupName(e.target.value)}
-                    style={{ marginBottom: '10px' }}
+                    onChange={(e) => setNewGroupName(e.target.value)}
+
                 />
 
                 <Input
                     placeholder="Comments (optional)"
                     value={comments}
                     onChange={(e) => setComments(e.target.value)}
-                    style={{ marginBottom: '10px' }}
+
                 />
 
                 <Input
                     placeholder="URL (optional)"
                     value={urlField}
                     onChange={handleUrlChange}
-                    style={{ marginBottom: '10px' }}
+
                     status={urlError ? 'error' : ''}
                 />
-                {urlError && <span style={{ color: 'red' }}>{urlError}</span>}
+                {urlError && <span style={{color: 'red'}}>{urlError}</span>}
 
 
             </Modal>
