@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { PlusOutlined, UserOutlined, EyeInvisibleOutlined, EyeTwoTone, RollbackOutlined } from '@ant-design/icons';
-import { Button, Tooltip, Modal, Input, Select, message } from 'antd';
+import { PlusOutlined, UserOutlined, EyeInvisibleOutlined, EyeTwoTone, RollbackOutlined , ShareAltOutlined } from '@ant-design/icons';
+import { Button, Tooltip, Modal, Input, Select, message, Switch } from 'antd';
 import { addPasswordItem } from './crud_operation';
 import axios from './axiosConfg';
 import { usePasswordContext } from './PasswordContext';
 import './styles.css';
+import './save_new_password.css'
 
 const { Option } = Select;
 
@@ -22,6 +23,8 @@ const SaveNewPassword = ({ userId, onPasswordAdd }) => {
     const [strengthMessage, setStrengthMessage] = useState('');
     const [strengthScore, setStrengthScore] = useState(0);
     const [loading, setLoading] = useState(false); // Loading state
+    const [isSharingEnabled, setIsSharingEnabled] = useState(true);
+    const [sharedGroups, setSharedGroups] = useState([]);
 
     useEffect(() => {
         const fetchGroups = async () => {
@@ -206,6 +209,26 @@ const createNewGroup = async (groupName) => {
         }
     };
 
+    const inviteUser = async (groupId, emailOrUsername) => {
+        if (!groupId || groupId === 'null') {
+            message.error("Please select a valid group before inviting users.");
+            return;
+        }
+
+        try {
+            const response = await axios.post(`http://127.0.0.1:8000/api/groups/${groupId}/invite/`, {
+                user: emailOrUsername,
+            });
+
+            if (response.status === 200) {
+                message.success('User invited successfully');
+            }
+        } catch (error) {
+            console.error('Error inviting user:', error);
+            message.error('Failed to invite user. Please try again.');
+        }
+    };
+
     return (
         <>
             <Tooltip title="Add new password">
@@ -225,7 +248,7 @@ const createNewGroup = async (groupName) => {
                 onCancel={handleCancel}
                 width={600}
                 className="modal-common"
-                okButtonProps={{ loading }} // Add loading to the OK button
+                okButtonProps={{loading}} // Add loading to the OK button
             >
                 <p>Enter the new password details here...</p>
 
@@ -233,81 +256,144 @@ const createNewGroup = async (groupName) => {
                     placeholder="Field name"
                     value={fieldName}
                     onChange={(e) => setFieldName(e.target.value)}
-                    style={{ marginBottom: '10px' }}
+                    style={{marginBottom: '10px'}}
                 />
                 <Input
                     placeholder="User-name"
-                    prefix={<UserOutlined />}
+                    prefix={<UserOutlined/>}
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    style={{ marginBottom: '10px' }}
+
                 />
 
-                <div style={{ marginBottom: '10px' }}>
+                <div >
                     <div style={{
                         height: '10px',
                         width: `${strengthScore * 24.75}%`,
                         backgroundColor: ['#D73F40', '#DC6551', '#F2B84F', '#BDE952', '#3ba62f'][strengthScore],
                         transition: 'width 0.3s',
                         borderRadius: '4px',
-                        marginBottom: '10px',
-                        marginTop: '10px',
-                    }} />
+                        marginTop: '3px',
+                        marginBottom: '3px'
+                    }}/>
                 </div>
 
                 <Input.Password
                     placeholder="Input password"
                     value={password}
                     onChange={handlePasswordChange}
-                    iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
-                    style={{ width: '45%', marginBottom: '10px' }}
+                    iconRender={(visible) => (visible ? <EyeTwoTone/> : <EyeInvisibleOutlined/>)}
+                    style={{width: '50%', marginBottom: '10px', height: '31px'}}
                 />
-                <Button type="primary" style={{ width: '45%', marginBottom: '10px', marginLeft: '9.5%' }}
-                    onClick={generatePassword}>
+                <Button type="primary" style={{width: '45%', marginBottom: '10px', marginLeft: '5%'}}
+                        onClick={generatePassword}>
                     Generate password
                 </Button>
 
-                <Select
-                    style={{ width: '100%', marginBottom: '10px' }}
-                    placeholder="Select a group"
-                    value={selectedGroup || undefined}
-                    onChange={(value) => setSelectedGroup(value)}
-                    allowClear
-                    showSearch
-                    notFoundContent="No groups found"
-                    filterOption={(input, option) =>
-                        option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                    }
-                >
-                    {groupOptions.map((group) => (
-                        <Option key={group.groupId} value={group.groupId}>
-                            {group.groupName}
-                        </Option>
-                    ))}
-                </Select>
+            <div className={'shared-group'}>
+                <div className="group" style={{ width: '50%' }}>
+
+                    <Select
+                        style={{ width: '100%', marginBottom: '10px' }}
+                        placeholder="Select a group"
+                        value={selectedGroup || undefined}
+                        onChange={(value) => {
+                            setSelectedGroup(value);
+                            setIsSharingEnabled(sharedGroups.includes(value));
+                        }}
+                        allowClear
+                        showSearch
+                        notFoundContent="No groups found"
+                        filterOption={(input, option) =>
+                            option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                        }
+                    >
+                        {groupOptions.map((group) => (
+                            <Option key={group.groupId} value={group.groupId}>
+                                {group.groupName}
+                                {sharedGroups.includes(group.groupId) && (
+                                    <ShareAltOutlined style={{ marginLeft: '10px', color: '#1677ff' }} />
+                                )}
+                            </Option>
+                        ))}
+                    </Select>
+
+
+                    {
 
                 <Input
                     placeholder="Or enter new group name"
                     value={newGroupName}
-                                        onChange={(e) => setNewGroupName(e.target.value)}
-                    style={{ marginBottom: '10px' }}
-                />
+                    onChange={(e) => setNewGroupName(e.target.value)}
 
+                />
+                        /* Conditional Rendering of Share Icon */}
+                    {selectedGroup && selectedGroup !== 'null' && isSharingEnabled && (
+                        <ShareAltOutlined
+                            style={{
+                                position: 'absolute',
+                                right: '-30px',
+                                top: '50%',
+                                transform: 'translateY(-50%)',
+                                fontSize: '18px',
+                                color: '#1677ff'
+                            }}
+                        />
+                    )}
+
+                </div>
+                <div className={'share-box'} style={{borderRadius: '5px',height:'auto'}}>
+                    <div style={{display: 'flex', alignItems: 'center', marginBottom: '5px', width: '100%'}}>
+                        <span style={{fontWeight: '500', marginRight: 'auto'}}>Share Password</span>
+                        <Switch
+                            defaultChecked={false}
+                            onChange={(checked) => {
+                                setIsSharingEnabled(checked);
+                                if (selectedGroup && selectedGroup !== 'null') {
+                                    if (checked) {
+                                        // Add the group to the sharedGroups list if not already present
+                                        setSharedGroups((prevSharedGroups) => {
+                                            if (!prevSharedGroups.includes(selectedGroup)) {
+                                                return [...prevSharedGroups, selectedGroup];
+                                            }
+                                            return prevSharedGroups;
+                                        });
+                                    } else {
+                                        // Remove the group from the sharedGroups list if unchecked
+                                        setSharedGroups((prevSharedGroups) =>
+                                            prevSharedGroups.filter((groupId) => groupId !== selectedGroup)
+                                        );
+                                    }
+                                }
+                            }}
+                            className="switch"
+                        />
+
+                    </div>
+                    <Input
+                        placeholder="Enter email or username"
+                        style={{width: '100%', height:'31px'}}
+                        disabled={!isSharingEnabled}
+                    />
+
+                </div>
+
+            </div>
                 <Input
                     placeholder="Comments (optional)"
                     value={comments}
                     onChange={(e) => setComments(e.target.value)}
-                    style={{ marginBottom: '10px' }}
+
                 />
 
                 <Input
                     placeholder="URL (optional)"
                     value={urlField}
                     onChange={handleUrlChange}
-                    style={{ marginBottom: '10px' }}
+
                     status={urlError ? 'error' : ''}
                 />
-                {urlError && <span style={{ color: 'red' }}>{urlError}</span>}
+                {urlError && <span style={{color: 'red'}}>{urlError}</span>}
 
 
             </Modal>
