@@ -1,8 +1,17 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import './aboutUs.css';
 import { ParallaxProvider, Parallax } from 'react-scroll-parallax';
 
 const AboutUs = () => {
+    useEffect(() => {
+        // Add the 'about-us-page' class for dark mode styling
+        document.body.classList.add('about-us-page');
+
+        return () => {
+            // Clean up by removing the class when the component unmounts
+            document.body.classList.remove('about-us-page');
+        };
+    }, []);
     return (
         <ParallaxProvider>
             <div className="main-container">
@@ -12,7 +21,7 @@ const AboutUs = () => {
                         Welcome to LockR, your trusted companion in managing and securing your passwords. Our mission is to simplify your digital life with a robust, easy-to-use password manager designed for everyone—from individuals to businesses.
                     </p>
                     <div className="buttons-container">
-                        <button className="primary-button">Get Started</button>
+                        <button className="primary-button-about-us">Get Started</button>
                         <button className="secondary-button">Learn More</button>
                     </div>
                 </div>
