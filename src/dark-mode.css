@@ -108,31 +108,7 @@ body.dark-mode .ant-btn:focus {
     box-shadow: 0 0 0 2px rgba(23, 125, 220, 0.6); /* Optional blue focus ring */
 }
 
-/* Style for numbered pagination items in dark mode */
-/*body.dark-mode .ant-pagination-item {*/
-/*    background-color: #001529 !important; !* Apply dark blue background *!*/
-/*    color: #e5e6e8 !important; !* Light text for visibility *!*/
-/*    border: 1px solid rgba(255, 255, 255, 0.2) !important; !* Subtle border *!*/
-/*    transition: background-color 0.3s ease, color 0.3s ease; !* Smooth transitions *!*/
-/*}*/
 
-/*!* Active pagination item *!*/
-/*body.dark-mode .ant-pagination-item-active {*/
-/*    background-color: #177ddc !important; !* Light blue background for active state *!*/
-/*    color: #ffffff !important; !* White text for active item *!*/
-/*    border: none !important; !* Remove border for active item *!*/
-/*}*/
-
-/*!* Hover effect for numbered pagination items *!*/
-/*body.dark-mode .ant-pagination-item:hover {*/
-/*    background-color: #177ddc !important; !* Lighter blue on hover *!*/
-/*    color: #ffffff !important; !* White text on hover *!*/
-/*}*/
-
-/*!* Text inside the pagination item *!*/
-/*body.dark-mode .ant-pagination-item a {*/
-/*    color: #e5e6e8 !important; !* Ensure text color applies correctly *!*/
-/*}*/
 
 
 /* Specifically target the active pagination item */
@@ -420,104 +396,6 @@ body.dark-mode .ant-modal-close:hover {
 }
 
 
-
-
-/*!* Dark Mode Styles for View Modal *!*/
-/*!* General Dark Mode Styling for Details Modal *!*/
-/*body.dark-mode .details-modal,*/
-/*body.dark-mode .view-modal {*/
-/*    background-color: #001529 !important; !* Maintain the dark background *!*/
-/*    color: #ffffff !important;!* Default all text to white *!*/
-/*}*/
-
-/*!* Apply explicitly to all child elements *!*/
-/*body.dark-mode .details-modal *,*/
-/*body.dark-mode .view-modal * {*/
-/*    color: #ffffff !important; !* Force all child elements' text to white *!*/
-/*}*/
-
-/*!* Override for input fields, textareas, and links inside the modal *!*/
-/*body.dark-mode .details-modal input,*/
-/*body.dark-mode .details-modal textarea,*/
-/*body.dark-mode .view-modal input,*/
-/*body.dark-mode .view-modal textarea,*/
-/*body.dark-mode .details-modal a,*/
-/*body.dark-mode .view-modal a {*/
-/*    color: #ffffff !important; !* Ensure inputs, textareas, and links are also white *!*/
-/*    background-color: #112a45 !important; !* Darker background for inputs *!*/
-/*    border: 1px solid rgba(255, 255, 255, 0.3) !important; !* Subtle border *!*/
-/*}*/
-
-/*!* Placeholder text styling for inputs and textareas *!*/
-/*body.dark-mode .details-modal input::placeholder,*/
-/*body.dark-mode .details-modal textarea::placeholder,*/
-/*body.dark-mode .view-modal input::placeholder,*/
-/*body.dark-mode .view-modal textarea::placeholder {*/
-/*    color: rgba(255, 255, 255, 0.6) !important; !* Subtle lighter white for placeholders *!*/
-/*}*/
-
-/*!* Ensure headers, bold text, and emphasized text are white *!*/
-/*body.dark-mode .details-modal h1,*/
-/*body.dark-mode .details-modal h2,*/
-/*body.dark-mode .details-modal h3,*/
-/*body.dark-mode .details-modal h4,*/
-/*body.dark-mode .details-modal h5,*/
-/*body.dark-mode .details-modal h6,*/
-/*body.dark-mode .details-modal strong,*/
-/*body.dark-mode .details-modal b,*/
-/*body.dark-mode .view-modal h1,*/
-/*body.dark-mode .view-modal h2,*/
-/*body.dark-mode .view-modal h3,*/
-/*body.dark-mode .view-modal h4,*/
-/*body.dark-mode .view-modal h5,*/
-/*body.dark-mode .view-modal h6,*/
-/*body.dark-mode .view-modal strong,*/
-/*body.dark-mode .view-modal b {*/
-/*    color: #ffffff !important; !* White color for headings and bold text *!*/
-/*    font-weight: bold; !* Retain bold style *!*/
-/*}*/
-
-/*!* Specific fix for Ant Design typography inside modals *!*/
-/*body.dark-mode .details-modal .ant-typography,*/
-/*body.dark-mode .details-modal .ant-typography-secondary,*/
-/*body.dark-mode .view-modal .ant-typography,*/
-/*body.dark-mode .view-modal .ant-typography-secondary {*/
-/*    color: #ffffff !important; !* Ensure all Ant Design typography is white *!*/
-/*}*/
-
-/*!* Ensure list elements are white *!*/
-/*body.dark-mode .details-modal ul,*/
-/*body.dark-mode .details-modal ol,*/
-/*body.dark-mode .details-modal li,*/
-/*body.dark-mode .view-modal ul,*/
-/*body.dark-mode .view-modal ol,*/
-/*body.dark-mode .view-modal li {*/
-/*    color: #ffffff !important; !* Force white text for lists *!*/
-/*}*/
-
-/*!* Divider Lines *!*/
-/*body.dark-mode .details-modal hr,*/
-/*body.dark-mode .view-modal hr {*/
-/*    border-color: rgba(255, 255, 255, 0.2) !important; !* Subtle divider line *!*/
-/*}*/
-
-/*!* Ensure buttons in the modals are styled properly *!*/
-/*body.dark-mode .details-modal .ant-btn,*/
-/*body.dark-mode .view-modal .ant-btn {*/
-/*    background-color: #0056b3 !important; !* Button background *!*/
-/*    color: #ffffff !important; !* Button text *!*/
-/*    border: none !important; !* Remove borders *!*/
-/*}*/
-
-/*!* Ensure button text remains styled on hover *!*/
-/*body.dark-mode .details-modal .ant-btn:hover,*/
-/*body.dark-mode .view-modal .ant-btn:hover {*/
-/*    background-color: #177ddc !important; !* Slightly lighter blue *!*/
-/*    color: #ffffff !important; !* Keep white text on hover *!*/
-/*}*/
-
-
-
 /* Remove the white line under the Ant Design tabs */
 body.dark-mode .ant-tabs-ink-bar {
     background-color: transparent !important; /* Make the ink-bar background transparent */
@@ -769,4 +647,39 @@ body.dark-mode .pagination-number-box {
     font-size: 16px;
     margin: 0 12px; /* Spacing between buttons */
 }
+
+
+body.dark-mode .share-box {
+    background-color: #001529 !important; /* Dark blue background */
+    border: 0.5px solid #d3d3d3 !important; /* Slimmer border with light grey color */
+    border-radius: 8px; /* Optional: Keep rounded corners */
+    padding: 10px; /* Maintain padding */
+    box-shadow: none !important;
+}
+
+
+body.dark-mode .share-switch {
+    border: 1px solid #ffffff !important; /* White border for better visibility */
+}
+
+body.dark-mode .share-switch.ant-switch-checked {
+    background-color: #0056b3 !important; /* Ensure distinct background when checked */
+    border-color: #ffffff !important; /* Keep the border white */
+
+}
+
+body.dark-mode .share-switch .ant-switch-inner {
+    color: #ffffff !important; /* Ensure the text inside the switch remains white */
+}
+
+body.dark-mode h2.ant-typography {
+    color: #ffffff !important; /* White color for better visibility in dark mode */
+}
+
+body.dark-mode span.ant-typography.ant-typography-secondary {
+    color: #d3d3d3 !important; /* Very light grey for subtle contrast */
+}
+
+
+
 

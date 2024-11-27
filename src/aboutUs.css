@@ -8,9 +8,11 @@ body {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    color: #333;
-    background: linear-gradient(90deg, #bbd0ff, #9061bf); /* Subtle gradient background */
+    color: #333 !important;
 }
+
+
+
 .ant-layout-content{
     /*background: linear-gradient(90deg, #f3f4f6, rgba(47, 114, 237, 0.53));*/
     padding: 0;
@@ -468,3 +470,129 @@ body {
 }
 
 
+
+
+
+/* Dark mode background for the About Us page */
+body.about-us-page.dark-mode {
+    background: #1C2C3E !important; /* Dark blue/gray background */
+    color: #E5E6E8 !important; /* Light gray text for readability */
+}
+
+/* Override text colors for specific elements */
+body.about-us-page.dark-mode .title {
+    color: #ffffff !important; /* Bright white for the main title */
+}
+
+body.about-us-page.dark-mode .subtitle {
+    color: #d3d3d3 !important; /* Light grey for subtitles */
+}
+
+body.about-us-page.dark-mode .buttons-container .primary-button {
+    background-color: #0056b3 !important; /* Deep blue for buttons */
+    color: #ffffff !important; /* White text */
+    border: none !important;
+}
+
+body.about-us-page.dark-mode .buttons-container .primary-button:hover {
+    background-color: #0077e6 !important; /* Brighter blue on hover */
+}
+
+body.about-us-page.dark-mode .buttons-container .secondary-button {
+    color: #ffffff !important; /* White text for secondary button */
+    text-decoration: underline;
+}
+
+body.about-us-page.dark-mode .secondary-button:hover {
+    color: #d3d3d3 !important; /* Light grey on hover */
+}
+
+/* Features section */
+body.about-us-page.dark-mode .features-section {
+    background: rgba(28, 44, 62, 0.9) !important; /* Semi-transparent dark background */
+    color: #E5E6E8 !important; /* Light text for the section */
+    border-radius: 15px;
+    padding: 20px;
+}
+
+body.about-us-page.dark-mode .features-section .section-title {
+    color: #ffffff !important; /* Bright white for section titles */
+}
+
+body.about-us-page.dark-mode .features-section .feature-card {
+    background: #00314D !important; /* Darker blue for feature cards */
+    color: #ffffff !important; /* White text inside feature cards */
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Slight shadow */
+}
+
+body.about-us-page.dark-mode .feature-card:hover {
+    background: #00556D !important; /* Slightly lighter blue on hover */
+}
+
+/* Footer */
+body.about-us-page.dark-mode .footer {
+    background: #001529 !important; /* Deep blue for the footer */
+    color: #ffffff !important; /* Bright white text for footer content */
+}
+
+body.about-us-page.dark-mode .footer-link {
+    color: #d3d3d3 !important; /* Light grey links */
+}
+
+body.about-us-page.dark-mode .footer-link:hover {
+    color: #ffffff !important; /* Bright white on hover */
+}
+
+/* Dark mode styles */
+body.dark-mode .feature-card {
+    background-color: #00263E !important; /* Darker blue for dark mode */
+    color: #ffffff !important; /* White text for readability */
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Slightly deeper shadow */
+}
+
+body.dark-mode .feature-card:hover {
+    background-color: #001D31 !important; /* Even darker blue on hover */
+    transform: scale(1.05); /* Lift effect on hover */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5); /* Deeper shadow on hover */
+}
+
+
+
+
+/* Default (light mode) styles */
+.community-background {
+    background: none !important; /* Remove the background */
+    color: #333333; /* Ensure text is readable in light mode */
+}
+
+/* Dark mode styles */
+body.dark-mode .community-background {
+    background: none !important; /* Remove the background */
+    color: #ffffff !important; /* Ensure text is white for visibility */
+}
+
+/* Ensure text inside stays styled correctly */
+body.dark-mode .community-background h2,
+body.dark-mode .community-background p {
+    color: #ffffff !important; /* Make headings and paragraphs white in dark mode */
+}
+
+
+.primary-button-about-us {
+    background-color: #012a55 !important; /* Dark blue background */
+    color: #ffffff !important; /* White text for contrast */
+    padding: 15px 30px;
+    border: none;
+    font-size: 16px; /* Keep font consistent */
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    border-radius: 25px; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional subtle shadow */
+}
+
+.primary-button-about-us:hover {
+    background-color: #001f4d !important; /* Slightly darker blue on hover */
+    transform: translateY(-3px); /* Button lift effect on hover */
+}

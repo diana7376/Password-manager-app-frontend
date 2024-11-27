@@ -366,7 +366,7 @@ const createNewGroup = async (groupName) => {
                                     }
                                 }
                             }}
-                            className="switch"
+                            className="share-switch"
                         />
 
                     </div>
