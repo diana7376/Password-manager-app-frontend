@@ -241,3 +241,64 @@ export const fetchHistory = async (passwordId) => {
         throw error;
     }
 };
+// Invite a user to a group
+export const inviteUserToGroup = async (groupId, email) => {
+    try {
+        const response = await api.post(`groups/${groupId}/invite/`, { email });
+        console.log('Invitation sent successfully:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Error inviting user:', error.response?.data || error.message);
+        throw error;
+    }
+};
+
+// Fetch pending invitations
+export const fetchPendingInvitations = async () => {
+    try {
+        const response = await api.get('groups/pending-invitations/');
+        console.log('Pending invitations fetched successfully:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching pending invitations:', error.response?.data || error.message);
+        throw error;
+    }
+};
+
+// Accept an invitation
+export const acceptInvitation = async (invitationId) => {
+    try {
+        const response = await api.post('groups/accept-invitation/', { invitationId });
+        console.log('Invitation accepted successfully:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Error accepting invitation:', error.response?.data || error.message);
+        throw error;
+    }
+};
+
+// Decline an invitation
+export const declineInvitation = async (invitationId) => {
+    try {
+        const response = await api.post('groups/decline-invitation/', { invitationId });
+        console.log('Invitation declined successfully:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Error declining invitation:', error.response?.data || error.message);
+        throw error;
+    }
+};
+
+// Remove a user from a group
+export const removeUserFromGroup = async (groupId, userId) => {
+    try {
+        const response = await api.delete(`groups/${groupId}/remove/`, {
+            data: { userId },
+        });
+        console.log('User removed successfully:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Error removing user:', error.response?.data || error.message);
+        throw error;
+    }
+};

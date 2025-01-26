@@ -328,18 +328,18 @@ const createNewGroup = async (groupName) => {
 
                 />
                         /* Conditional Rendering of Share Icon */}
-                    {selectedGroup && selectedGroup !== 'null' && isSharingEnabled && (
-                        <ShareAltOutlined
-                            style={{
-                                position: 'absolute',
-                                right: '-30px',
-                                top: '50%',
-                                transform: 'translateY(-50%)',
-                                fontSize: '18px',
-                                color: '#1677ff'
-                            }}
-                        />
-                    )}
+                    {/*{selectedGroup && selectedGroup !== 'null' && isSharingEnabled && (*/}
+                    {/*    <ShareAltOutlined*/}
+                    {/*        style={{*/}
+                    {/*            position: 'absolute',*/}
+                    {/*            right: '-30px',*/}
+                    {/*            top: '50%',*/}
+                    {/*            transform: 'translateY(-50%)',*/}
+                    {/*            fontSize: '18px',*/}
+                    {/*            color: '#1677ff'*/}
+                    {/*        }}*/}
+                    {/*    />*/}
+                    {/*)}*/}
 
                 </div>
                 <div className={'share-box'} style={{borderRadius: '5px',height:'auto'}}>
