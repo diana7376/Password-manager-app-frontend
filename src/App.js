@@ -22,6 +22,8 @@ import PrivateRoute from './authorisation/PrivateRoute';
 import AboutUs from "./aboutUs";
 import { useLocation } from 'react-router-dom';
 import { PasswordProvider } from './PasswordContext';
+import ForgotPassword from './authorisation/ForgotPassword';
+import ResetPassword from './authorisation/ResetPassword';
 
 const { Search } = Input;
 const { Header, Content, Footer, Sider } = Layout;
@@ -380,6 +382,8 @@ const handleCancelLogout = () => {
                         <Route path="/login" element={<Login/>}/>
                         <Route path="/register" element={<Register/>}/>
                         <Route path="/about" element={<AboutUs/>}/>
+                        <Route path="/forgot-password" element={<ForgotPassword />} />
+                        <Route path="/reset/:uidb64/:token" element={<ResetPassword />} /> {/* The Reset Password route */}
 
                         <Route path="/" element={<Navigate to="/about"/>}/>
 

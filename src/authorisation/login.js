@@ -5,8 +5,6 @@ import { EyeInvisibleOutlined, EyeOutlined } from '@ant-design/icons';
 import { message } from 'antd';
 import './login.css';
 
-
-
 const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -33,7 +31,6 @@ const Login = () => {
             console.log('Full error:', err);  // Log the entire error object
             const errorMessage = err.response?.data?.detail || 'Unknown error occurred.';
             setError(errorMessage);  // Display the error
-            // message.error(`Login failed: ${errorMessage}`);
         }
     };
 
@@ -84,6 +81,16 @@ const Login = () => {
                         </p>
                     </div>
                 </form>
+                {/* Forgot Password Link */}
+                <div className="forgot-password">
+                    <span
+                        className="forgot-password-link"
+                        onClick={() => navigate('/forgot-password')}
+                        style={{ cursor: 'pointer', marginLeft: '5px', color: '#007bff' }}
+                    >
+                        Forgot Password?
+                    </span>
+                </div>
             </div>
         </div>
     );
